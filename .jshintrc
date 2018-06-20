@@ -1,0 +1,10 @@
+{
+    "bitwise": true,
+    "curly": true,
+    "eqeqeq": true,
+    "esversion": 6,
+    "maxdepth": 3,
+    "maxparams": 7,
+    "maxstatements": 100,
+    "unused": "vars"
+}
