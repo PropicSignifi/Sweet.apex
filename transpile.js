@@ -1,10 +1,9 @@
 const _ = require('lodash');
 const fs = require('fs');
 const path = require('path');
-const parse = require('./src/parser');
-const compile = require('./src/compiler');
+const transpile = require('./src/transpiler');
 
-const [ , , ...args ] = process.argv;
+const [ , currentFileName, ...args ] = process.argv;
 
 let isDebugEnabled = false;
 let srcDir = null;
@@ -22,8 +21,17 @@ while(true) {
     }
 }
 
-srcDir = _.nth(args, 0) || __dirname + path.sep + 'resources';
-destDir = _.nth(args, 1) || __dirname + path.sep + 'build';
+srcDir = _.nth(args, 0);
+destDir = _.nth(args, 1);
+
+const usage = () => {
+    console.error(`Usage: node ${_.chain(currentFileName).split(path.sep).last().value()} <srcDir> <destDir>`);
+};
+
+if(!srcDir || !destDir) {
+    usage();
+    return;
+}
 
 if(!fs.existsSync(destDir)) {
     fs.mkdirSync(destDir);
@@ -31,6 +39,8 @@ if(!fs.existsSync(destDir)) {
 
 const config = {
     apiVersion: "42.0",
+    isDebugEnabled,
+    features: null,
 };
 
 try {
@@ -54,12 +64,7 @@ _.each(_.filter(fs.readdirSync(srcDir), name => name.endsWith(suffix)), fileName
 
         const src = fs.readFileSync(srcDir + path.sep + fileName, 'utf8');
 
-        const result = parse(src);
-        if(isDebugEnabled) {
-            console.log(JSON.stringify(result, null, 4));
-        }
-
-        const apexClass = compile(result);
+        const apexClass = transpile(src, config);
 
         fs.writeFileSync(destDir + path.sep + name + '.cls', apexClass);
 
