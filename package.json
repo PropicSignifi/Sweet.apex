@@ -21,7 +21,8 @@
   "homepage": "https://github.com/Click-to-Cloud/Sweet.apex#readme",
   "dependencies": {
     "lodash": "^4.17.10",
-    "pegjs": "^0.10.0"
+    "pegjs": "^0.10.0",
+    "pegjs-util": "^1.4.12"
   },
   "devDependencies": {
     "jasmine": "^3.1.0"

@@ -1,4 +1,5 @@
 const peg = require('pegjs');
+const pegUtil = require('pegjs-util');
 const fs = require('fs');
 const path = require('path');
 
@@ -7,16 +8,13 @@ const pegContent = fs.readFileSync(__dirname + path.sep + pegFileName, 'utf8');
 const parser = peg.generate(pegContent);
 
 const parse = src => {
-    try {
-        return parser.parse(src);
+    const result = pegUtil.parse(parser, src);
+    if(result.error) {
+        throw new Error("ERROR: Parsing Failure:\n" +
+        pegUtil.errorMessage(result.error, true).replace(/^/mg, "ERROR: "));
     }
-    catch(e) {
-        if(e instanceof parser.SyntaxError) {
-            throw new Error(`Error found at line ${e.location.start.line}, column ${e.location.start.column}:\n${e.message}`);
-        }
-        else {
-            throw e;
-        }
+    else {
+        return result.ast;
     }
 };
 
