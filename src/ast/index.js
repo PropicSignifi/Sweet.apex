@@ -100,6 +100,22 @@ const getMethodSignature = (methodDeclaration, typeDeclaration) => {
     }
 };
 
+const transform = (srcNode, destNode) => {
+    if(!srcNode || !destNode) {
+        return;
+    }
+
+    _.each(Object.keys(srcNode), key => {
+        if(key === 'parent') {
+            return;
+        }
+
+        delete srcNode[key];
+    });
+
+    _.assign(srcNode, destNode);
+};
+
 const AST = {
     traverse,
     getParent,
@@ -108,6 +124,7 @@ const AST = {
     getMethodSignature,
     addIndex,
     removeIndex,
+    transform,
 };
 
 module.exports = AST;
