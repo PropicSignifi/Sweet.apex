@@ -587,7 +587,7 @@ FormalParameters "formal parameters"
     { return optionalList(params); }
 
 FormalParameter "formal parameter"
-    = modifiers:(FINAL { return makeModifier('final'); } / Annotation)*
+    = EmptyLines modifiers:(FINAL { return makeModifier('final'); } / Annotation)*
       type:Type decl:VariableDeclaratorId
     {
       return mergeProps(decl, {
