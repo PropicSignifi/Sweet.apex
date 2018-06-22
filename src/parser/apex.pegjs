@@ -259,7 +259,7 @@ ClassBodyDeclaration "class body declaration"
         modifiers: modifier === null ? [] : [makeModifier('static')]
       };
     }
-    / Indent modifiers:Modifier* member:MemberDecl            // ClassMemberDeclaration
+    / Indent modifiers:Modifier* EmptyLines member:MemberDecl            // ClassMemberDeclaration
     { return mergeProps(member, { modifiers: modifiers }); }
     / Indent comment:EndOfLineComment
     { return { node: "EndOfLineComment", comment: comment.value }; }
@@ -274,7 +274,7 @@ MemberDecl "member declaration"
     = InterfaceDeclaration                             // Interface
     / ClassDeclaration                                 // Class
     / EnumDeclaration                                  // Enum
-    / type:Type id:Identifier
+    / EmptyLines type:Type EmptyLines id:Identifier
       rest:MethodDeclaratorRest                        // Method
     {
       return mergeProps(rest, {
@@ -311,7 +311,7 @@ MemberDecl "member declaration"
     }
 
 MethodDeclaratorRest "method declarator rest"
-    = params:FormalParameters dims:Dim*
+    = (EmptyLines EndOfLineComment)* params:FormalParameters dims:Dim*
       body:(MethodBody / SEMI { return null; })
     {
       return {
@@ -663,7 +663,7 @@ BlockStatement "block statement"
 
 Statement "statement"
     = Block
-    / Indent IF expr:ParExpression then:Statement alt:(ELSE Statement)?
+    / Indent IF expr:ParExpression (EmptyLines EndOfLineComment)* then:Statement (EmptyLines EndOfLineComment)* alt:(ELSE Statement)?
     {
       return {
         node:         'IfStatement',
@@ -672,7 +672,7 @@ Statement "statement"
         expression:    expr.expression,
       };
     }
-    / Indent FOR LPAR init:ForInit? SEMI expr:Expression? SEMI up:ForUpdate? RPAR body:Statement
+    / Indent FOR LPAR (EmptyLines EndOfLineComment)* init:ForInit? SEMI (EmptyLines EndOfLineComment)* expr:Expression? SEMI (EmptyLines EndOfLineComment)* up:ForUpdate? RPAR body:Statement
     {
       return {
         node:        'ForStatement',
@@ -911,31 +911,31 @@ ConditionalExpression "conditional expression"
     / ConditionalOrExpression
 
 ConditionalOrExpression "conditional OR expression"
-    = EmptyLines first:ConditionalAndExpression rest:(OROR ConditionalAndExpression)*
+    = (EmptyLines EndOfLineComment)* EmptyLines first:ConditionalAndExpression (EmptyLines EndOfLineComment)* EmptyLines rest:(OROR ConditionalAndExpression)*
     { return buildInfixExpr(first, rest); }
 
 ConditionalAndExpression "conditional AND expression"
-    = EmptyLines first:InclusiveOrExpression rest:(ANDAND InclusiveOrExpression)*
+    = (EmptyLines EndOfLineComment)* EmptyLines first:InclusiveOrExpression (EmptyLines EndOfLineComment)* EmptyLines rest:(ANDAND InclusiveOrExpression)*
     { return buildInfixExpr(first, rest); }
 
 InclusiveOrExpression "inclusive OR expression"
-    = first:ExclusiveOrExpression rest:(OR ExclusiveOrExpression)*
+    = (EmptyLines EndOfLineComment)* EmptyLines first:ExclusiveOrExpression (EmptyLines EndOfLineComment)* EmptyLines rest:(OR ExclusiveOrExpression)*
     { return buildInfixExpr(first, rest); }
 
 ExclusiveOrExpression "exclusive OR expression"
-    = first:AndExpression rest:(HAT AndExpression)*
+    = (EmptyLines EndOfLineComment)* EmptyLines first:AndExpression (EmptyLines EndOfLineComment)* EmptyLines rest:(HAT AndExpression)*
     { return buildInfixExpr(first, rest); }
 
 AndExpression "AND expression"
-    = first:EqualityExpression rest:(AND EqualityExpression)*
+    = (EmptyLines EndOfLineComment)* EmptyLines first:EqualityExpression (EmptyLines EndOfLineComment)* EmptyLines rest:(AND EqualityExpression)*
     { return buildInfixExpr(first, rest); }
 
 EqualityExpression "equality expression"
-    = first:RelationalExpression rest:((EQUAL /  NOTEQUAL) RelationalExpression)*
+    = (EmptyLines EndOfLineComment)* EmptyLines first:RelationalExpression (EmptyLines EndOfLineComment)* EmptyLines rest:((EQUAL /  NOTEQUAL) RelationalExpression)*
     { return buildInfixExpr(first, rest); }
 
 RelationalExpression "relational expression"
-    = first:ShiftExpression rest:((LE / GE / LT / GT) ShiftExpression / INSTANCEOF ReferenceType )*
+    = (EmptyLines EndOfLineComment)* EmptyLines first:ShiftExpression (EmptyLines EndOfLineComment)* EmptyLines rest:((LE / GE / LT / GT) ShiftExpression / INSTANCEOF ReferenceType )*
     {
       return buildTree(first, rest, function(result, element) {
         return element[0][0] === 'instanceof' ? {
@@ -952,15 +952,15 @@ RelationalExpression "relational expression"
     }
 
 ShiftExpression "shift expression"
-    = first:AdditiveExpression rest:((SL / SR / BSR) AdditiveExpression)*
+    = (EmptyLines EndOfLineComment)* EmptyLines first:AdditiveExpression (EmptyLines EndOfLineComment)* EmptyLines rest:((SL / SR / BSR) AdditiveExpression)*
     { return buildInfixExpr(first, rest); }
 
 AdditiveExpression "additive expression"
-    = first:MultiplicativeExpression rest:((PLUS / MINUS) MultiplicativeExpression)*
+    = (EmptyLines EndOfLineComment)* EmptyLines first:MultiplicativeExpression (EmptyLines EndOfLineComment)* EmptyLines rest:((PLUS / MINUS) MultiplicativeExpression)*
     { return buildInfixExpr(first, rest); }
 
 MultiplicativeExpression "multiplicative expression"
-    = first:UnaryExpression rest:((STAR / DIV / MOD) UnaryExpression)*
+    = (EmptyLines EndOfLineComment)* EmptyLines first:UnaryExpression (EmptyLines EndOfLineComment)* EmptyLines rest:((STAR / DIV / MOD) UnaryExpression)*
     { return buildInfixExpr(first, rest); }
 
 UnaryExpression "unary expression"
@@ -1377,6 +1377,7 @@ Modifier "modifier"
         / "with sharing"
         / "without sharing"
         / "func"
+        / "testmethod"
         ) !LetterOrDigit Spacing
       { return makeModifier(keyword); }
 
