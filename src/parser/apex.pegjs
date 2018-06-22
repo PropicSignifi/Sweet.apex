@@ -823,6 +823,16 @@ StatementExpression "statement expression"
 ConstantExpression "constant expression"
     = Expression
 
+MethodReference "method reference"
+    = left:Identifier COLONCOLON right:(Identifier / NEW { return { node: "SimpleName", identifier: "new" }; })
+    {
+      return {
+        node: 'MethodReference',
+        class: left,
+        method: right
+      };
+    }
+
 Expression "expression"
     = left:ConditionalExpression op:AssignmentOperator right:Expression
     {
@@ -833,14 +843,7 @@ Expression "expression"
         rightHandSide: right
       };
     }
-    / left:Identifier COLONCOLON right:(Identifier / NEW { return { node: "SimpleName", identifier: "new" }; })
-    {
-      return {
-        node: 'MethodReference',
-        class: left,
-        method: right
-      };
-    }
+    / MethodReference
     / LambdaExpression
     / ConditionalExpression
 
@@ -1373,6 +1376,7 @@ Modifier "modifier"
         / "transient"
         / "with sharing"
         / "without sharing"
+        / "func"
         ) !LetterOrDigit Spacing
       { return makeModifier(keyword); }
 

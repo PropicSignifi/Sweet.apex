@@ -78,6 +78,22 @@ const getParent = (root, current) => {
     return current.parent;
 };
 
+const parseTypeDeclaration = content => {
+    const newTypeDeclaration = parse(content, {
+        startRule: 'TypeDeclaration',
+    });
+
+    return newTypeDeclaration;
+};
+
+const parseClassBodyDeclaration = content => {
+    const newClassBodyDeclaration = parse(content, {
+        startRule: 'ClassBodyDeclaration',
+    });
+
+    return newClassBodyDeclaration;
+};
+
 const parseBlockStatement = line => {
     const newBlockStatement = parse(line, {
         startRule: 'BlockStatement',
@@ -116,15 +132,75 @@ const transform = (srcNode, destNode) => {
     _.assign(srcNode, destNode);
 };
 
+const hasModifier = (modifiers, target) => !!_.find(modifiers, { node: 'Modifier', keyword: target });
+
+const parseEmptyLine = () => ({
+    node: 'LineEmpty',
+});
+
+const findNext = (parent, current) => {
+    if(!parent || !current) {
+        return null;
+    }
+
+    let next = null;
+
+    _.forOwn(parent, (value, key) => {
+        if(key === 'parent') {
+            return;
+        }
+
+        if(_.isArray(value) && _.includes(value, current)) {
+            const index = _.indexOf(value, current);
+            if(index < _.size(value) - 1) {
+                next = _.nth(value, index + 1);
+                return false;
+            }
+        }
+    });
+
+    return next;
+};
+
+const findPrev = (parent, current) => {
+    if(!parent || !current) {
+        return null;
+    }
+
+    let prev = null;
+
+    _.forOwn(parent, (value, key) => {
+        if(key === 'parent') {
+            return;
+        }
+
+        if(_.isArray(value) && _.includes(value, current)) {
+            const index = _.indexOf(value, current);
+            if(index > 0) {
+                prev = _.nth(value, index - 1);
+                return false;
+            }
+        }
+    });
+
+    return prev;
+};
+
 const AST = {
     traverse,
     getParent,
     parseBlockStatement,
     parseBlockStatements,
+    parseTypeDeclaration,
+    parseClassBodyDeclaration,
     getMethodSignature,
     addIndex,
     removeIndex,
     transform,
+    hasModifier,
+    parseEmptyLine,
+    findNext,
+    findPrev,
 };
 
 module.exports = AST;

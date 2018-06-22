@@ -8,6 +8,8 @@ const pegContent = fs.readFileSync(__dirname + path.sep + pegFileName, 'utf8');
 
 const allowedStartRules = [
     'CompilationUnit',
+    'TypeDeclaration',
+    'ClassBodyDeclaration',
     'BlockStatement',
 ];
 const parser = peg.generate(pegContent, {
