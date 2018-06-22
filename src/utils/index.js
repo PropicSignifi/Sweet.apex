@@ -33,6 +33,11 @@ const addAnnotations = (lines, indent, annotations) => {
     });
 };
 
+const getAnnotations = modifiers => {
+    const ret = _.map(_.filter(modifiers, modifier => modifier.node === 'Annotation'), getValue).join(' ');
+    return _.isEmpty(ret) ? '' : ret + ' ';
+};
+
 const getModifiers = modifiers => {
     const ret = _.map(_.filter(modifiers, modifier => modifier.node === 'Modifier'), getValue).join(' ');
     return _.isEmpty(ret) ? '' : ret + ' ';
@@ -56,6 +61,7 @@ module.exports = {
     addBodyDeclarations,
     addAnnotations,
     getModifiers,
+    getAnnotations,
     getTypeParameters,
     getExtendsSuperClass,
     getImplementsInterfaces,

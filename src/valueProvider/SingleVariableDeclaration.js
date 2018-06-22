@@ -1,5 +1,5 @@
 const getValue = require('./index.js');
-const { getModifiers, } = require('../utils');
+const { getModifiers, getAnnotations, } = require('../utils');
 
 const SingleVariableDeclaration = node => {
     const {
@@ -9,7 +9,8 @@ const SingleVariableDeclaration = node => {
         name,
     } = node;
 
-    let line = getModifiers(modifiers);
+    let line = getAnnotations(modifiers);
+    line += getModifiers(modifiers);
     line += getValue(type);
     line += ' ' + getValue(name);
     if(varargs) {

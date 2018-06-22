@@ -3,19 +3,20 @@ const getValue = require('./index.js');
 
 const Annotation = node => {
     const {
+        typeName,
         value,
         values,
     } = node;
 
     if(value) {
-        return getValue(value);
+        return `@${getValue(typeName)}(${getValue(value)})`;
     }
 
     if(values) {
-        return _.fromPairs(_.map(values, pair => {
-            return [ getValue(pair.name), getValue(pair.value) ];
-        }));
+        return `@${getValue(typeName)}(${_.map(values, getValue).join(', ')})`;
     }
+
+    return `@${getValue(typeName)}`;
 };
 
 module.exports = Annotation;

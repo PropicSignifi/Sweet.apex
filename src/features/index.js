@@ -14,8 +14,9 @@ const loadFeatures = () => {
         }
 
         const name = fileName.endsWith('.js') ? fileName.substring(0, fileName.length - 3) : fileName;
-        const compiler = require('.' + path.sep + fileName);
-        features[name] = compiler;
+        const feature = require('.' + path.sep + fileName);
+        feature.name = name;
+        features[name] = feature;
     });
 
     return features;
@@ -35,23 +36,44 @@ const run = (context, feature) => {
     }
 };
 
+const runGroup = (group, feature) => {
+    if(_.isFunction(feature.runGroup)) {
+        feature.runGroup(group);
+    }
+};
+
 const rebuildWithFeature = (node, feature) => {
     const collected = [];
+
     AST.traverse(node, (current, parent) => {
         const context = {
             current,
-            parent,
-            root: node,
+            parent: parent || {},
+            root: node || {},
         };
+
         if(accept(context, feature)) {
             collected.push(context);
         }
     });
 
     if(!_.isEmpty(collected)) {
-        _.each(collected, context => {
-            run(context, feature);
-        });
+        if(_.isFunction(feature.groupBy)) {
+            const groups = _.groupBy(collected, feature.groupBy);
+
+            _.each(groups, group => {
+                runGroup(group, feature);
+            });
+
+            AST.addIndex(node);
+        }
+        else {
+            _.each(collected, context => {
+                run(context, feature);
+
+                AST.addIndex(node);
+            });
+        }
     }
 };
 
@@ -64,6 +86,8 @@ const rebuild = (node, fList) => {
         features = loadFeatures();
     }
 
+    AST.addIndex(node);
+
     _.each(features, (feature, featureName) => {
         if(fList && !_.includes(fList, featureName)) {
             return;
@@ -71,6 +95,8 @@ const rebuild = (node, fList) => {
 
         rebuildWithFeature(node, feature);
     });
+
+    AST.removeIndex(node);
 };
 
 module.exports = rebuild;

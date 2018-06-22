@@ -5,10 +5,17 @@ const path = require('path');
 
 const pegFileName = 'apex.pegjs';
 const pegContent = fs.readFileSync(__dirname + path.sep + pegFileName, 'utf8');
-const parser = peg.generate(pegContent);
 
-const parse = src => {
-    const result = pegUtil.parse(parser, src);
+const allowedStartRules = [
+    'CompilationUnit',
+    'BlockStatement',
+];
+const parser = peg.generate(pegContent, {
+    allowedStartRules,
+});
+
+const parse = (src, options) => {
+    const result = pegUtil.parse(parser, src, options);
     if(result.error) {
         throw new Error("ERROR: Parsing Failure:\n" +
         pegUtil.errorMessage(result.error, true).replace(/^/mg, "ERROR: "));
