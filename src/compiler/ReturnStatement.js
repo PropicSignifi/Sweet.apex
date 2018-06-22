@@ -14,7 +14,12 @@ const ReturnStatement = (node, context) => {
         indent,
     } = context;
 
-    lines.push(addIndent('return ' + getValue(expression) + ';', indent));
+    if(expression) {
+        lines.push(addIndent('return ' + getValue(expression) + ';', indent));
+    }
+    else {
+        lines.push(addIndent('return;', indent));
+    }
 };
 
 module.exports = ReturnStatement;

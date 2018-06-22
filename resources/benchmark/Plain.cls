@@ -90,6 +90,8 @@ private class Plain extends Func implements Queueable {
     @isTest
     private static void simpleTest() {
         System.assert(false);
+
+        return;
     }
 
     public abstract class CustomClass {
