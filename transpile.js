@@ -74,5 +74,3 @@ _.each(_.filter(fs.readdirSync(srcDir), name => name.endsWith(suffix)), fileName
         console.log(e);
     }
 });
-
-console.log('Compilation Success');
