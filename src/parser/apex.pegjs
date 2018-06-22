@@ -911,11 +911,11 @@ ConditionalExpression "conditional expression"
     / ConditionalOrExpression
 
 ConditionalOrExpression "conditional OR expression"
-    = first:ConditionalAndExpression rest:(OROR ConditionalAndExpression)*
+    = EmptyLines first:ConditionalAndExpression rest:(OROR ConditionalAndExpression)*
     { return buildInfixExpr(first, rest); }
 
 ConditionalAndExpression "conditional AND expression"
-    = first:InclusiveOrExpression rest:(ANDAND InclusiveOrExpression)*
+    = EmptyLines first:InclusiveOrExpression rest:(ANDAND InclusiveOrExpression)*
     { return buildInfixExpr(first, rest); }
 
 InclusiveOrExpression "inclusive OR expression"
@@ -1209,7 +1209,7 @@ PrimitiveType "primitive type"
     = BasicType
 
 Arguments "arguments"
-    = LPAR EmptyLines args:(first:Expression rest:(COMMA Expression)* { return buildList(first, rest, 1); })? EmptyLines RPAR
+    = LPAR EmptyLines args:(first:Expression rest:(COMMA EmptyLines Expression)* { return buildList(first, rest, 2); })? EmptyLines RPAR
     { return optionalList(args); }
 
 Creator "creator"
@@ -1303,7 +1303,7 @@ VariableInitializer "variable initializer"
     / Expression
 
 ParExpression "parenthesized expression"
-    = LPAR expr:Expression RPAR
+    = LPAR EmptyLines expr:Expression EmptyLines RPAR
     { return { node: 'ParenthesizedExpression', expression: expr }; }
 
 QualifiedIdentifier "qualified identifier"

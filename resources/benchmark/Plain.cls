@@ -32,7 +32,6 @@ private class Plain extends Func implements Queueable {
 
     public Plain(String name) {
         super(-1);
-
         this.name = name;
     }
 
@@ -47,7 +46,6 @@ private class Plain extends Func implements Queueable {
         for(i = 0; i < 10 ; i++) {
             total = total + i;
         }
-
         total += (Integer)mList[0];
 
         if(total > 20) {
