@@ -13,7 +13,6 @@ private class Plain extends Func implements Queueable {
 
     private Type t1 = List<String>.class;
     private Type t2 = Func.FuncException.class;
-
     String name {
         private set;
 

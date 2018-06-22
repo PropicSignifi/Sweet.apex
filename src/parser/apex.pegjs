@@ -292,7 +292,7 @@ MemberDecl "member declaration"
         type:      type
       };
     }
-    / VOID id:Identifier rest:VoidMethodDeclaratorRest // Void method
+    / EmptyLines VOID EmptyLines id:Identifier rest:VoidMethodDeclaratorRest // Void method
     {
       return mergeProps(rest, {
         node:       'MethodDeclaration',
@@ -323,7 +323,7 @@ MethodDeclaratorRest "method declarator rest"
     }
 
 VoidMethodDeclaratorRest "void method declarator rest"
-    = params:FormalParameters
+    = (EmptyLines EndOfLineComment)* params:FormalParameters
       body:(MethodBody / SEMI { return null; })
     {
       return {
@@ -335,7 +335,7 @@ VoidMethodDeclaratorRest "void method declarator rest"
     }
 
 ConstructorDeclaratorRest "constructor declarator rest"
-    = params:FormalParameters body:MethodBody
+    = (EmptyLines EndOfLineComment)* params:FormalParameters body:MethodBody
     {
       return {
         parameters:       params,
@@ -631,7 +631,7 @@ VariableDeclaratorId "variable declarator id"
 //-------------------------------------------------------------------------
 
 Block "block"
-    = LWING statements:BlockStatements Indent RWING
+    = Indent LWING statements:BlockStatements Indent RWING
     {
       return {
         node:      'Block',
