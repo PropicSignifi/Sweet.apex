@@ -8,7 +8,7 @@ const Func = {
         const grandParent = AST.getParent(root, parent);
 
         return current.node === 'MethodDeclaration' &&
-            AST.hasModifier(current.modifiers, 'func') &&
+            AST.hasAnnotation(current.modifiers, 'func') &&
             grandParent.node === 'CompilationUnit';
     },
 
@@ -25,6 +25,10 @@ const Func = {
             const methodDeclaration = current;
             if(!typeDeclaration) {
                 typeDeclaration = parent;
+            }
+
+            if(!AST.hasModifier(methodDeclaration.modifiers, 'static')) {
+                throw new Error('Func method should be static');
             }
 
             const methodName = getValue(methodDeclaration.name);
@@ -74,12 +78,18 @@ const Func = {
             newNodes.push(AST.parseEmptyLine());
             newNodes.push(newFuncType);
 
-            const next = AST.findNext(typeDeclaration, methodDeclaration);
-            AST.removeChild(parent, 'bodyDeclarations', methodDeclaration);
+            const annotation = _.find(methodDeclaration.modifiers, modifier => modifier.node === 'Annotation' && getValue(modifier.typeName) === 'func');
+            AST.removeChild(methodDeclaration, 'modifiers', annotation);
+            AST.removeChildren(methodDeclaration.body, 'statements');
 
-            if(next && next.node === 'LineEmpty') {
-                AST.removeChild(parent, 'bodyDeclarations', next);
+            let line = '';
+            if(returnType === 'void') {
+                line = `F.${methodName}.runN(new List<Object>{ ${_.map(parameters, param => param.name).join(', ')} });`;
             }
+            else {
+                line = `return (${returnType})F.${methodName}.runN(new List<Object>{ ${_.map(parameters, param => param.name).join(', ')} });`;
+            }
+            AST.appendChild(methodDeclaration.body, 'statements', AST.parseBlockStatement(line));
         });
 
         AST.appendChild(typeDeclaration, 'bodyDeclarations', AST.parseEmptyLine());

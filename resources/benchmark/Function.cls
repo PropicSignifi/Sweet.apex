@@ -1,4 +1,12 @@
 public class Function {
+    public static Integer add(Integer a, Integer b) {
+        return (Integer)F.add.runN(new List<Object>{ a, b });
+    }
+
+    public static void run() {
+        F.run.runN(new List<Object>{  });
+    }
+
     public static void test() {
         System.debug(Function.F.run.run());
     }

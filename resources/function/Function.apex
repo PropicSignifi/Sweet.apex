@@ -1,9 +1,11 @@
 public class Function {
-    func Integer add(Integer a, Integer b) {
+    @func
+    public static Integer add(Integer a, Integer b) {
         return a + b;
     }
 
-    func void run() {
+    @func
+    public static void run() {
         System.debug('Test');
     }
 

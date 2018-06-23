@@ -130,9 +130,13 @@ const transform = (srcNode, destNode) => {
     });
 
     _.assign(srcNode, destNode);
+
+    addIndex(srcNode);
 };
 
 const hasModifier = (modifiers, target) => !!_.find(modifiers, { node: 'Modifier', keyword: target });
+
+const hasAnnotation = (modifiers, target) => !!_.find(modifiers, modifier => modifier.node === 'Annotation' && getValue(modifier.typeName) === target);
 
 const parseEmptyLine = () => ({
     node: 'LineEmpty',
@@ -190,6 +194,8 @@ const setChild = (parent, name, child) => {
     if(parent && child) {
         parent[name] = child;
         child.parent = parent;
+
+        addIndex(child);
     }
 };
 
@@ -213,6 +219,8 @@ const removeChild = (parent, name, child) => {
     }
 };
 
+const removeChildren = removeChild;
+
 const prependChild = (parent, name, child) => {
     if(parent && child) {
         if(!parent[name]) {
@@ -225,6 +233,7 @@ const prependChild = (parent, name, child) => {
         ];
 
         child.parent = parent;
+        addIndex(child);
     }
 };
 
@@ -239,7 +248,10 @@ const preppendChildren = (parent, name, children) => {
             ...parent[name],
         ];
 
-        _.each(children, child => child.parent = parent);
+        _.each(children, child => {
+            child.parent = parent;
+            addIndex(child);
+        });
     }
 };
 
@@ -255,6 +267,7 @@ const appendChild = (parent, name, child) => {
         ];
 
         child.parent = parent;
+        addIndex(child);
     }
 };
 
@@ -269,7 +282,10 @@ const apppendChildren = (parent, name, children) => {
             ...children,
         ];
 
-        _.each(children, child => child.parent = parent);
+        _.each(children, child => {
+            child.parent = parent;
+            addIndex(child);
+        });
     }
 };
 
@@ -285,11 +301,13 @@ const AST = {
     removeIndex,
     transform,
     hasModifier,
+    hasAnnotation,
     parseEmptyLine,
     findNext,
     findPrev,
     setChild,
     removeChild,
+    removeChildren,
     appendChild,
     apppendChildren,
     prependChild,

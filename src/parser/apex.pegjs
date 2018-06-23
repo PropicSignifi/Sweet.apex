@@ -1402,7 +1402,6 @@ Modifier
         / "transient"
         / "with sharing"
         / "without sharing"
-        / "func"
         / "testmethod"
         / "testMethod"
         ) !LetterOrDigit Spacing
