@@ -311,7 +311,7 @@ MemberDecl
     }
 
 MethodDeclaratorRest
-    = (EmptyLines EndOfLineComment)* params:FormalParameters dims:Dim*
+    = EmptyLines (EmptyLines CommentStatement)* params:FormalParameters dims:Dim*
       body:(MethodBody / SEMI { return null; })
     {
       return {
@@ -323,7 +323,7 @@ MethodDeclaratorRest
     }
 
 VoidMethodDeclaratorRest
-    = (EmptyLines EndOfLineComment)* params:FormalParameters
+    = EmptyLines (EmptyLines CommentStatement)* params:FormalParameters
       body:(MethodBody / SEMI { return null; })
     {
       return {
@@ -335,7 +335,7 @@ VoidMethodDeclaratorRest
     }
 
 ConstructorDeclaratorRest
-    = (EmptyLines EndOfLineComment)* params:FormalParameters body:MethodBody
+    = EmptyLines (EmptyLines CommentStatement)* params:FormalParameters body:MethodBody
     {
       return {
         parameters:       params,
@@ -535,7 +535,7 @@ VariableDeclarators
     { return buildList(first, rest, 1); }
 
 VariableDeclarator
-    = name:Identifier dims:Dim* EmptyLines init:(EQU VariableInitializer)? accessor:AccessorDeclarator?
+    = name:Identifier dims:Dim* EmptyLines init:(EQU VariableInitializer)? accessor:(AccessorDeclarator1 / AccessorDeclarator2)?
     {
       return {
         node:           'VariableDeclarationFragment',
@@ -564,11 +564,25 @@ GetterDeclarator
         };
     }
 
-AccessorDeclarator
+AccessorDeclarator1
     = LWING
     setter:SetterDeclarator?
     EmptyLines
     getter:GetterDeclarator?
+    EmptyLines RWING
+    {
+        return {
+            node: 'AccessorDeclarationFragment',
+            setter: setter,
+            getter: getter,
+        };
+    }
+
+AccessorDeclarator2
+    = LWING
+    getter:GetterDeclarator?
+    EmptyLines
+    setter:SetterDeclarator?
     EmptyLines RWING
     {
         return {
@@ -664,7 +678,7 @@ BlockStatement
 
 Statement
     = Block
-    / Indent IF expr:ParExpression (EmptyLines EndOfLineComment)* then:Statement (EmptyLines EndOfLineComment)* alt:(ELSE Statement)?
+    / Indent IF expr:ParExpression EmptyLines (EmptyLines CommentStatement)* then:Statement EmptyLines (EmptyLines CommentStatement)* alt:(ELSE Statement)?
     {
       return {
         node:         'IfStatement',
@@ -673,7 +687,7 @@ Statement
         expression:    expr.expression,
       };
     }
-    / Indent FOR LPAR (EmptyLines EndOfLineComment)* init:ForInit? SEMI (EmptyLines EndOfLineComment)* expr:Expression? SEMI (EmptyLines EndOfLineComment)* up:ForUpdate? RPAR body:Statement
+    / Indent FOR LPAR EmptyLines (EmptyLines CommentStatement)* init:ForInit? SEMI EmptyLines (EmptyLines CommentStatement)* expr:Expression? SEMI EmptyLines (EmptyLines CommentStatement)* up:ForUpdate? RPAR body:Statement
     {
       return {
         node:        'ForStatement',
@@ -912,31 +926,31 @@ ConditionalExpression
     / ConditionalOrExpression
 
 ConditionalOrExpression
-    = (EmptyLines EndOfLineComment)* EmptyLines first:ConditionalAndExpression (EmptyLines EndOfLineComment)* EmptyLines rest:(OROR ConditionalAndExpression)*
+    = EmptyLines (EmptyLines CommentStatement)* EmptyLines first:ConditionalAndExpression EmptyLines (EmptyLines CommentStatement)* EmptyLines rest:(OROR ConditionalAndExpression)*
     { return buildInfixExpr(first, rest); }
 
 ConditionalAndExpression
-    = (EmptyLines EndOfLineComment)* EmptyLines first:InclusiveOrExpression (EmptyLines EndOfLineComment)* EmptyLines rest:(ANDAND InclusiveOrExpression)*
+    = EmptyLines (EmptyLines CommentStatement)* EmptyLines first:InclusiveOrExpression EmptyLines (EmptyLines CommentStatement)* EmptyLines rest:(ANDAND InclusiveOrExpression)*
     { return buildInfixExpr(first, rest); }
 
 InclusiveOrExpression
-    = (EmptyLines EndOfLineComment)* EmptyLines first:ExclusiveOrExpression (EmptyLines EndOfLineComment)* EmptyLines rest:(OR ExclusiveOrExpression)*
+    = EmptyLines (EmptyLines CommentStatement)* EmptyLines first:ExclusiveOrExpression EmptyLines (EmptyLines CommentStatement)* EmptyLines rest:(OR ExclusiveOrExpression)*
     { return buildInfixExpr(first, rest); }
 
 ExclusiveOrExpression
-    = (EmptyLines EndOfLineComment)* EmptyLines first:AndExpression (EmptyLines EndOfLineComment)* EmptyLines rest:(HAT AndExpression)*
+    = EmptyLines (EmptyLines CommentStatement)* EmptyLines first:AndExpression EmptyLines (EmptyLines CommentStatement)* EmptyLines rest:(HAT AndExpression)*
     { return buildInfixExpr(first, rest); }
 
 AndExpression
-    = (EmptyLines EndOfLineComment)* EmptyLines first:EqualityExpression (EmptyLines EndOfLineComment)* EmptyLines rest:(AND EqualityExpression)*
+    = EmptyLines (EmptyLines CommentStatement)* EmptyLines first:EqualityExpression EmptyLines (EmptyLines CommentStatement)* EmptyLines rest:(AND EqualityExpression)*
     { return buildInfixExpr(first, rest); }
 
 EqualityExpression
-    = (EmptyLines EndOfLineComment)* EmptyLines first:RelationalExpression (EmptyLines EndOfLineComment)* EmptyLines rest:((EQUAL /  NOTEQUAL) RelationalExpression)*
+    = EmptyLines (EmptyLines CommentStatement)* EmptyLines first:RelationalExpression EmptyLines (EmptyLines CommentStatement)* EmptyLines rest:((EQUAL /  NOTEQUAL) RelationalExpression)*
     { return buildInfixExpr(first, rest); }
 
 RelationalExpression
-    = (EmptyLines EndOfLineComment)* EmptyLines first:ShiftExpression (EmptyLines EndOfLineComment)* EmptyLines rest:((LE / GE / LT / GT) ShiftExpression / INSTANCEOF ReferenceType )*
+    = EmptyLines (EmptyLines CommentStatement)* EmptyLines first:ShiftExpression EmptyLines (EmptyLines CommentStatement)* EmptyLines rest:((LE / GE / LT / GT) ShiftExpression / INSTANCEOF ReferenceType )*
     {
       return buildTree(first, rest, function(result, element) {
         return element[0][0] === 'instanceof' ? {
@@ -953,15 +967,15 @@ RelationalExpression
     }
 
 ShiftExpression
-    = (EmptyLines EndOfLineComment)* EmptyLines first:AdditiveExpression (EmptyLines EndOfLineComment)* EmptyLines rest:((SL / SR / BSR) AdditiveExpression)*
+    = EmptyLines (EmptyLines CommentStatement)* EmptyLines first:AdditiveExpression EmptyLines (EmptyLines CommentStatement)* EmptyLines rest:((SL / SR / BSR) AdditiveExpression)*
     { return buildInfixExpr(first, rest); }
 
 AdditiveExpression
-    = (EmptyLines EndOfLineComment)* EmptyLines first:MultiplicativeExpression (EmptyLines EndOfLineComment)* EmptyLines rest:((PLUS / MINUS) MultiplicativeExpression)*
+    = EmptyLines (EmptyLines CommentStatement)* EmptyLines first:MultiplicativeExpression EmptyLines (EmptyLines CommentStatement)* EmptyLines rest:((PLUS / MINUS) MultiplicativeExpression)*
     { return buildInfixExpr(first, rest); }
 
 MultiplicativeExpression
-    = (EmptyLines EndOfLineComment)* EmptyLines first:UnaryExpression (EmptyLines EndOfLineComment)* EmptyLines rest:((STAR / DIV / MOD) UnaryExpression)*
+    = EmptyLines (EmptyLines CommentStatement)* EmptyLines first:UnaryExpression EmptyLines (EmptyLines CommentStatement)* EmptyLines rest:((STAR / DIV / MOD) UnaryExpression)*
     { return buildInfixExpr(first, rest); }
 
 UnaryExpression
@@ -1379,6 +1393,7 @@ Modifier
         / "without sharing"
         / "func"
         / "testmethod"
+        / "testMethod"
         ) !LetterOrDigit Spacing
       { return makeModifier(keyword); }
 
