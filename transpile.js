@@ -44,17 +44,12 @@ if(!fs.existsSync(destDir)) {
 }
 
 const config = {
-    apiVersion: "42.0",
-    isDebugEnabled,
-    isPerfEnabled,
-    features: null,
 };
 
-try {
-    _.assign(config, JSON.parse(fs.readFileSync(__dirname + path.sep + 'config.json', 'utf8')));
-}
-catch(e) {
-}
+_.assign(config, JSON.parse(fs.readFileSync(__dirname + path.sep + 'config.json', 'utf8')), {
+    isDebugEnabled,
+    isPerfEnabled,
+});
 
 const meta = `<?xml version="1.0" encoding="UTF-8"?>
 <ApexClass xmlns="http://soap.sforce.com/2006/04/metadata">
@@ -63,48 +58,60 @@ const meta = `<?xml version="1.0" encoding="UTF-8"?>
 </ApexClass>
 `;
 
-_.each(_.filter(fs.readdirSync(srcDir), name => name.endsWith(suffix)), fileName => {
-    try {
-        console.log(`Compiling ${fileName} ...`);
+const writeToFile = (fileName, content) => {
+    time(`Write File ${fileName}`, config);
 
-        const name = fileName.substring(0, fileName.length - suffix.length);
+    return new Promise((resolve, reject) => {
+        fs.writeFile(destDir + path.sep + fileName, content, (error, data) => {
+            timeEnd(`Write File ${fileName}`, config);
+            if(error) {
+                reject(error);
+            }
 
-        time(`Read file ${fileName}`, config);
+            resolve(null);
+        });
+    });
+};
+
+const compileFile = fileName => {
+    console.log(`Compiling ${fileName} ...`);
+
+    const name = fileName.substring(0, fileName.length - suffix.length);
+
+    time(`Read file ${fileName}`, config);
+
+    return new Promise((resolve, reject) => {
         fs.readFile(srcDir + path.sep + fileName, 'utf8', (error, src) => {
             timeEnd(`Read file ${fileName}`, config);
             if(error) {
-                console.error(error);
-                return;
+                reject(error);
             }
 
             time(`Transpile`, config);
             const apexClass = transpile(src, config);
             timeEnd(`Transpile`, config);
 
-            time(`Write File ${name}.cls`, config);
-            fs.writeFile(destDir + path.sep + name + '.cls', apexClass, (error, data) => {
-                timeEnd(`Write File ${name}.cls`, config);
-                if(error) {
-                    console.error(error);
-                    return;
-                }
-
-                console.log(`Compiled ${name}.cls`);
-            });
-
-            time(`Write File ${name}.cls-meta.xml`, config);
-            fs.writeFile(destDir + path.sep + name + '.cls-meta.xml', meta, (error, data) => {
-                timeEnd(`Write File ${name}.cls-meta.xml`, config);
-                if(error) {
-                    console.error(error);
-                    return;
-                }
-
-                console.log(`Compiled ${name}.cls-meta.xml`);
-            });
+            Promise.all([
+                writeToFile(`${name}.cls`, apexClass, config)
+                    .then(() => console.log(`Compiled ${name}.cls`)),
+                writeToFile(`${name}.cls-meta.xml`, meta, config)
+                    .then(() => console.log(`Compiled ${name}.cls-meta.xml`)),
+            ]).then(resolve);
         });
-    }
-    catch(e) {
-        console.log(e);
-    }
-});
+    });
+};
+
+const start = Date.now();
+
+Promise.all(
+    _.chain(fs.readdirSync(srcDir))
+        .filter(name => name.endsWith(suffix))
+        .map(compileFile)
+        .value()
+).then(
+    () => {
+        const end = Date.now();
+        console.log(`Completed after ${end - start} ms`);
+    },
+    error => console.error(error)
+);

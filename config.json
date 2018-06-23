@@ -1,3 +1,6 @@
 {
-    "apiVersion": "42.0"
+    "apiVersion": "42.0",
+    "isDebugEnabled": false,
+    "isPerfEnabled": false,
+    "features": null
 }
