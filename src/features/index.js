@@ -2,6 +2,7 @@ const fs = require('fs');
 const path = require('path');
 const _ = require('lodash');
 const AST = require('../ast');
+const { time, timeEnd, } = require('../utils');
 
 let features = null;
 
@@ -73,26 +74,34 @@ const rebuildWithFeature = (node, feature) => {
     }
 };
 
-const rebuild = (node, fList) => {
+const rebuild = (node, config) => {
     if(!node) {
         throw new Error('Node does not exist');
     }
+
+    const fList = config.features;
 
     if(!features) {
         features = loadFeatures();
     }
 
+    time('Add index', config);
     AST.addIndex(node);
+    timeEnd('Add index', config);
 
     _.each(features, (feature, featureName) => {
         if(fList && !_.includes(fList, featureName)) {
             return;
         }
 
+        time(`Rebuild with ${featureName}`, config);
         rebuildWithFeature(node, feature);
+        timeEnd(`Rebuild with ${featureName}`, config);
     });
 
+    time('Remove index', config);
     AST.removeIndex(node);
+    timeEnd('Remove index', config);
 };
 
 module.exports = rebuild;

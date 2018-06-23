@@ -54,6 +54,26 @@ const getExtendsSuperClass = superclassType =>
 const getImplementsInterfaces = superInterfaceTypes =>
     _.isEmpty(superInterfaceTypes) ? '' : ' implements ' + _.map(superInterfaceTypes, intf => intf.name.identifier).join(', ');
 
+const perfCounters = {};
+
+const time = (message, config) => {
+    if(config.isPerfEnabled) {
+        perfCounters[message] = {
+            message,
+            start: Date.now(),
+        };
+    }
+};
+
+const timeEnd = (message, config) => {
+    if(config.isPerfEnabled) {
+        const counter = perfCounters[message];
+        counter.end = Date.now();
+        counter.duration = counter.end - counter.start;
+
+        console.log(`${message}: ${counter.duration}`);
+    }
+};
 
 module.exports = {
     addIndent,
@@ -65,4 +85,6 @@ module.exports = {
     getTypeParameters,
     getExtendsSuperClass,
     getImplementsInterfaces,
+    time,
+    timeEnd,
 };

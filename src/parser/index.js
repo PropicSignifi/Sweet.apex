@@ -13,6 +13,7 @@ const allowedStartRules = [
     'BlockStatement',
 ];
 const parser = peg.generate(pegContent, {
+    cache: true,
     allowedStartRules,
 });
 
