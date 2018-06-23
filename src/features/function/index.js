@@ -47,7 +47,7 @@ const Func = {
             const returnType = getValue(methodDeclaration.returnType2);
 
             let castStatements = _.map(parameters, (param, index) => {
-                return `${param.type} ${param.name} = (${param.type})args.get(${index});`;
+                return `${param.type} ${param.name} = args.get(${index}) == null ? null : (${param.type})args.get(${index});`;
             }).join('\n');
             castStatements = _.isEmpty(castStatements) ? '' : castStatements + '\n\n';
 

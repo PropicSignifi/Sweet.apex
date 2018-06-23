@@ -24,8 +24,8 @@ public class Function {
         }
 
         public override Object execN(List<Object> args) {
-            Integer a = (Integer)args.get(0);
-            Integer b = (Integer)args.get(1);
+            Integer a = args.get(0) == null ? null : (Integer)args.get(0);
+            Integer b = args.get(1) == null ? null : (Integer)args.get(1);
 
             return a + b;
         }

@@ -2,5 +2,11 @@
     "apiVersion": "42.0",
     "isDebugEnabled": false,
     "isPerfEnabled": false,
-    "features": null
+    "features": [
+        "array_creation",
+        "mod",
+        "not_null",
+        "default_value",
+        "function"
+    ]
 }

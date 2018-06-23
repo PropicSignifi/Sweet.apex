@@ -89,9 +89,10 @@ const rebuild = (node, config) => {
     AST.addIndex(node);
     timeEnd('Add index', config);
 
-    _.each(features, (feature, featureName) => {
-        if(fList && !_.includes(fList, featureName)) {
-            return;
+    _.each(fList, featureName => {
+        const feature = features[featureName];
+        if(!feature) {
+            throw new Error(`No such feature "${featureName}" cound be found`);
         }
 
         time(`Rebuild with ${featureName}`, config);
