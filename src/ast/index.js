@@ -186,6 +186,93 @@ const findPrev = (parent, current) => {
     return prev;
 };
 
+const setChild = (parent, name, child) => {
+    if(parent && child) {
+        parent[name] = child;
+        child.parent = parent;
+    }
+};
+
+const removeChild = (parent, name, child) => {
+    if(parent) {
+        if(_.isArray(parent[name])) {
+            if(child) {
+                _.pull(parent[name], child);
+                child.parent = null;
+            }
+            else {
+                parent[name] = [];
+            }
+        }
+        else {
+            parent[name] = null;
+            if(child) {
+                child.parent = null;
+            }
+        }
+    }
+};
+
+const prependChild = (parent, name, child) => {
+    if(parent && child) {
+        if(!parent[name]) {
+            parent[name] = [];
+        }
+
+        parent[name] = [
+            child,
+            ...parent[name],
+        ];
+
+        child.parent = parent;
+    }
+};
+
+const preppendChildren = (parent, name, children) => {
+    if(parent && children) {
+        if(!parent[name]) {
+            parent[name] = [];
+        }
+
+        parent[name] = [
+            ...children,
+            ...parent[name],
+        ];
+
+        _.each(children, child => child.parent = parent);
+    }
+};
+
+const appendChild = (parent, name, child) => {
+    if(parent && child) {
+        if(!parent[name]) {
+            parent[name] = [];
+        }
+
+        parent[name] = [
+            ...parent[name],
+            child,
+        ];
+
+        child.parent = parent;
+    }
+};
+
+const apppendChildren = (parent, name, children) => {
+    if(parent && children) {
+        if(!parent[name]) {
+            parent[name] = [];
+        }
+
+        parent[name] = [
+            ...parent[name],
+            ...children,
+        ];
+
+        _.each(children, child => child.parent = parent);
+    }
+};
+
 const AST = {
     traverse,
     getParent,
@@ -201,6 +288,12 @@ const AST = {
     parseEmptyLine,
     findNext,
     findPrev,
+    setChild,
+    removeChild,
+    appendChild,
+    apppendChildren,
+    prependChild,
+    preppendChildren,
 };
 
 module.exports = AST;

@@ -64,14 +64,10 @@ const rebuildWithFeature = (node, feature) => {
             _.each(groups, group => {
                 runGroup(group, feature);
             });
-
-            AST.addIndex(node);
         }
         else {
             _.each(collected, context => {
                 run(context, feature);
-
-                AST.addIndex(node);
             });
         }
     }

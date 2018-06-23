@@ -62,13 +62,32 @@ _.each(_.filter(fs.readdirSync(srcDir), name => name.endsWith(suffix)), fileName
 
         const name = fileName.substring(0, fileName.length - suffix.length);
 
-        const src = fs.readFileSync(srcDir + path.sep + fileName, 'utf8');
+        fs.readFile(srcDir + path.sep + fileName, 'utf8', (error, src) => {
+            if(error) {
+                console.error(error);
+                return;
+            }
 
-        const apexClass = transpile(src, config);
+            const apexClass = transpile(src, config);
 
-        fs.writeFileSync(destDir + path.sep + name + '.cls', apexClass);
+            fs.writeFile(destDir + path.sep + name + '.cls', apexClass, (error, data) => {
+                if(error) {
+                    console.error(error);
+                    return;
+                }
 
-        fs.writeFileSync(destDir + path.sep + name + '.cls-meta.xml', meta);
+                console.log(`Compiled ${name}.cls`);
+            });
+
+            fs.writeFile(destDir + path.sep + name + '.cls-meta.xml', meta, (error, data) => {
+                if(error) {
+                    console.error(error);
+                    return;
+                }
+
+                console.log(`Compiled ${name}.cls-meta.xml`);
+            });
+        });
     }
     catch(e) {
         console.log(e);

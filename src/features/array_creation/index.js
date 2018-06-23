@@ -23,7 +23,7 @@ const ArrayCreation = {
             dimensions: [],
         };
 
-        parent.initializer = arrayCreationNode;
+        AST.setChild(parent, 'initializer', arrayCreationNode);
     },
 };
 

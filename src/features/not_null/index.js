@@ -38,15 +38,12 @@ const NotNull = {
 
             newBlockStatements.push(newBlockStatement);
 
-            _.pull(parent.modifiers, current);
+            AST.removeChild(parent, 'modifiers', current);
         });
 
         newBlockStatements.push(AST.parseBlockStatement('\n'));
 
-        methodDeclaration.body.statements = [
-            ...newBlockStatements,
-            ...methodDeclaration.body.statements,
-        ];
+        AST.preppendChildren(methodDeclaration.body, 'statements', newBlockStatements);
     },
 };
 

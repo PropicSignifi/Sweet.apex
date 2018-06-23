@@ -75,25 +75,25 @@ const Func = {
             newNodes.push(newFuncType);
 
             const next = AST.findNext(typeDeclaration, methodDeclaration);
-            _.pull(parent.bodyDeclarations, methodDeclaration);
+            AST.removeChild(parent, 'bodyDeclarations', methodDeclaration);
 
             if(next && next.node === 'LineEmpty') {
-                _.pull(parent.bodyDeclarations, next);
+                AST.removeChild(parent, 'bodyDeclarations', next);
             }
         });
 
-        typeDeclaration.bodyDeclarations.push(AST.parseEmptyLine());
-        typeDeclaration.bodyDeclarations.push(AST.parseClassBodyDeclaration(`public static final Funcs F = new Funcs();`));
+        AST.appendChild(typeDeclaration, 'bodyDeclarations', AST.parseEmptyLine());
+        AST.appendChild(typeDeclaration, 'bodyDeclarations', AST.parseClassBodyDeclaration(`public static final Funcs F = new Funcs();`));
 
-        typeDeclaration.bodyDeclarations.push(AST.parseEmptyLine());
+        AST.appendChild(typeDeclaration, 'bodyDeclarations', AST.parseEmptyLine());
         const funcsContent = _.map(newFuncs, newFunc => `public Func ${newFunc.name} = new ${newFunc.type}();`).join('\n');
-        typeDeclaration.bodyDeclarations.push(
+        AST.appendChild(typeDeclaration, 'bodyDeclarations',
             AST.parseClassBodyDeclaration(`public class Funcs {
                 ${funcsContent}
             }`)
         );
 
-        _.each(newNodes, newNode => typeDeclaration.bodyDeclarations.push(newNode));
+        AST.apppendChildren(typeDeclaration, 'bodyDeclarations', newNodes);
     },
 };
 
