@@ -643,12 +643,13 @@ BlockStatements "block statements"
     = BlockStatement*
 
 BlockStatement "block statement"
-    = Indent op:DMLOperator operand:Expression SEMI
+    = Indent op:DMLOperator Indent operand:Expression Indent rest:Expression? SEMI
     {
         return {
             node: 'DMLStatement',
             operator: op[1],
             operand: operand,
+            rest: rest,
         };
     }
     / LocalVariableDeclarationStatement
@@ -1058,7 +1059,7 @@ Primary "primary"
         type:  makePrimitive('void')
       };
     }
-    / LBRK value:(Escape / ![\[\]\\\n\r] _)* RBRK
+    / LBRK value:(Escape / ![\[\]] _)* RBRK
     {
         return {
             node: 'SoqlLiteral',

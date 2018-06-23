@@ -7,6 +7,7 @@ const DMLStatement = (node, context) => {
     const {
         operator,
         operand,
+        rest,
     } = node;
 
     const {
@@ -14,7 +15,13 @@ const DMLStatement = (node, context) => {
         indent,
     } = context;
 
-    line = operator + ' ' + getValue(operand) + ';';
+    line = operator + ' ' + getValue(operand);
+
+    if(rest) {
+        line += ' ' + getValue(rest);
+    }
+
+    line += ';';
 
     lines.push(addIndent(line, indent));
 };

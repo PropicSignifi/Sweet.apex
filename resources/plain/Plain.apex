@@ -25,6 +25,8 @@ private class Plain extends Func implements Queueable {
     private static Map<String, Object> mMap = new Map<String, Object>{ 'name' => 'value' };
     private static List<Object> mList = new List<Object>{ 1, 2, 3 };
     private static List<SObject> accounts = [ SELECT Id FROM Account LIMIT 10 ];
+    private static List<SObject> accounts1 = [ SELECT Id FROM Account
+        LIMIT 10 ];
 
     static {
         count = 0;
@@ -62,6 +64,8 @@ private class Plain extends Func implements Queueable {
         while(total > 0) {
             total -= 1;
         }
+
+        upsert accounts Id;
 
         do {
             total += 1;
