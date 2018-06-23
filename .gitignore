@@ -1,2 +1,4 @@
 node_modules/
 build/
+resources/Test.apex
+.vscode/

@@ -678,6 +678,7 @@ BlockStatement
 
 Statement
     = Block
+    / BlockExpressionStatement
     / Indent IF expr:ParExpression EmptyLines (EmptyLines CommentStatement)* then:Statement EmptyLines (EmptyLines CommentStatement)* alt:(ELSE Statement)?
     {
       return {
@@ -779,6 +780,16 @@ Catch
 Finally
     = FINALLY block:Block
     { return block; }
+
+BlockExpressionStatement
+    = expr:Expression body:Block
+    {
+        return {
+            node: 'BlockExpressionStatement',
+            expression: expr,
+            body: body,
+        };
+    }
 
 SwitchBlockStatementGroups
     = blocks:SwitchBlockStatementGroup*

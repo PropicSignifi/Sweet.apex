@@ -95,6 +95,14 @@ private class Plain extends Func implements Queueable {
         return;
     }
 
+    @isTest
+    private static void testRunAs() {
+        User admin = DummyRecordCreator.admin;
+        System.runAs(admin) {
+            System.debug('Run As');
+        }
+    }
+
     public abstract class CustomClass {
         public abstract void init();
     }
