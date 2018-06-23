@@ -1554,7 +1554,6 @@ Keyword
       / "implements"
       / "instanceof"
       / "interface"
-      / "new"
       / "null"
       / "override"
       / "private"
