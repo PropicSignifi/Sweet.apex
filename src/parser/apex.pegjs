@@ -203,7 +203,7 @@
 //  Compilation Unit
 //-------------------------------------------------------------------------
 
-CompilationUnit "compilation unit"
+CompilationUnit
     = Spacing types:TypeDeclaration* EmptyLines EOT
     {
       return {
@@ -212,7 +212,7 @@ CompilationUnit "compilation unit"
       };
     }
 
-TypeDeclaration "type declaration"
+TypeDeclaration
     = EmptyLines
       leadComments:LeadingComments
       EmptyLines
@@ -230,7 +230,7 @@ TypeDeclaration "type declaration"
 //  Class Declaration
 //-------------------------------------------------------------------------
 
-ClassDeclaration "class declaration"
+ClassDeclaration
     = CLASS id:Identifier EmptyLines gen:TypeParameters? EmptyLines ext:(EXTENDS ClassType)? EmptyLines impl:(IMPLEMENTS ClassTypeList)? EmptyLines body:ClassBody
     {
       return {
@@ -244,11 +244,11 @@ ClassDeclaration "class declaration"
       };
     }
 
-ClassBody "class body"
+ClassBody
     = LWING decls:ClassBodyDeclaration* Indent RWING
     { return skipNulls(decls); }
 
-ClassBodyDeclaration "class body declaration"
+ClassBodyDeclaration
     = Indent SEMI
     { return null; }
     / Indent modifier:STATIC? body:Block                      // Static or Instance Initializer
@@ -270,7 +270,7 @@ ClassBodyDeclaration "class body declaration"
     / Indent !LetterOrDigit [\r\n\u000C]
     { return { node: "LineEmpty" }; }
 
-MemberDecl "member declaration"
+MemberDecl
     = InterfaceDeclaration                             // Interface
     / ClassDeclaration                                 // Class
     / EnumDeclaration                                  // Enum
@@ -310,7 +310,7 @@ MemberDecl "member declaration"
       });
     }
 
-MethodDeclaratorRest "method declarator rest"
+MethodDeclaratorRest
     = (EmptyLines EndOfLineComment)* params:FormalParameters dims:Dim*
       body:(MethodBody / SEMI { return null; })
     {
@@ -322,7 +322,7 @@ MethodDeclaratorRest "method declarator rest"
       };
     }
 
-VoidMethodDeclaratorRest "void method declarator rest"
+VoidMethodDeclaratorRest
     = (EmptyLines EndOfLineComment)* params:FormalParameters
       body:(MethodBody / SEMI { return null; })
     {
@@ -334,7 +334,7 @@ VoidMethodDeclaratorRest "void method declarator rest"
       };
     }
 
-ConstructorDeclaratorRest "constructor declarator rest"
+ConstructorDeclaratorRest
     = (EmptyLines EndOfLineComment)* params:FormalParameters body:MethodBody
     {
       return {
@@ -346,14 +346,14 @@ ConstructorDeclaratorRest "constructor declarator rest"
       };
     }
 
-MethodBody "method body"
+MethodBody
     = Block
 
 //-------------------------------------------------------------------------
 //  Interface Declaration
 //-------------------------------------------------------------------------
 
-InterfaceDeclaration "interface declaration"
+InterfaceDeclaration
     = INTERFACE id:Identifier gen:TypeParameters? ext:(EXTENDS ClassTypeList)? body:InterfaceBody
     {
       return {
@@ -367,11 +367,11 @@ InterfaceDeclaration "interface declaration"
         };
     }
 
-InterfaceBody "interface body"
+InterfaceBody
     = LWING decls:InterfaceBodyDeclaration* Indent RWING
     { return skipNulls(decls); }
 
-InterfaceBodyDeclaration "interface body declaration"
+InterfaceBodyDeclaration
     = Indent modifiers:Modifier* member:InterfaceMemberDecl
     { return mergeProps(member, { modifiers: modifiers }); }
     / Indent SEMI
@@ -385,7 +385,7 @@ InterfaceBodyDeclaration "interface body declaration"
     / Indent !LetterOrDigit [\r\n\u000C]
     { return { node: "LineEmpty" }; }
 
-InterfaceMemberDecl "interface member declaration"
+InterfaceMemberDecl
     = InterfaceDeclaration
     / ClassDeclaration
     / EnumDeclaration
@@ -394,7 +394,7 @@ InterfaceMemberDecl "interface member declaration"
     / VOID id:Identifier rest:VoidInterfaceMethodDeclaratorRest
     { return mergeProps(rest, { name: id }); }
 
-InterfaceMethodOrFieldDecl "interface method or field declaration"
+InterfaceMethodOrFieldDecl
     = type:Type id:Identifier rest:InterfaceMethodOrFieldRest
     {
       if (rest.node === 'FieldDeclaration') {
@@ -409,12 +409,12 @@ InterfaceMethodOrFieldDecl "interface method or field declaration"
       }
     }
 
-InterfaceMethodOrFieldRest "interface method or field rest"
+InterfaceMethodOrFieldRest
     = rest:ConstantDeclaratorsRest SEMI
     { return { node: 'FieldDeclaration', fragments: rest }; }
     / InterfaceMethodDeclaratorRest
 
-InterfaceMethodDeclaratorRest "interface method declarator rest"
+InterfaceMethodDeclaratorRest
     = params:FormalParameters dims:Dim* SEMI
     {
       return {
@@ -426,7 +426,7 @@ InterfaceMethodDeclaratorRest "interface method declarator rest"
       };
     }
 
-InterfaceGenericMethodDecl "interface generic method declaration"
+InterfaceGenericMethodDecl
     = params:TypeParameters type:(Type / VOID { return makePrimitive('void'); }) id:Identifier rest:InterfaceMethodDeclaratorRest
     {
       return mergeProps(rest, {
@@ -436,7 +436,7 @@ InterfaceGenericMethodDecl "interface generic method declaration"
       });
     }
 
-VoidInterfaceMethodDeclaratorRest "void interface method declarator rest"
+VoidInterfaceMethodDeclaratorRest
     = params:FormalParameters SEMI
     {
       return {
@@ -450,15 +450,15 @@ VoidInterfaceMethodDeclaratorRest "void interface method declarator rest"
       };
     }
 
-ConstantDeclaratorsRest "constant declarators rest"
+ConstantDeclaratorsRest
     = first:ConstantDeclaratorRest rest:(COMMA ConstantDeclarator)*
     { return buildList(first, rest, 1); }
 
-ConstantDeclarator "constant declarator"
+ConstantDeclarator
     = id:Identifier rest:ConstantDeclaratorRest
     { return mergeProps(rest, { name: id }); }
 
-ConstantDeclaratorRest "constant declarator rest"
+ConstantDeclaratorRest
     = dims:Dim* EQU init:VariableInitializer
     {
         return {
@@ -472,7 +472,7 @@ ConstantDeclaratorRest "constant declarator rest"
 //  Enum Declaration
 //-------------------------------------------------------------------------
 
-EnumDeclaration "enum declaration"
+EnumDeclaration
     = ENUM name:Identifier impl:(IMPLEMENTS ClassTypeList)? eb:EnumBody
     {
       return mergeProps(eb, {
@@ -482,7 +482,7 @@ EnumDeclaration "enum declaration"
       });
     }
 
-EnumBody "enum body"
+EnumBody
     = LWING consts:EnumConstants? COMMA? body:EnumBodyDeclarations? Indent RWING
     {
       return {
@@ -491,11 +491,11 @@ EnumBody "enum body"
       };
     }
 
-EnumConstants "enum constants"
+EnumConstants
     = first:EnumConstant rest:(COMMA EnumConstant)*
     { return buildList(first, rest, 1); }
 
-EnumConstant "enum constant"
+EnumConstant
     = EmptyLines annot:Annotation* name:Identifier args:Arguments? cls:ClassBody?
     {
       return {
@@ -510,7 +510,7 @@ EnumConstant "enum constant"
       };
     }
 
-EnumBodyDeclarations "enum body declarations"
+EnumBodyDeclarations
     = SEMI decl:ClassBodyDeclaration*
     { return decl; }
 
@@ -518,7 +518,7 @@ EnumBodyDeclarations "enum body declarations"
 //  Variable Declarations
 //-------------------------------------------------------------------------
 
-LocalVariableDeclarationStatement "local variable declaration statement"
+LocalVariableDeclarationStatement
     = Indent modifiers:(FINAL { return makeModifier('final'); } / Annotation)*
       type:Type decls:VariableDeclarators SEMI
     {
@@ -530,11 +530,11 @@ LocalVariableDeclarationStatement "local variable declaration statement"
       };
     }
 
-VariableDeclarators "variable declarators"
+VariableDeclarators
     = first:VariableDeclarator rest:(COMMA VariableDeclarator)*
     { return buildList(first, rest, 1); }
 
-VariableDeclarator "variable declarator"
+VariableDeclarator
     = name:Identifier dims:Dim* EmptyLines init:(EQU VariableInitializer)? accessor:AccessorDeclarator?
     {
       return {
@@ -546,7 +546,7 @@ VariableDeclarator "variable declarator"
       };
     }
 
-SetterDeclarator "setter declarator"
+SetterDeclarator
     = modifiers:Modifier* Indent SET body:Block? Indent SEMI?
     {
         return {
@@ -555,7 +555,7 @@ SetterDeclarator "setter declarator"
         };
     }
 
-GetterDeclarator "getter declarator"
+GetterDeclarator
     = modifiers:Modifier* Indent GET body:Block? Indent SEMI?
     {
         return {
@@ -564,7 +564,7 @@ GetterDeclarator "getter declarator"
         };
     }
 
-AccessorDeclarator "accessor declarator"
+AccessorDeclarator
     = LWING
     setter:SetterDeclarator?
     EmptyLines
@@ -582,11 +582,11 @@ AccessorDeclarator "accessor declarator"
 //  Formal Parameters
 //-------------------------------------------------------------------------
 
-FormalParameters "formal parameters"
+FormalParameters
     = LPAR params:FormalParameterList? EmptyLines RPAR
     { return optionalList(params); }
 
-FormalParameter "formal parameter"
+FormalParameter
     = EmptyLines modifiers:(FINAL { return makeModifier('final'); } / Annotation)*
       type:Type decl:VariableDeclaratorId
     {
@@ -598,7 +598,7 @@ FormalParameter "formal parameter"
       });
     }
 
-LastFormalParameter "last formal parameter"
+LastFormalParameter
     = modifiers:(FINAL { return makeModifier('final'); } / Annotation)*
       type:Type ELLIPSIS decl:VariableDeclaratorId
     {
@@ -610,13 +610,13 @@ LastFormalParameter "last formal parameter"
       });
     }
 
-FormalParameterList "formal parameter list"
+FormalParameterList
     = first:FormalParameter rest:(COMMA FormalParameter)* last:(COMMA LastFormalParameter)?
     { return buildList(first, rest, 1).concat(extractOptionalList(last, 1)); }
     / last:LastFormalParameter
     { return [last]; }
 
-VariableDeclaratorId "variable declarator id"
+VariableDeclaratorId
     = id:Identifier dims:Dim*
     {
       return {
@@ -630,7 +630,7 @@ VariableDeclaratorId "variable declarator id"
 //  Statements
 //-------------------------------------------------------------------------
 
-Block "block"
+Block
     = Indent LWING statements:BlockStatements Indent RWING
     {
       return {
@@ -639,10 +639,10 @@ Block "block"
       }
     }
 
-BlockStatements "block statements"
+BlockStatements
     = BlockStatement*
 
-BlockStatement "block statement"
+BlockStatement
     = Indent op:DMLOperator Indent operand:Expression Indent rest:Expression? SEMI
     {
         return {
@@ -662,7 +662,7 @@ BlockStatement "block statement"
     }
     / Statement
 
-Statement "statement"
+Statement
     = Block
     / Indent IF expr:ParExpression (EmptyLines EndOfLineComment)* then:Statement (EmptyLines EndOfLineComment)* alt:(ELSE Statement)?
     {
@@ -743,7 +743,7 @@ Statement "statement"
     / Indent !LetterOrDigit [\r\n\u000C]
     { return { node: "LineEmpty" }; }
 
-Catch "catch"
+Catch
     = CATCH LPAR modifiers:(FINAL { return makeModifier('final'); } / Annotation)*
       first:Type rest:(OR Type)* decl:VariableDeclaratorId EmptyLines RPAR body:Block
     {
@@ -762,19 +762,19 @@ Catch "catch"
       };
     }
 
-Finally "finally"
+Finally
     = FINALLY block:Block
     { return block; }
 
-SwitchBlockStatementGroups "switch block statement groups"
+SwitchBlockStatementGroups
     = blocks:SwitchBlockStatementGroup*
     { return [].concat.apply([], blocks); }
 
-SwitchBlockStatementGroup "switch block statement group"
+SwitchBlockStatementGroup
     = expr:SwitchLabel blocks:BlockStatements
     { return [{ node: 'SwitchCase', expression: expr }].concat(blocks); }
 
-SwitchLabel "switch label"
+SwitchLabel
     = CASE expr:ConstantExpression COLON
     { return expr; }
     / CASE expr:EnumConstantName COLON
@@ -782,7 +782,7 @@ SwitchLabel "switch label"
     / DEFAULT COLON
     { return null; }
 
-ForInit "for-init"
+ForInit
     = modifiers:(FINAL { return makeModifier('final'); } / Annotation)* type:Type decls:VariableDeclarators
     {
       return [{
@@ -795,18 +795,18 @@ ForInit "for-init"
     / first:StatementExpression rest:(COMMA StatementExpression)*
     { return extractExpressions(buildList(first, rest, 1)); }
 
-ForUpdate "for-update"
+ForUpdate
     = first:StatementExpression rest:(COMMA StatementExpression)*
     { return extractExpressions(buildList(first, rest, 1)); }
 
-EnumConstantName "enum constant name"
+EnumConstantName
     = Identifier
 
 //-------------------------------------------------------------------------
 //  Expressions
 //-------------------------------------------------------------------------
 
-StatementExpression "statement expression"
+StatementExpression
     = expr:Expression
     {
       switch(expr.node) {
@@ -821,10 +821,10 @@ StatementExpression "statement expression"
       }
     }
 
-ConstantExpression "constant expression"
+ConstantExpression
     = Expression
 
-MethodReference "method reference"
+MethodReference
     = left:Identifier COLONCOLON right:(Identifier / NEW { return { node: "SimpleName", identifier: "new" }; })
     {
       return {
@@ -834,7 +834,7 @@ MethodReference "method reference"
       };
     }
 
-Expression "expression"
+Expression
     = left:ConditionalExpression op:AssignmentOperator right:Expression
     {
       return {
@@ -848,7 +848,7 @@ Expression "expression"
     / LambdaExpression
     / ConditionalExpression
 
-LambdaExpression "lambda expression"
+LambdaExpression
     = args:Arguments POINTER body:LambdaBody
     {
       return {
@@ -866,7 +866,7 @@ LambdaExpression "lambda expression"
       };
     }
 
-LambdaBody "lambda body"
+LambdaBody
     = body:MethodBody
     { return body; }
     / statement:StatementExpression
@@ -877,7 +877,7 @@ LambdaBody "lambda body"
       }
     }
 
-AssignmentOperator "assignment operator"
+AssignmentOperator
     = EQU
     / PLUSEQU
     / MINUSEQU
@@ -891,7 +891,7 @@ AssignmentOperator "assignment operator"
     / SREQU
     / BSREQU
 
-DMLOperator "DML operator"
+DMLOperator
     = INSERT
     / UPDATE
     / UPSERT
@@ -899,7 +899,7 @@ DMLOperator "DML operator"
     / UNDELETE
     / MERGE
 
-ConditionalExpression "conditional expression"
+ConditionalExpression
     = expr:ConditionalOrExpression QUERY then:Expression COLON alt:ConditionalExpression
     {
       return {
@@ -911,31 +911,31 @@ ConditionalExpression "conditional expression"
     }
     / ConditionalOrExpression
 
-ConditionalOrExpression "conditional OR expression"
+ConditionalOrExpression
     = (EmptyLines EndOfLineComment)* EmptyLines first:ConditionalAndExpression (EmptyLines EndOfLineComment)* EmptyLines rest:(OROR ConditionalAndExpression)*
     { return buildInfixExpr(first, rest); }
 
-ConditionalAndExpression "conditional AND expression"
+ConditionalAndExpression
     = (EmptyLines EndOfLineComment)* EmptyLines first:InclusiveOrExpression (EmptyLines EndOfLineComment)* EmptyLines rest:(ANDAND InclusiveOrExpression)*
     { return buildInfixExpr(first, rest); }
 
-InclusiveOrExpression "inclusive OR expression"
+InclusiveOrExpression
     = (EmptyLines EndOfLineComment)* EmptyLines first:ExclusiveOrExpression (EmptyLines EndOfLineComment)* EmptyLines rest:(OR ExclusiveOrExpression)*
     { return buildInfixExpr(first, rest); }
 
-ExclusiveOrExpression "exclusive OR expression"
+ExclusiveOrExpression
     = (EmptyLines EndOfLineComment)* EmptyLines first:AndExpression (EmptyLines EndOfLineComment)* EmptyLines rest:(HAT AndExpression)*
     { return buildInfixExpr(first, rest); }
 
-AndExpression "AND expression"
+AndExpression
     = (EmptyLines EndOfLineComment)* EmptyLines first:EqualityExpression (EmptyLines EndOfLineComment)* EmptyLines rest:(AND EqualityExpression)*
     { return buildInfixExpr(first, rest); }
 
-EqualityExpression "equality expression"
+EqualityExpression
     = (EmptyLines EndOfLineComment)* EmptyLines first:RelationalExpression (EmptyLines EndOfLineComment)* EmptyLines rest:((EQUAL /  NOTEQUAL) RelationalExpression)*
     { return buildInfixExpr(first, rest); }
 
-RelationalExpression "relational expression"
+RelationalExpression
     = (EmptyLines EndOfLineComment)* EmptyLines first:ShiftExpression (EmptyLines EndOfLineComment)* EmptyLines rest:((LE / GE / LT / GT) ShiftExpression / INSTANCEOF ReferenceType )*
     {
       return buildTree(first, rest, function(result, element) {
@@ -952,19 +952,19 @@ RelationalExpression "relational expression"
       });
     }
 
-ShiftExpression "shift expression"
+ShiftExpression
     = (EmptyLines EndOfLineComment)* EmptyLines first:AdditiveExpression (EmptyLines EndOfLineComment)* EmptyLines rest:((SL / SR / BSR) AdditiveExpression)*
     { return buildInfixExpr(first, rest); }
 
-AdditiveExpression "additive expression"
+AdditiveExpression
     = (EmptyLines EndOfLineComment)* EmptyLines first:MultiplicativeExpression (EmptyLines EndOfLineComment)* EmptyLines rest:((PLUS / MINUS) MultiplicativeExpression)*
     { return buildInfixExpr(first, rest); }
 
-MultiplicativeExpression "multiplicative expression"
+MultiplicativeExpression
     = (EmptyLines EndOfLineComment)* EmptyLines first:UnaryExpression (EmptyLines EndOfLineComment)* EmptyLines rest:((STAR / DIV / MOD) UnaryExpression)*
     { return buildInfixExpr(first, rest); }
 
-UnaryExpression "unary expression"
+UnaryExpression
     = operator:PrefixOp operand:UnaryExpression
     {
       return operand.node === 'NumberLiteral' && operator === '-' &&
@@ -980,7 +980,7 @@ UnaryExpression "unary expression"
     }
     / UnaryExpressionNotPlusMinus
 
-UnaryExpressionNotPlusMinus "unary expression not plus minus"
+UnaryExpressionNotPlusMinus
     = expr:CastExpression
     {
       return {
@@ -1009,11 +1009,11 @@ UnaryExpressionNotPlusMinus "unary expression not plus minus"
     }
     / Primary
 
-CastExpression "cast expression"
+CastExpression
     = LPAR PrimitiveType RPAR UnaryExpression
     / LPAR ReferenceType RPAR UnaryExpressionNotPlusMinus
 
-Primary "primary"
+Primary
     = ParExpression
     / args:NonWildcardTypeArguments ret:(ExplicitGenericInvocationSuffix
     {
@@ -1067,7 +1067,7 @@ Primary "primary"
         };
     }
 
-QualifiedIdentifierSuffix "qualified identifier suffix"
+QualifiedIdentifierSuffix
     = qual:QualifiedIdentifier dims:Dim+ DOT CLASS
     {
       return {
@@ -1107,7 +1107,7 @@ QualifiedIdentifierSuffix "qualified identifier suffix"
     / qual:QualifiedIdentifier DOT NEW args:NonWildcardTypeArguments? rest:InnerCreator
     { return mergeProps(rest, { expression: qual, typeArguments: optionalList(args) }); }
 
-ExplicitGenericInvocation "explicit generic invocation"
+ExplicitGenericInvocation
     = args:NonWildcardTypeArguments ret:ExplicitGenericInvocationSuffix
     {
       if (ret.typeArguments.length) return TODO(/* Ugly ! */);
@@ -1115,30 +1115,30 @@ ExplicitGenericInvocation "explicit generic invocation"
       return ret;
     }
 
-NonWildcardTypeArguments "non-wildcard type arguments"
+NonWildcardTypeArguments
     = LPOINT first:ReferenceType rest:(COMMA ReferenceType)* RPOINT
     { return buildList(first, rest, 1); }
 
-EmptyWildcardTypeArguments "empty wildcard type arguments"
+EmptyWildcardTypeArguments
     = LPOINT RPOINT
     { return []; }
 
-TypeArgumentsOrDiamond "type arguments or diamond"
+TypeArgumentsOrDiamond
     = LPOINT RPOINT
     { return []; }
     / TypeArguments
 
-NonWildcardTypeArgumentsOrDiamond "non-wildcard type arguments or diamond"
+NonWildcardTypeArgumentsOrDiamond
     = LPOINT RPOINT
     / NonWildcardTypeArguments
 
-ExplicitGenericInvocationSuffix "explicit generic invocation suffix"
+ExplicitGenericInvocationSuffix
     = SUPER suffix:SuperSuffix
     { return suffix; }
     / id:Identifier args:Arguments
     { return { node: 'MethodInvocation', arguments: args, name: id, typeArguments: [] }; }
 
-PrefixOp "prefix operator"
+PrefixOp
     = op:(
       INC
     / DEC
@@ -1148,13 +1148,13 @@ PrefixOp "prefix operator"
     / MINUS
     ) { return op[0]; /* remove ending spaces */ }
 
-PostfixOp "postfix operator"
+PostfixOp
     = op:(
       INC
     / DEC
     ) { return op[0]; /* remove ending spaces */ }
 
-Selector "selector"
+Selector
     = DOT id:Identifier args:Arguments
     { return { node: 'MethodInvocation', arguments: args, name: id, typeArguments: [] }; }
     / DOT id:Identifier
@@ -1170,7 +1170,7 @@ Selector "selector"
     / expr:DimExpr
     { return { node: 'ArrayAccess', index: expr }; }
 
-SuperSuffix "super suffix"
+SuperSuffix
     = args:Arguments
     {
       return {
@@ -1193,7 +1193,7 @@ SuperSuffix "super suffix"
       };
     }
 
-BasicType "basic type"
+BasicType
     = type:(
         "byte"
       / "short"
@@ -1206,14 +1206,14 @@ BasicType "basic type"
       ) !LetterOrDigit Spacing
     { return makePrimitive(type); }
 
-PrimitiveType "primitive type"
+PrimitiveType
     = BasicType
 
-Arguments "arguments"
+Arguments
     = LPAR EmptyLines args:(first:Expression rest:(COMMA EmptyLines Expression)* { return buildList(first, rest, 2); })? EmptyLines RPAR
     { return optionalList(args); }
 
-Creator "creator"
+Creator
     = type:(BasicType / CreatedName) rest:ArrayCreatorRest
     {
       return  {
@@ -1242,11 +1242,11 @@ Creator "creator"
       });
     }
 
-CreatedName "created name"
+CreatedName
     = qual:QualifiedIdentifier args:TypeArgumentsOrDiamond? rest:( DOT Identifier TypeArgumentsOrDiamond? )*
     { return buildTypeName(qual, args, rest); }
 
-InnerCreator "inner creator"
+InnerCreator
     = id:Identifier args:NonWildcardTypeArgumentsOrDiamond? rest:ClassCreatorRest
     {
       return mergeProps(rest, {
@@ -1255,7 +1255,7 @@ InnerCreator "inner creator"
       });
     }
 
-ClassCreatorRest "class creator rest"
+ClassCreatorRest
     = args:Arguments body:ClassBody?
     {
       return {
@@ -1267,7 +1267,7 @@ ClassCreatorRest "class creator rest"
       };
     }
 
-ArrayCreatorRest "array creator rest"
+ArrayCreatorRest
     = dims:Dim+ init:ArrayInitializer
     { return { extraDims:dims, init:init, dimms: [] }; }
     / dimexpr:DimExpr+ dims:Dim*
@@ -1275,7 +1275,7 @@ ArrayCreatorRest "array creator rest"
     / dim:Dim
     { return { extraDims:[dim], init:null, dimms: [] }; }
 
-ArrayElementValuePair "array element value pair"
+ArrayElementValuePair
     = Indent name:VariableInitializer ARROW? value:ElementValue?
     {
         if(value) {
@@ -1290,7 +1290,7 @@ ArrayElementValuePair "array element value pair"
         }
     }
 
-ArrayInitializer "array initializer"
+ArrayInitializer
     = LWING
       init:(
         first:ArrayElementValuePair rest:(COMMA ArrayElementValuePair)*
@@ -1299,22 +1299,22 @@ ArrayInitializer "array initializer"
       COMMA? EmptyLines  RWING
     { return { node: 'ArrayInitializer', expressions: optionalList(init) }; }
 
-VariableInitializer "variable initializer"
+VariableInitializer
     = ArrayInitializer
     / Expression
 
-ParExpression "parenthesized expression"
+ParExpression
     = LPAR EmptyLines expr:Expression EmptyLines RPAR
     { return { node: 'ParenthesizedExpression', expression: expr }; }
 
-QualifiedIdentifier "qualified identifier"
+QualifiedIdentifier
     = first:Identifier rest:(DOT Identifier)*
     { return buildQualified(first, rest, 1); }
 
-Dim "dimension"
+Dim
     = LBRK RBRK
 
-DimExpr "dimension expression"
+DimExpr
     = LBRK exp:Expression RBRK
     { return exp; }
 
@@ -1322,37 +1322,37 @@ DimExpr "dimension expression"
 //  Types and Modifiers
 //-------------------------------------------------------------------------
 
-Type "type"
+Type
     = type:(BasicType / ClassType) dims:Dim*
       { return buildArrayTree(type, dims); }
 
-ReferenceType "reference type"
+ReferenceType
     = bas:BasicType dims:Dim+
     { return buildArrayTree(bas, dims); }
     / cls:ClassType dims:Dim*
     { return buildArrayTree(cls, dims); }
 
-ClassType "class type"
+ClassType
     = qual:QualifiedIdentifier args:TypeArguments? rest:(DOT Identifier TypeArguments?)*
     { return buildTypeName(qual, args, rest); }
 
-ClassTypeList "class type list"
+ClassTypeList
     = first:ClassType rest:(COMMA ClassType)*
     { return buildList(first, rest, 1); }
 
-TypeArguments "type arguments"
+TypeArguments
     = LPOINT first:TypeArgument rest:(COMMA TypeArgument)* EmptyLines RPOINT
     { return buildList(first, rest, 1); }
 
-TypeArgument "type argument"
+TypeArgument
     = EmptyLines refType:ReferenceType
     { return refType; }
 
-TypeParameters "type parameters"
+TypeParameters
     = LPOINT first:TypeParameter rest:(COMMA TypeParameter)* EmptyLines RPOINT
     { return buildList(first, rest, 1); }
 
-TypeParameter "type parameter"
+TypeParameter
     = EmptyLines id:Identifier
     {
       return {
@@ -1362,7 +1362,7 @@ TypeParameter "type parameter"
     }
     / EmptyLines QUERY { return { node: 'WildcardType' }; }
 
-Modifier "modifier"
+Modifier
     = Annotation
       / Indent keyword:(
           "public"
@@ -1386,12 +1386,12 @@ Modifier "modifier"
 //  Annotations
 //-------------------------------------------------------------------------
 
-Annotation "annotation"
+Annotation
     = NormalAnnotation
     / SingleElementAnnotation
     / MarkerAnnotation
 
-NormalAnnotation "normal annotation"
+NormalAnnotation
     = Indent AT id:QualifiedIdentifier LPAR pairs:ElementValuePairs? Indent RPAR Spacing
     {
       return {
@@ -1401,7 +1401,7 @@ NormalAnnotation "normal annotation"
       };
     }
 
-SingleElementAnnotation "single element annotation"
+SingleElementAnnotation
     = Indent AT id:QualifiedIdentifier LPAR value:ElementValue RPAR Spacing
     {
       return {
@@ -1411,15 +1411,15 @@ SingleElementAnnotation "single element annotation"
       };
     }
 
-MarkerAnnotation "marker annotation"
+MarkerAnnotation
     = Indent AT id:QualifiedIdentifier Spacing
     { return { node: 'Annotation', typeName: id }; }
 
-ElementValuePairs "element value pairs"
+ElementValuePairs
     = first:ElementValuePair rest:(COMMA ElementValuePair)*
     { return buildList(first, rest, 1); }
 
-ElementValuePair "element value pair"
+ElementValuePair
     = Indent name:Identifier EQU value:ElementValue
     {
       return {
@@ -1429,16 +1429,16 @@ ElementValuePair "element value pair"
       };
     }
 
-ElementValue "element value"
+ElementValue
     = ConditionalExpression
     / Annotation
     / ElementValueArrayInitializer
 
-ElementValueArrayInitializer "element value array initializer"
+ElementValueArrayInitializer
     = LWING values:ElementValues? COMMA? RWING
     { return { node: 'ArrayInitializer', expressions: optionalList(values)}; }
 
-ElementValues "element values"
+ElementValues
     = first:ElementValue rest:(COMMA ElementValue)*
     { return buildList(first, rest, 1); }
 
@@ -1446,23 +1446,23 @@ ElementValues "element values"
 //  Spacing
 //-------------------------------------------------------------------------
 
-Indent "indent"
+Indent
     = [ \t]*
 
-Spacing "spacing"
+Spacing
     = Indent WhiteSpaces?
 
-WhiteSpaces "whitespaces"
+WhiteSpaces
     = [\r\n\u000C]
 
-EmptyLines "empty lines"
+EmptyLines
     = [ \t\r\n\u000C]*
 
-LeadingComments "leading comments"
+LeadingComments
     = commentStatements:CommentStatement*
     { return leadingComments(commentStatements); }
 
-CommentStatement "comment statement"
+CommentStatement
     = commentStatement:(
       comment:JavaDocComment [\r\n\u000C]*
       { return comment; }
@@ -1473,22 +1473,22 @@ CommentStatement "comment statement"
       )
     { return commentStatement; }
 
-JavaDocComment "java doc comment"
+JavaDocComment
     = "/**" comment:MultilineCommentLetter* "*/" [\r\n\u000C]?
     { return { value: "/**" + comment.join("") + "*/" }; }
 
-TraditionalComment "traditional comment"
+TraditionalComment
     = "/*" !("*"!"/") comment:MultilineCommentLetter* "*/" [\r\n\u000C]?
     { return { value: "/*" + comment.join("") + "*/" }; }
 
-MultilineCommentLetter "multiline comment letter" = letter:(!"*/" _)
+MultilineCommentLetter = letter:(!"*/" _)
     { return letter[1]; }
 
-EndOfLineComment "end-of-line comment"
+EndOfLineComment
     = "//" comment:CommentLetter* [\r\n\u000C]
     { return { value: "//" + comment.join("") }; }
 
-CommentLetter "comment letter"
+CommentLetter
     = letter:(![\r\n\u000C] _)
     { return letter[1]; }
 
@@ -1496,11 +1496,11 @@ CommentLetter "comment letter"
 //  Identifiers
 //-------------------------------------------------------------------------
 
-Identifier "identifier"
+Identifier
     = !Keyword first:Letter rest:$LetterOrDigit* Spacing
     { return { identifier: first + rest, node: 'SimpleName' }; }
 
-Letter "letter" = [a-z] / [A-Z] / [_$] ;
+Letter = [a-z] / [A-Z] / [_$] ;
 
 LetterOrDigit "letter or digit" = [a-z] / [A-Z] / [0-9] / [_$] ;
 
@@ -1508,7 +1508,7 @@ LetterOrDigit "letter or digit" = [a-z] / [A-Z] / [0-9] / [_$] ;
 //  Keywords
 //-------------------------------------------------------------------------
 
-Keyword "keyword"
+Keyword
     = ( "abstract"
       / "break"
       / "case"
@@ -1591,7 +1591,7 @@ MERGE        = Indent "merge"        !LetterOrDigit Spacing
 //  Literals
 //-------------------------------------------------------------------------
 
-Literal "literal"
+Literal
     = EmptyLines literal:( FloatLiteral
       / IntegerLiteral          // May be a prefix of FloatLiteral
       / StringLiteral
@@ -1604,7 +1604,7 @@ Literal "literal"
       ) Spacing
     { return literal; }
 
-IntegerLiteral "integer literal"
+IntegerLiteral
     = ( HexNumeral
       / BinaryNumeral
       / OctalNumeral            // May be a prefix of HexNumeral or BinaryNumeral
@@ -1612,67 +1612,67 @@ IntegerLiteral "integer literal"
       ) [lL]?
     { return { node: 'NumberLiteral', token: text() }; }
 
-DecimalNumeral "decimal numeral"
+DecimalNumeral
     = "0"
     / [1-9]([_]*[0-9])*
 
-HexNumeral "hex numeral"
+HexNumeral
     = ("0x" / "0X") HexDigits
 
-BinaryNumeral "binary numeral"
+BinaryNumeral
     = ("0b" / "0B") [01]([_]*[01])*
 
-OctalNumeral "octal numeral"
+OctalNumeral
     = "0" ([_]*[0-7])+
 
-FloatLiteral "float literarl"
+FloatLiteral
     = ( HexFloat
     / DecimalFloat )
     { return { node: 'NumberLiteral', token: text() }; }
 
-DecimalFloat "decimal float"
+DecimalFloat
     = Digits "." Digits?  Exponent? [fFdD]?
     / "." Digits Exponent? [fFdD]?
     / Digits Exponent [fFdD]?
     / Digits Exponent? [fFdD]
 
-Exponent "exponent"
+Exponent
     = [eE] [+\-]? Digits
 
-HexFloat "hex float"
+HexFloat
     = HexSignificand BinaryExponent [fFdD]?
 
-HexSignificand "hex significand"
+HexSignificand
     = ("0x" / "0X") HexDigits? "." HexDigits
     / HexNumeral "."?                           // May be a prefix of above
 
-BinaryExponent "binary exponent"
+BinaryExponent
     = [pP] [+\-]? Digits
 
-Digits "digits"
+Digits
     = [0-9]([_]*[0-9])*
 
-HexDigits "hex digits"
+HexDigits
     = HexDigit ([_]*HexDigit)*
 
-HexDigit "hex digit"
+HexDigit
     = [a-f] / [A-F] / [0-9]
 
-StringLiteral "string literal"
+StringLiteral
     = "\"" (Escape / !["\\\n\r] _)* "\""                   // this " keeps the editor happy
     { return { node: 'StringLiteral', escapedValue: text() }; }
     / "\'" (Escape / !['\\\n\r] _)* "\'"                   // this " keeps the editor happy
     { return { node: 'StringLiteral', escapedValue: text() }; }
 
-Escape "escape"
+Escape
     = "\\" ([btnfr"'\\] / OctalEscape / UnicodeEscape)     // this " keeps the editor happy
 
-OctalEscape "octal escape"
+OctalEscape
     = [0-3][0-7][0-7]
     / [0-7][0-7]
     / [0-7]
 
-UnicodeEscape "unicode escape"
+UnicodeEscape
     = "u"+ HexDigit HexDigit HexDigit HexDigit
 
 //-------------------------------------------------------------------------
