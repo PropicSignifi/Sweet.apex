@@ -535,7 +535,7 @@ VariableDeclarators "variable declarators"
     { return buildList(first, rest, 1); }
 
 VariableDeclarator "variable declarator"
-    = name:Identifier dims:Dim* init:(EQU VariableInitializer)? accessor:AccessorDeclarator?
+    = name:Identifier dims:Dim* EmptyLines init:(EQU VariableInitializer)? accessor:AccessorDeclarator?
     {
       return {
         node:           'VariableDeclarationFragment',
