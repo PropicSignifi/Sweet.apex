@@ -8,6 +8,10 @@ public class Lambda {
         Func outerF = new AnonymousFunc3(new Sweet.AnonymousContext(null, new Map<String, Object>{ 'num' => num }));
     }
 
+    public void run() {
+        Func thisF = new AnonymousFunc4(new Sweet.AnonymousContext(null, new Map<String, Object>{ 'this' => this }));
+    }
+
     private class AnonymousFunc0 extends Func {
         private Sweet.AnonymousContext anonymous_context;
 
@@ -62,6 +66,20 @@ public class Lambda {
         public override Object execN(List<Object> args) {
 
             return anonymous_context.get('num');
+        }
+    }
+
+    private class AnonymousFunc4 extends Func {
+        private Sweet.AnonymousContext anonymous_context;
+
+        public AnonymousFunc4(Sweet.AnonymousContext context) {
+            super(0);
+            this.anonymous_context = context;
+        }
+
+        public override Object execN(List<Object> args) {
+
+            return anonymous_context.get('this');
         }
     }
 }

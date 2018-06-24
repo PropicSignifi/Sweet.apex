@@ -417,9 +417,21 @@ const getTopLevelType = root => {
 };
 
 const getEnclosingType = node => {
+    return _getEnclosing('TypeDeclaration', node);
+};
+
+const getEnclosingMethod = node => {
+    return _getEnclosing('MethodDeclaration', node);
+};
+
+const getEnclosingField = node => {
+    return _getEnclosing('FieldDeclaration', node);
+};
+
+const _getEnclosing = (type, node) => {
     let current = node;
     while(current) {
-        if(current.node === 'TypeDeclaration') {
+        if(current.node === type) {
             break;
         }
 
@@ -427,7 +439,7 @@ const getEnclosingType = node => {
     }
 
     return current;
-};
+}
 
 const AST = {
     traverse,
@@ -461,6 +473,8 @@ const AST = {
     getAnnotationValue,
     getTopLevelType,
     getEnclosingType,
+    getEnclosingMethod,
+    getEnclosingField,
 };
 
 module.exports = AST;

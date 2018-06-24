@@ -24,9 +24,13 @@ const Lambda = {
 
             const outerVariables = [];
             const outerVariableNames = [];
+            const thisNodes = [];
             AST.traverse(current, (node, parent) => {
                 if(node.node === 'QualifiedName' && getValue(node.qualifier) === 'outer') {
                     outerVariables.push(node);
+                }
+                else if(node.node === 'ThisExpression') {
+                    thisNodes.push(node);
                 }
             }, (node, parent) => {
                 return node.node === 'LambdaExpression' && node !== current;
@@ -38,6 +42,13 @@ const Lambda = {
 
                 const newNode = AST.parseExpression(`anonymous_context.get('${name}')`);
                 AST.transform(outerVariable, newNode);
+            });
+
+            _.each(thisNodes, thisNode => {
+                const name = 'this';
+
+                const newNode = AST.parseExpression(`anonymous_context.get('${name}')`);
+                AST.transform(thisNode, newNode);
             });
 
             const parameters = _.map(current.args, arg => {
@@ -82,10 +93,20 @@ const Lambda = {
             const outer = _.map(outerVariableNames, outerVariableName => `'${outerVariableName}' => ${outerVariableName}`).join(', ');
 
             const enclosingType = AST.getEnclosingType(current);
+            const enclosingMethod = AST.getEnclosingMethod(current);
+            const enclosingField = AST.getEnclosingField(current);
             const anonyousContext = _.find(_.get(enclosingType, 'bodyDeclarations'), bodyDeclaration => bodyDeclaration.node === 'FieldDeclaration' && !_.isEmpty(bodyDeclaration.fragments) && getValue(bodyDeclaration.fragments[0].name) === 'anonymous_context');
+
+            let thisOuter = outer;
+            if((enclosingMethod && !AST.hasModifier(enclosingMethod.modifiers, 'static')) ||
+                (enclosingField && !AST.hasModifier(enclosingField.modifiers, 'static'))
+            ) {
+                thisOuter = _.isEmpty(thisOuter) ? "'this' => this" : thisOuter + ", 'this' => this";
+            }
+
             const newNode = anonyousContext ?
                 AST.parseExpression(`new AnonymousFunc${index}(new Sweet.AnonymousContext(anonymous_context, new Map<String, Object>{ ${outer} }))`) :
-                AST.parseExpression(`new AnonymousFunc${index}(new Sweet.AnonymousContext(null, new Map<String, Object>{ ${outer} }))`);
+                AST.parseExpression(`new AnonymousFunc${index}(new Sweet.AnonymousContext(null, new Map<String, Object>{ ${thisOuter} }))`);
 
             AST.transform(current, newNode);
         });

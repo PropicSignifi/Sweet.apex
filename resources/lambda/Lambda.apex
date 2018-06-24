@@ -15,4 +15,10 @@ public class Lambda {
             return outer.num;
         };
     }
+
+    public void run() {
+        Func thisF = () -> {
+            return this;
+        };
+    }
 }
