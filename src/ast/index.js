@@ -404,6 +404,10 @@ const getAnnotationValue = annotation => {
     }
 };
 
+const getTopLevelType = root => {
+    return root.types[0];
+};
+
 const AST = {
     traverse,
     getParent,
@@ -434,6 +438,7 @@ const AST = {
     insertChildrenAfter,
     getUniqueName,
     getAnnotationValue,
+    getTopLevelType,
 };
 
 module.exports = AST;

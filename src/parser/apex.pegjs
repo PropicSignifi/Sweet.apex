@@ -875,7 +875,7 @@ Expression
     / ConditionalExpression
 
 LambdaExpression
-    = args:Arguments POINTER body:LambdaBody
+    = args:FormalParameters POINTER body:LambdaBody
     {
       return {
         node: 'LambdaExpression',
@@ -883,25 +883,10 @@ LambdaExpression
         body: body
       };
     }
-    / id:Identifier POINTER body:LambdaBody
-    {
-      return {
-        node: 'LambdaExpression',
-        args: [id],
-        body: body
-      };
-    }
 
 LambdaBody
     = body:MethodBody
     { return body; }
-    / statement:StatementExpression
-    {
-      return {
-        node:      'Block',
-        statements: [statement]
-      }
-    }
 
 AssignmentOperator
     = EQU

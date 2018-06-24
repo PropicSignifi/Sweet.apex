@@ -6,6 +6,7 @@
         "array_creation",
         "mod",
         "template_string",
+        "lambda",
         "switch",
         "not_null",
         "default_value",
