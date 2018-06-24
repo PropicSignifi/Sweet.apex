@@ -387,6 +387,23 @@ const getUniqueName = node => {
     return _.join(items, '_');
 };
 
+const getAnnotationValue = annotation => {
+    if(annotation.value) {
+        return getValue(annotation.value);
+    }
+    else if(annotation.values) {
+        const data = {};
+        _.each(annotation.values, pair => {
+            data[getValue(pair.name)] = getValue(pair.value);
+        });
+
+        return data;
+    }
+    else {
+        return null;
+    }
+};
+
 const AST = {
     traverse,
     getParent,
@@ -416,6 +433,7 @@ const AST = {
     insertChildrenBefore,
     insertChildrenAfter,
     getUniqueName,
+    getAnnotationValue,
 };
 
 module.exports = AST;

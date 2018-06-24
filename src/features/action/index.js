@@ -35,6 +35,18 @@ const Action = {
                 throw new Error('Should be static method');
             }
 
+            const annotation = _.find(current.modifiers, modifier => modifier.node === 'Annotation' && getValue(modifier.typeName) === 'action');
+            let returnRaw = false;
+            let annotationValue = AST.getAnnotationValue(annotation);
+            if(annotationValue) {
+                if(_.isPlainObject(annotationValue)) {
+                    returnRaw = annotationValue.returnRaw;
+                }
+                else {
+                    returnRaw = annotationValue === 'true';
+                }
+            }
+
             const methodName = getValue(current.name);
             const actionName = _.capitalize(methodName) + 'Action';
             actionNames.push(actionName);
@@ -96,6 +108,7 @@ const Action = {
                         super('${methodName}');
 
                         ${_.map(parameters, param => `param('${param.name}', ${param.type}.class, '${paramComments[param.name] || param.name}');`).join('\n')}
+                        ${returnRaw ? 'this.returnRaw();' : ''}
                     }
 
                     ${execActionCode}

@@ -22,6 +22,7 @@ public class ActionDemo {
             super('add');
             param('a', Integer.class, 'The first number');
             param('b', Integer.class, 'The second number');
+            this.returnRaw();
         }
 
         public override Object execAction(Object arg0, Object arg1) {
@@ -36,6 +37,7 @@ public class ActionDemo {
         public StartAction() {
             super('start');
             param('id', String.class, 'id');
+
         }
 
         public override Object execAction(Object arg0) {
@@ -52,6 +54,7 @@ public class ActionDemo {
             param('s2', String.class, 's2');
             param('s3', String.class, 's3');
             param('s4', String.class, 's4');
+            this.returnRaw();
         }
 
         public override Object execActionN(List<Object> args) {

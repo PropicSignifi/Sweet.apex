@@ -4,7 +4,7 @@ public class ActionDemo {
      * @param b The second number
      * */
     @AuraEnabled
-    @action
+    @action(true)
     public static Integer add(Integer a, Integer b) {
         return a + b;
     }
@@ -16,7 +16,7 @@ public class ActionDemo {
     }
 
     @AuraEnabled
-    @action
+    @action(returnRaw=true)
     public static String concat(String s1, String s2, String s3, String s4) {
         return s1 + s2 + s3 + s4;
     }
