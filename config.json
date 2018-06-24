@@ -9,6 +9,7 @@
         "switch",
         "not_null",
         "default_value",
+        "rethrow",
         "function",
         "enum"
     ]
