@@ -1620,6 +1620,7 @@ Literal
     = EmptyLines literal:( FloatLiteral
       / IntegerLiteral          // May be a prefix of FloatLiteral
       / StringLiteral
+      / TemplateStringLiteral
       / "true"  !LetterOrDigit
       { return { node: 'BooleanLiteral', booleanValue: true }; }
       / "false" !LetterOrDigit
@@ -1688,6 +1689,10 @@ StringLiteral
     { return { node: 'StringLiteral', escapedValue: text() }; }
     / "\'" (Escape / !['\\\n\r] _)* "\'"                   // this " keeps the editor happy
     { return { node: 'StringLiteral', escapedValue: text() }; }
+
+TemplateStringLiteral
+    = "\`" (Escape / ![`] _)* "\`"                   // this " keeps the editor happy
+    { return { node: 'TemplateStringLiteral', escapedValue: text() }; }
 
 Escape
     = "\\" ([btnfr"'\\] / OctalEscape / UnicodeEscape)     // this " keeps the editor happy

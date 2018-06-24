@@ -11,6 +11,7 @@ const allowedStartRules = [
     'TypeDeclaration',
     'ClassBodyDeclaration',
     'BlockStatement',
+    'Expression',
 ];
 const parser = peg.generate(pegContent, {
     cache: true,

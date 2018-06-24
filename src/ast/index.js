@@ -78,28 +78,28 @@ const getParent = (root, current) => {
     return current.parent;
 };
 
-const parseTypeDeclaration = content => {
-    const newTypeDeclaration = parse(content, {
-        startRule: 'TypeDeclaration',
+const _parse = (type, content) => {
+    const node = parse(content, {
+        startRule: type,
     });
 
-    return newTypeDeclaration;
+    return node;
+};
+
+const parseTypeDeclaration = content => {
+    return _parse('TypeDeclaration', content);
 };
 
 const parseClassBodyDeclaration = content => {
-    const newClassBodyDeclaration = parse(content, {
-        startRule: 'ClassBodyDeclaration',
-    });
+    return _parse('ClassBodyDeclaration', content);
+};
 
-    return newClassBodyDeclaration;
+const parseExpression = content => {
+    return _parse('Expression', content);
 };
 
 const parseBlockStatement = line => {
-    const newBlockStatement = parse(line, {
-        startRule: 'BlockStatement',
-    });
-
-    return newBlockStatement;
+    return _parse('BlockStatement', line);
 };
 
 const parseBlockStatements = lines => _.map(lines, parseBlockStatement);
@@ -394,6 +394,7 @@ const AST = {
     parseBlockStatements,
     parseTypeDeclaration,
     parseClassBodyDeclaration,
+    parseExpression,
     getMethodSignature,
     addIndex,
     removeIndex,

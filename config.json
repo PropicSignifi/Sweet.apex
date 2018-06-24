@@ -5,6 +5,7 @@
     "features": [
         "array_creation",
         "mod",
+        "template_string",
         "switch",
         "not_null",
         "default_value",
