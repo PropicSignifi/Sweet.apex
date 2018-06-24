@@ -8,6 +8,7 @@
         "switch",
         "not_null",
         "default_value",
-        "function"
+        "function",
+        "enum"
     ]
 }

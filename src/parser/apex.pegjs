@@ -221,6 +221,7 @@ TypeDeclaration
       type:(
           ClassDeclaration
         / InterfaceDeclaration
+        / EnumDeclaration
       )
       { return mergeProps(type, { modifiers: modifiers, comments: leadComments }); }
       / SEMI

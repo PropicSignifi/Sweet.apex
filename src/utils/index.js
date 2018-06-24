@@ -49,10 +49,10 @@ const getTypeParameters = typeParameters =>
         '<' + _.map(typeParameters, getValue).join(', ') + '>';
 
 const getExtendsSuperClass = superclassType =>
-    superclassType ? ' extends ' + superclassType.name.identifier : '';
+    superclassType ? ' extends ' + getValue(superclassType) : '';
 
 const getImplementsInterfaces = superInterfaceTypes =>
-    _.isEmpty(superInterfaceTypes) ? '' : ' implements ' + _.map(superInterfaceTypes, intf => intf.name.identifier).join(', ');
+    _.isEmpty(superInterfaceTypes) ? '' : ' implements ' + _.map(superInterfaceTypes, getValue).join(', ');
 
 const perfCounters = {};
 
