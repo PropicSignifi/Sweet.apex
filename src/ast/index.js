@@ -2,12 +2,18 @@ const _ = require('lodash');
 const parse = require('../parser');
 const getValue = require('../valueProvider');
 
-const _traverse = (node, parent, callback) => {
+const _traverse = (node, parent, callback, skip) => {
     if(!node) {
         return;
     }
 
     callback = callback || _.noop;
+
+    if(skip && _.isFunction(skip)) {
+        if(skip(node, parent)) {
+            return;
+        }
+    }
 
     const ret = callback(node, parent);
     let terminated = false;
@@ -33,7 +39,7 @@ const _traverse = (node, parent, callback) => {
             if(_.isArray(value) && !_.isEmpty(value) && _.first(value).node) {
                 for(let i in value) {
                     const item = value[i];
-                    const ret = _traverse(item, node, callback);
+                    const ret = _traverse(item, node, callback, skip);
                     if(ret === false) {
                         terminated = true;
                         return false;
@@ -41,7 +47,7 @@ const _traverse = (node, parent, callback) => {
                 }
             }
             else if(value.node) {
-                const ret = _traverse(value, node, callback);
+                const ret = _traverse(value, node, callback, skip);
                 if(ret === false) {
                     terminated = true;
                 }
@@ -54,8 +60,8 @@ const _traverse = (node, parent, callback) => {
     }
 };
 
-const traverse = (node, callback) => {
-    _traverse(node, null, callback);
+const traverse = (node, callback, skip) => {
+    _traverse(node, null, callback, skip);
 };
 
 const addIndex = root => {
@@ -128,6 +134,8 @@ const transform = (srcNode, destNode) => {
 
         delete srcNode[key];
     });
+
+    destNode.parent = srcNode.parent;
 
     _.assign(srcNode, destNode);
 
@@ -408,6 +416,19 @@ const getTopLevelType = root => {
     return root.types[0];
 };
 
+const getEnclosingType = node => {
+    let current = node;
+    while(current) {
+        if(current.node === 'TypeDeclaration') {
+            break;
+        }
+
+        current = current.parent;
+    }
+
+    return current;
+};
+
 const AST = {
     traverse,
     getParent,
@@ -439,6 +460,7 @@ const AST = {
     getUniqueName,
     getAnnotationValue,
     getTopLevelType,
+    getEnclosingType,
 };
 
 module.exports = AST;

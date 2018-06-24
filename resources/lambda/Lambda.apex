@@ -4,10 +4,15 @@ public class Lambda {
     };
 
     public static void test() {
+        Integer num = 0;
         Func nested = () -> {
             return () -> {
                 System.debug('Run');
             };
+        };
+
+        Func outerF = () -> {
+            return outer.num;
         };
     }
 }

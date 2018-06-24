@@ -1,7 +1,6 @@
 const _ = require('lodash');
 const AST = require('../../ast');
 const getValue = require('../../valueProvider');
-const compile = require('../../compiler');
 
 const Lambda = {
     accept: ({ current, parent, root, }) => {
@@ -23,6 +22,24 @@ const Lambda = {
                 typeDeclaration = AST.getTopLevelType(root);
             }
 
+            const outerVariables = [];
+            const outerVariableNames = [];
+            AST.traverse(current, (node, parent) => {
+                if(node.node === 'QualifiedName' && getValue(node.qualifier) === 'outer') {
+                    outerVariables.push(node);
+                }
+            }, (node, parent) => {
+                return node.node === 'LambdaExpression' && node !== current;
+            });
+
+            _.each(outerVariables, outerVariable => {
+                const name = getValue(outerVariable.name);
+                outerVariableNames.push(name);
+
+                const newNode = AST.parseExpression(`anonymous_context.get('${name}')`);
+                AST.transform(outerVariable, newNode);
+            });
+
             const parameters = _.map(current.args, arg => {
                 return {
                     name: getValue(arg.name),
@@ -34,8 +51,12 @@ const Lambda = {
 
             const newFuncContent =
                 `private class AnonymousFunc${index} extends Func {
-                    public AnonymousFunc${index}() {
+                    private Sweet.AnonymousContext anonymous_context;
+
+                    public AnonymousFunc${index}(Sweet.AnonymousContext context) {
                         super(${_.size(parameters)});
+
+                        this.anonymous_context = context;
                     }
 
                     public override Object execN(List<Object> args) {
@@ -54,22 +75,17 @@ const Lambda = {
                 execMethod.body.statements.push(AST.parseBlockStatement(`return null;`));
             }
 
+            AST.addIndex(newFunc);
             newStatements.push(AST.parseEmptyLine());
             newStatements.push(newFunc);
 
-            const newNode = {
-                node: 'ClassInstanceCreation',
-                'arguments': [],
-                anonymousClassDeclaration: null,
-                expression: null,
-                type: {
-                    node: 'SimpleType',
-                    name: {
-                        identifier: `AnonymousFunc${index}`,
-                        node: 'SimpleName',
-                    },
-                },
-            };
+            const outer = _.map(outerVariableNames, outerVariableName => `'${outerVariableName}' => ${outerVariableName}`).join(', ');
+
+            const enclosingType = AST.getEnclosingType(current);
+            const anonyousContext = _.find(_.get(enclosingType, 'bodyDeclarations'), bodyDeclaration => bodyDeclaration.node === 'FieldDeclaration' && !_.isEmpty(bodyDeclaration.fragments) && getValue(bodyDeclaration.fragments[0].name) === 'anonymous_context');
+            const newNode = anonyousContext ?
+                AST.parseExpression(`new AnonymousFunc${index}(new Sweet.AnonymousContext(anonymous_context, new Map<String, Object>{ ${outer} }))`) :
+                AST.parseExpression(`new AnonymousFunc${index}(new Sweet.AnonymousContext(null, new Map<String, Object>{ ${outer} }))`);
 
             AST.transform(current, newNode);
         });

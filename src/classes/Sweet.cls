@@ -5,6 +5,28 @@ public class Sweet {
         }
     }
 
+    public class AnonymousContext {
+        private AnonymousContext parent;
+        private Map<String, Object> context;
+
+        public AnonymousContext(AnonymousContext parent, Map<String, Object> context) {
+            this.parent = parent;
+            this.context = context;
+        }
+
+        public Object get(String key) {
+            if(context.containsKey(key)) {
+                return context.get(key);
+            }
+            else if(this.parent != null) {
+                return this.parent.get(key);
+            }
+            else {
+                return null;
+            }
+        }
+    }
+
     public virtual class BaseEnum {
         private String name;
         private Integer ordinal;
