@@ -103,7 +103,7 @@ const Func = {
             }`)
         );
 
-        AST.apppendChildren(typeDeclaration, 'bodyDeclarations', newNodes);
+        AST.appendChildren(typeDeclaration, 'bodyDeclarations', newNodes);
     },
 };
 

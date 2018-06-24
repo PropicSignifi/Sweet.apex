@@ -733,7 +733,7 @@ Statement
         resources:    []
       });
     }
-    / Indent SWITCH expr:ParExpression LWING cases:SwitchBlockStatementGroups RWING
+    / Indent SWITCH expr:ParExpression LWING cases:SwitchBlockStatementGroups EmptyLines RWING
     { return { node: 'SwitchStatement', statements: cases, expression: expr.expression }; }
     / Indent RETURN expr:Expression? SEMI
     { return { node: 'ReturnStatement', expression: expr } }

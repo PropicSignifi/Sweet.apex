@@ -191,7 +191,7 @@ const findPrev = (parent, current) => {
 };
 
 const setChild = (parent, name, child) => {
-    if(parent && child) {
+    if(parent && name && child) {
         parent[name] = child;
         child.parent = parent;
 
@@ -200,7 +200,7 @@ const setChild = (parent, name, child) => {
 };
 
 const removeChild = (parent, name, child) => {
-    if(parent) {
+    if(parent && name) {
         if(_.isArray(parent[name])) {
             if(child) {
                 _.pull(parent[name], child);
@@ -222,7 +222,7 @@ const removeChild = (parent, name, child) => {
 const removeChildren = removeChild;
 
 const prependChild = (parent, name, child) => {
-    if(parent && child) {
+    if(parent && name && child) {
         if(!parent[name]) {
             parent[name] = [];
         }
@@ -237,8 +237,8 @@ const prependChild = (parent, name, child) => {
     }
 };
 
-const preppendChildren = (parent, name, children) => {
-    if(parent && children) {
+const prependChildren = (parent, name, children) => {
+    if(parent && name && children) {
         if(!parent[name]) {
             parent[name] = [];
         }
@@ -256,7 +256,7 @@ const preppendChildren = (parent, name, children) => {
 };
 
 const appendChild = (parent, name, child) => {
-    if(parent && child) {
+    if(parent && name && child) {
         if(!parent[name]) {
             parent[name] = [];
         }
@@ -271,8 +271,8 @@ const appendChild = (parent, name, child) => {
     }
 };
 
-const apppendChildren = (parent, name, children) => {
-    if(parent && children) {
+const appendChildren = (parent, name, children) => {
+    if(parent && name && children) {
         if(!parent[name]) {
             parent[name] = [];
         }
@@ -287,6 +287,104 @@ const apppendChildren = (parent, name, children) => {
             addIndex(child);
         });
     }
+};
+
+const insertChildBefore = (parent, name, target, child) => {
+    if(parent && name && target && child) {
+        if(!parent[name]) {
+            parent[name] = [];
+        }
+
+        const index = _.indexOf(parent[name], target);
+        if(index >= 0) {
+            parent[name] = [
+                ..._.slice(parent[name], 0, index),
+                child,
+                ..._.slice(parent[name], index),
+            ];
+            child.parent = parent;
+            addIndex(child);
+        }
+    }
+};
+
+const insertChildAfter = (parent, name, target, child) => {
+    if(parent && name && target && child) {
+        if(!parent[name]) {
+            parent[name] = [];
+        }
+
+        const index = _.indexOf(parent[name], target);
+        if(index >= 0) {
+            parent[name] = [
+                ..._.slice(parent[name], 0, index + 1),
+                child,
+                ..._.slice(parent[name], index + 1),
+            ];
+            child.parent = parent;
+            addIndex(child);
+        }
+    }
+};
+
+const insertChildrenBefore = (parent, name, target, children) => {
+    if(parent && name && target && children) {
+        if(!parent[name]) {
+            parent[name] = [];
+        }
+
+        const index = _.indexOf(parent[name], target);
+        if(index >= 0) {
+            parent[name] = [
+                ..._.slice(parent[name], 0, index),
+                ...children,
+                ..._.slice(parent[name], index),
+            ];
+
+            _.each(children, child => {
+                child.parent = parent;
+                addIndex(child);
+            });
+        }
+    }
+};
+
+const insertChildrenAfter = (parent, name, target, children) => {
+    if(parent && name && target && children) {
+        if(!parent[name]) {
+            parent[name] = [];
+        }
+
+        const index = _.indexOf(parent[name], target);
+        if(index >= 0) {
+            parent[name] = [
+                ..._.slice(parent[name], 0, index + 1),
+                ...children,
+                ..._.slice(parent[name], index + 1),
+            ];
+
+            _.each(children, child => {
+                child.parent = parent;
+                addIndex(child);
+            });
+        }
+    }
+};
+
+const getUniqueName = node => {
+    const items = [];
+    let curr = node;
+    while(curr) {
+        if(curr.name) {
+            items.push(getValue(curr.name));
+        }
+
+        curr = curr.parent;
+    }
+
+    _.reverse(items);
+
+    return _.join(items, '_');
 };
 
 const AST = {
@@ -309,9 +407,14 @@ const AST = {
     removeChild,
     removeChildren,
     appendChild,
-    apppendChildren,
+    appendChildren,
     prependChild,
-    preppendChildren,
+    prependChildren,
+    insertChildBefore,
+    insertChildAfter,
+    insertChildrenBefore,
+    insertChildrenAfter,
+    getUniqueName,
 };
 
 module.exports = AST;

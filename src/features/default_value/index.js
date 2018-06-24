@@ -46,7 +46,7 @@ const DefaultValue = {
 
         newBlockStatements.push(AST.parseBlockStatement('\n'));
 
-        AST.preppendChildren(methodDeclaration.body, 'statements', newBlockStatements);
+        AST.prependChildren(methodDeclaration.body, 'statements', newBlockStatements);
     },
 };
 
