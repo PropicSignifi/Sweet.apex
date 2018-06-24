@@ -30,15 +30,9 @@ const Lambda = {
                 };
             });
 
-            const lines = [];
-            compile(current.body, {
-                lines,
-                indent: '',
-            });
-
             const hasReturn = _.size(current.body.statements) > 0 && _.last(current.body.statements).node === 'ReturnStatement';
 
-            const newFunc =
+            const newFuncContent =
                 `private class AnonymousFunc${index} extends Func {
                     public AnonymousFunc${index}() {
                         super(${_.size(parameters)});
@@ -46,14 +40,22 @@ const Lambda = {
 
                     public override Object execN(List<Object> args) {
                         ${_.map(parameters, (param, i) => `${param.type} ${param.name} = args.get(${i}) == null ? null : (${param.type})args.get(${i});`).join('\n')}
-
-                        ${_.join(lines, '\n')}
-                        ${hasReturn ? '' : 'return null;'}
                     }
                 }`;
+            const newFunc = AST.parseClassBodyDeclaration(newFuncContent);
+            const execMethod = _.find(newFunc.bodyDeclarations, bodyDeclaration => bodyDeclaration.node === 'MethodDeclaration' && getValue(bodyDeclaration.name) === 'execN');
+
+            execMethod.body.statements = [
+                ...execMethod.body.statements,
+                ...current.body.statements,
+            ];
+
+            if(!hasReturn) {
+                execMethod.body.statements.push(AST.parseBlockStatement(`return null;`));
+            }
 
             newStatements.push(AST.parseEmptyLine());
-            newStatements.push(AST.parseClassBodyDeclaration(newFunc));
+            newStatements.push(newFunc);
 
             const newNode = {
                 node: 'ClassInstanceCreation',

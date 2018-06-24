@@ -4,8 +4,10 @@ public class Lambda {
     };
 
     public static void test() {
-        Func run = () -> {
-            System.debug('Run');
+        Func nested = () -> {
+            return () -> {
+                System.debug('Run');
+            };
         };
     }
 }
