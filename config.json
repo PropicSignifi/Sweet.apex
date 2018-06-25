@@ -17,6 +17,7 @@
         "default_value",
         "optional",
         "rethrow",
+        "log",
         "function",
         "action",
         "reflect",
