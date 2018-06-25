@@ -1,4 +1,7 @@
 public class Function {
+    /**
+     * A sample add function
+     * */
     public static Integer add(Integer a, Integer b) {
         return (Integer)F.add.runN(new List<Object>{ a, b });
     }

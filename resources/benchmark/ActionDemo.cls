@@ -1,4 +1,6 @@
 public class ActionDemo {
+
+
     private static Action.Registry registry = new Action.Registry();
 
     static {
@@ -17,6 +19,12 @@ public class ActionDemo {
         return registry.actions;
     }
 
+    /**
+     * Some descriptions
+     *
+     * @param a The first number
+     * @param b The second number
+     * */
     private class AddAction extends Action {
         public AddAction() {
             super('add');

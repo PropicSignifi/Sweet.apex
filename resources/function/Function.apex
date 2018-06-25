@@ -1,4 +1,7 @@
 public class Function {
+    /**
+     * A sample add function
+     * */
     @func
     public static Integer add(Integer a, Integer b) {
         return a + b;

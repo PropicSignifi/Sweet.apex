@@ -61,10 +61,10 @@ const Action = {
                 lines.push('return null;');
             }
 
-            const javaDocComment = AST.findPrev(parent, current);
+            const prevNode = AST.findPrev(parent, current);
             const paramComments = {};
-            if(javaDocComment && javaDocComment.node === 'JavaDocComment') {
-                _.each(_.split(javaDocComment.comment, '\n'), comment => {
+            if(prevNode && prevNode.node === 'JavaDocComment') {
+                _.each(_.split(prevNode.comment, '\n'), comment => {
                     comment = _.trimStart(comment, ' *');
                     if(comment.startsWith('@param ')) {
                         const [ paramName, ...paramDesc ] = comment.substring(7).split(' ');
@@ -106,12 +106,14 @@ const Action = {
                 }`;
 
             newStatements.push(AST.parseEmptyLine());
-            newStatements.push(AST.parseClassBodyDeclaration(newActionContent));
 
             AST.removeChild(parent, 'bodyDeclarations', current);
-            if(javaDocComment) {
-                AST.removeChild(parent, 'bodyDeclarations', javaDocComment);
+            if(prevNode && (prevNode.node === 'JavaDocComment' || prevNode.node === 'TraditionalComment' || prevNode.nod === 'EndOfLineComment')) {
+                AST.removeChild(parent, 'bodyDeclarations', prevNode);
+                newStatements.push(prevNode);
             }
+
+            newStatements.push(AST.parseClassBodyDeclaration(newActionContent));
         });
 
         const helperCode = [
