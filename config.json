@@ -16,6 +16,7 @@
         "template_string",
         "lambda",
         "switch",
+        "file",
         "not_null",
         "default_value",
         "optional",
