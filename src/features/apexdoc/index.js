@@ -2,6 +2,7 @@ const fs = require('fs');
 const path = require('path');
 const AST = require('../../ast');
 const getValue = require('../../valueProvider');
+const buildDoc = require('./doc_builder');
 
 const writeToDoc = (fileName, content, config) => {
     if(config.docDir) {
@@ -31,17 +32,16 @@ const writeToDoc = (fileName, content, config) => {
 const ApexDoc = {
     accept: ({ current, parent, root, }) => {
         const accepted =
-            current.node === 'TypeDeclaration' ||
-            current.node === 'EnumDeclaration';
+            (current.node === 'TypeDeclaration' ||
+            current.node === 'EnumDeclaration') &&
+            current === AST.getTopLevelType(root);
         return accepted;
     },
 
     run: ({ current, parent, root, config, }) => {
-        const topType = AST.getTopLevelType(root);
-        const fileName = topType === current ? getValue(topType.name) : `${getValue(topType.name)}_${getValue(current.name)}`;
+        const fileName = getValue(current.name);
 
-        const docs = {};
-        // TODO
+        const docs = buildDoc(current, config);
 
         writeToDoc(`${fileName}.json`, JSON.stringify(docs, null, 4), config);
     },

@@ -2,7 +2,7 @@
     "apiVersion": "42.0",
     "isDebugEnabled": false,
     "isPerfEnabled": false,
-    "generateDoc": "sync",
+    "generateDoc": "off",
     "srcDir": "resources/",
     "destDir": "build/",
     "docDir": "docs/",

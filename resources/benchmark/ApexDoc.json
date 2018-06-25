@@ -1,0 +1,116 @@
+{
+    "type": "Class",
+    "name": "ApexDoc",
+    "modifiers": [
+        "public"
+    ],
+    "annotations": [],
+    "comments": {
+        "value": "Sample class for ApexDoc",
+        "properties": {
+            "author": "Wilson",
+            "version": "1.0.0"
+        }
+    },
+    "superclassType": null,
+    "superInterfaceTypes": [],
+    "typeParameters": [],
+    "classDeclarations": [],
+    "interfaceDeclarations": [
+        {
+            "type": "Interface",
+            "name": "MyInterface",
+            "modifiers": [
+                "public"
+            ],
+            "annotations": [],
+            "comments": {
+                "value": "My interface",
+                "properties": {
+                    "author": "Adam"
+                }
+            },
+            "superclassType": null,
+            "classDeclarations": [],
+            "interfaceDeclarations": [],
+            "enumDeclarations": [],
+            "fieldDeclarations": [],
+            "methodDeclarations": []
+        }
+    ],
+    "enumDeclarations": [
+        {
+            "type": "Enum",
+            "name": "MyEnum",
+            "modifiers": [
+                "public"
+            ],
+            "annotations": [],
+            "comments": {
+                "value": "My enum",
+                "properties": {
+                    "author": "Henry"
+                }
+            },
+            "superInterfaceTypes": [],
+            "classDeclarations": [],
+            "interfaceDeclarations": [],
+            "enumDeclarations": [],
+            "fieldDeclarations": [],
+            "methodDeclarations": []
+        }
+    ],
+    "fieldDeclarations": [
+        [
+            {
+                "name": "name",
+                "type": "String",
+                "modifiers": [
+                    "private"
+                ],
+                "annotations": [],
+                "comments": {}
+            }
+        ],
+        [
+            {
+                "name": "id",
+                "type": "String",
+                "modifiers": [
+                    "public"
+                ],
+                "annotations": [],
+                "comments": {
+                    "value": "The id",
+                    "properties": {
+                        "deprecated": ""
+                    }
+                }
+            }
+        ]
+    ],
+    "methodDeclarations": [
+        {
+            "name": "run",
+            "modifiers": [
+                "public"
+            ],
+            "annotations": [],
+            "constructor": false,
+            "parameters": [
+                {
+                    "name": "i",
+                    "type": "Integer"
+                }
+            ],
+            "returnType": "void",
+            "comments": {
+                "value": "Run",
+                "properties": {
+                    "example": "new ApexDoc().run(0);",
+                    "param": "i The seed"
+                }
+            }
+        }
+    ]
+}
