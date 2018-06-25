@@ -76,7 +76,7 @@ const getName = (node, config) => getValue(node.name);
 
 const getModifiers = (node, config) => _.chain(node.modifiers).filter(m => m.node === 'Modifier').map(getValue).value();
 
-const getAnnotations = (node, config) => _.chain(node.modifiers).filter(m => m.node === 'Annotation').map(getValue).value();
+const getAnnotations = (node, config) => _.chain(node.modifiers).filter(m => m.node === 'Annotation').map(AST.getAnnotation).value();
 
 const getSuperclassType = (node, config) => node.superclassType ? getValue(node.superclassType) : null;
 
@@ -103,8 +103,8 @@ const buildMemberEnumDeclarations = (node, config) =>
         .value();
 
 const buildFieldDeclaration = (node, parent, config) => {
-    const modifiers = _.chain(node.modifiers).filter(m => m.node === 'Modifier').map(getValue).value();
-    const annotations = _.chain(node.modifiers).filter(m => m.node === 'Annotation').map(getValue).value();
+    const modifiers = getModifiers(node, config);
+    const annotations = getAnnotations(node, config);
     const type = getValue(node.type);
     const comments = buildComments(node, parent, config);
 
@@ -128,8 +128,8 @@ const buildFieldDeclarations = (node, config) =>
         .value();
 
 const buildMethodDeclaration = (node, parent, config) => {
-    const modifiers = _.chain(node.modifiers).filter(m => m.node === 'Modifier').map(getValue).value();
-    const annotations = _.chain(node.modifiers).filter(m => m.node === 'Annotation').map(getValue).value();
+    const modifiers = getModifiers(node, config);
+    const annotations = getAnnotations(node, config);
     const name = getValue(node.name);
     const constructor = node.constructor;
     const returnType = getValue(node.returnType2);

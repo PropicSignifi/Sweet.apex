@@ -23,6 +23,7 @@ public class ApexDoc {
      *
      * @param i The seed
      * */
+    @future(callout=true)
     public void run(Integer i) {
     }
 

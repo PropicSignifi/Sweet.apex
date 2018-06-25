@@ -417,6 +417,26 @@ const getAnnotationValue = annotation => {
     }
 };
 
+const getAnnotation = annotation => {
+    const data = {
+        typeName: getValue(annotation.typeName),
+    };
+
+    if(annotation.value) {
+        data.value = getValue(annotation.value);
+    }
+    else if(annotation.values) {
+        data.values = _.map(annotation.values, pair => {
+            return {
+                name: getValue(pair.name),
+                value: getValue(pair.value),
+            };
+        });
+    }
+
+    return data;
+};
+
 const getTopLevelType = root => {
     return root.types[0];
 };
@@ -501,6 +521,7 @@ const AST = {
     getEnclosingField,
     getParameters,
     getCompiled,
+    getAnnotation,
 };
 
 module.exports = AST;

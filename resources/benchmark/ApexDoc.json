@@ -95,7 +95,17 @@
             "modifiers": [
                 "public"
             ],
-            "annotations": [],
+            "annotations": [
+                {
+                    "typeName": "future",
+                    "values": [
+                        {
+                            "name": "callout",
+                            "value": "true"
+                        }
+                    ]
+                }
+            ],
             "constructor": false,
             "parameters": [
                 {
