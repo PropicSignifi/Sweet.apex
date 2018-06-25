@@ -55,6 +55,26 @@ if(!config.srcDir || !config.destDir) {
     return;
 }
 
+const isDirectory = dir => {
+    try {
+        return fs.lstatSync(dir).isDirectory();
+    }
+    catch(e) {
+        return false;
+    }
+};
+
+const normalize = file => {
+    if(isDirectory(file)) {
+        file = file.endsWith(path.sep) ? file : file + path.sep;
+    }
+
+    return file;
+};
+
+config.srcDir = normalize(config.srcDir);
+config.destDir = normalize(config.destDir);
+
 if(!fs.existsSync(config.destDir)) {
     fs.mkdirSync(config.destDir);
 }
@@ -72,7 +92,7 @@ const writeToFile = (fileName, content) => {
     time(`Write File ${fileName}`, config);
 
     return new Promise((resolve, reject) => {
-        fs.writeFile(config.destDir + path.sep + fileName, content, (error, data) => {
+        fs.writeFile(config.destDir + fileName, content, (error, data) => {
             timeEnd(`Write File ${fileName}`, config);
             if(error) {
                 reject(error);
@@ -86,12 +106,13 @@ const writeToFile = (fileName, content) => {
 const compileFile = fileName => {
     console.log(`Compiling ${fileName} ...`);
 
-    const name = fileName.substring(0, fileName.length - suffix.length);
+    const index = _.lastIndexOf(fileName, path.sep);
+    const name = fileName.substring(index + 1, fileName.length - suffix.length);
 
     time(`Read file ${fileName}`, config);
 
     return new Promise((resolve, reject) => {
-        fs.readFile(config.srcDir + path.sep + fileName, 'utf8', (error, src) => {
+        fs.readFile(fileName, 'utf8', (error, src) => {
             timeEnd(`Read file ${fileName}`, config);
             if(error) {
                 reject(error);
@@ -103,9 +124,9 @@ const compileFile = fileName => {
 
             Promise.all([
                 writeToFile(`${name}.cls`, apexClass, config)
-                    .then(() => console.log(`Compiled ${name}.cls`)),
+                    .then(() => console.log(`Compiled ${config.destDir + name}.cls`)),
                 writeToFile(`${name}.cls-meta.xml`, meta, config)
-                    .then(() => console.log(`Compiled ${name}.cls-meta.xml`)),
+                    .then(() => console.log(`Compiled ${config.destDir + name}.cls-meta.xml`)),
             ]).then(resolve);
         });
     });
@@ -113,12 +134,26 @@ const compileFile = fileName => {
 
 const start = Date.now();
 
-Promise.all(
-    _.chain(fs.readdirSync(config.srcDir))
-        .filter(name => name.endsWith(suffix))
-        .map(compileFile)
-        .value()
-).then(
+let p = null;
+if(config.srcDir.endsWith(path.sep)) {
+    p = Promise.all(
+        _.chain(fs.readdirSync(config.srcDir))
+            .filter(name => name.endsWith(suffix))
+            .map(name => compileFile(config.srcDir + name))
+            .value()
+    );
+}
+else {
+    if(config.srcDir.endsWith(suffix)) {
+        p = compileFile(config.srcDir);
+    }
+    else {
+        console.error('Source file should have suffix: ' + suffix);
+        return;
+    }
+}
+
+p.then(
     () => {
         const end = Date.now();
         console.log(`Completed after ${end - start} ms`);
