@@ -43,7 +43,7 @@ const runGroup = (group, feature) => {
     }
 };
 
-const rebuildWithFeature = (node, feature) => {
+const rebuildWithFeature = (node, feature, config) => {
     const collected = [];
 
     AST.traverse(node, (current, parent) => {
@@ -51,6 +51,7 @@ const rebuildWithFeature = (node, feature) => {
             current,
             parent: parent || {},
             root: node || {},
+            config,
         };
 
         if(accept(context, feature)) {
@@ -96,7 +97,7 @@ const rebuild = (node, config) => {
         }
 
         time(`Rebuild with ${featureName}`, config);
-        rebuildWithFeature(node, feature);
+        rebuildWithFeature(node, feature, config);
         timeEnd(`Rebuild with ${featureName}`, config);
     });
 

@@ -34,15 +34,6 @@ const usage = () => {
     console.error(`Usage: node ${_.chain(currentFileName).split(path.sep).last().value()} <srcDir> <destDir>`);
 };
 
-if(!srcDir || !destDir) {
-    usage();
-    return;
-}
-
-if(!fs.existsSync(destDir)) {
-    fs.mkdirSync(destDir);
-}
-
 const config = {
 };
 
@@ -50,6 +41,25 @@ _.assign(config, JSON.parse(fs.readFileSync(__dirname + path.sep + 'config.json'
     isDebugEnabled,
     isPerfEnabled,
 });
+
+if(srcDir) {
+    config.srcDir = srcDir;
+}
+
+if(destDir) {
+    config.destDir = destDir;
+}
+
+if(!config.srcDir || !config.destDir) {
+    usage();
+    return;
+}
+
+if(!fs.existsSync(config.destDir)) {
+    fs.mkdirSync(config.destDir);
+}
+
+config.cwd = __dirname;
 
 const meta = `<?xml version="1.0" encoding="UTF-8"?>
 <ApexClass xmlns="http://soap.sforce.com/2006/04/metadata">
@@ -62,7 +72,7 @@ const writeToFile = (fileName, content) => {
     time(`Write File ${fileName}`, config);
 
     return new Promise((resolve, reject) => {
-        fs.writeFile(destDir + path.sep + fileName, content, (error, data) => {
+        fs.writeFile(config.destDir + path.sep + fileName, content, (error, data) => {
             timeEnd(`Write File ${fileName}`, config);
             if(error) {
                 reject(error);
@@ -81,7 +91,7 @@ const compileFile = fileName => {
     time(`Read file ${fileName}`, config);
 
     return new Promise((resolve, reject) => {
-        fs.readFile(srcDir + path.sep + fileName, 'utf8', (error, src) => {
+        fs.readFile(config.srcDir + path.sep + fileName, 'utf8', (error, src) => {
             timeEnd(`Read file ${fileName}`, config);
             if(error) {
                 reject(error);
@@ -104,7 +114,7 @@ const compileFile = fileName => {
 const start = Date.now();
 
 Promise.all(
-    _.chain(fs.readdirSync(srcDir))
+    _.chain(fs.readdirSync(config.srcDir))
         .filter(name => name.endsWith(suffix))
         .map(compileFile)
         .value()

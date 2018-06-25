@@ -2,7 +2,12 @@
     "apiVersion": "42.0",
     "isDebugEnabled": false,
     "isPerfEnabled": false,
+    "generateDoc": "sync",
+    "srcDir": "resources/",
+    "destDir": "build/",
+    "docDir": "docs/",
     "features": [
+        "apexdoc",
         "array_creation",
         "mod",
         "template_string",
