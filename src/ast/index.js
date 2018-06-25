@@ -1,6 +1,7 @@
 const _ = require('lodash');
 const parse = require('../parser');
 const getValue = require('../valueProvider');
+const compile = require('../compiler');
 
 const _traverse = (node, parent, callback, skip) => {
     if(!node) {
@@ -142,9 +143,13 @@ const transform = (srcNode, destNode) => {
     addIndex(srcNode);
 };
 
-const hasModifier = (modifiers, target) => !!_.find(modifiers, { node: 'Modifier', keyword: target });
+const findModifier = (modifiers, target) => _.find(modifiers, { node: 'Modifier', keyword: target });
 
-const hasAnnotation = (modifiers, target) => !!_.find(modifiers, modifier => modifier.node === 'Annotation' && getValue(modifier.typeName) === target);
+const hasModifier = (modifiers, target) => !!findModifier(modifiers, target);
+
+const findAnnotation = (modifiers, target) => _.find(modifiers, modifier => modifier.node === 'Annotation' && getValue(modifier.typeName) === target);
+
+const hasAnnotation = (modifiers, target) => !!findAnnotation(modifiers, target);
 
 const parseEmptyLine = () => ({
     node: 'LineEmpty',
@@ -439,7 +444,24 @@ const _getEnclosing = (type, node) => {
     }
 
     return current;
-}
+};
+
+const getParameters = parameters => _.map(parameters, param => {
+    return {
+        name: getValue(param.name),
+        type: getValue(param.type),
+    };
+});
+
+const getCompiled = node => {
+    const lines = [];
+    compile(node, {
+        lines,
+        indent: '',
+    });
+
+    return lines;
+};
 
 const AST = {
     traverse,
@@ -454,7 +476,9 @@ const AST = {
     removeIndex,
     transform,
     hasModifier,
+    findModifier,
     hasAnnotation,
+    findAnnotation,
     parseEmptyLine,
     findNext,
     findPrev,
@@ -475,6 +499,8 @@ const AST = {
     getEnclosingType,
     getEnclosingMethod,
     getEnclosingField,
+    getParameters,
+    getCompiled,
 };
 
 module.exports = AST;

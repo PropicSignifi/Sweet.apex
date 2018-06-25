@@ -51,12 +51,7 @@ const Lambda = {
                 AST.transform(thisNode, newNode);
             });
 
-            const parameters = _.map(current.args, arg => {
-                return {
-                    name: getValue(arg.name),
-                    type: getValue(arg.type),
-                };
-            });
+            const parameters = AST.getParameters(current.args);
 
             const hasReturn = _.size(current.body.statements) > 0 && _.last(current.body.statements).node === 'ReturnStatement';
 

@@ -25,7 +25,7 @@ const ReflectFeature = {
 
     run: ({ current, parent, root, }) => {
         const typeDeclaration = current;
-        const annotation = _.find(typeDeclaration.modifiers, modifier => modifier.node === 'Annotation' && getValue(modifier.typeName) === 'reflect');
+        const annotation = AST.findAnnotation(typeDeclaration.modifiers, 'reflect');
         AST.removeChild(typeDeclaration, 'modifiers', annotation);
 
         typeDeclaration.superInterfaceTypes = typeDeclaration.superInterfaceTypes || [];
@@ -53,12 +53,7 @@ const ReflectFeature = {
             }
             else if(bodyDeclaration.node === 'MethodDeclaration' && !AST.hasModifier(bodyDeclaration.modifiers, 'static') && !bodyDeclaration.constructor) {
                 const name = getValue(bodyDeclaration.name);
-                const parameters = _.map(bodyDeclaration.parameters, param => {
-                    return {
-                        name: getValue(param.name),
-                        type: getValue(param.type),
-                    };
-                });
+                const parameters = AST.getParameters(bodyDeclaration.parameters);
                 const returnType = getValue(bodyDeclaration.returnType2);
                 methods.push({
                     name,

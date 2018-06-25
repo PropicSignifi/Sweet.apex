@@ -35,7 +35,7 @@ const Action = {
                 throw new Error('Should be static method');
             }
 
-            const annotation = _.find(current.modifiers, modifier => modifier.node === 'Annotation' && getValue(modifier.typeName) === 'action');
+            const annotation = AST.findAnnotation(current.modifiers, 'action');
             let returnRaw = false;
             let annotationValue = AST.getAnnotationValue(annotation);
             if(annotationValue) {
@@ -51,18 +51,9 @@ const Action = {
             const actionName = _.capitalize(methodName) + 'Action';
             actionNames.push(actionName);
 
-            const parameters = _.map(current.parameters, param => {
-                return {
-                    name: getValue(param.name),
-                    type: getValue(param.type),
-                };
-            });
+            const parameters = AST.getParameters(current.parameters);
 
-            const lines = [];
-            compile(current.body, {
-                lines,
-                indent: '',
-            });
+            const lines = AST.getCompiled(current.body);
 
             const returnType = getValue(current.returnType2);
 

@@ -45,12 +45,7 @@ const Optional = {
             delegator = _.cloneDeep(delegator);
             const initialParams = _.initial(delegator.parameters);
             delegator.parameters = initialParams;
-            const params = _.map(initialParams, param => {
-                return {
-                    name: getValue(param.name),
-                    type: getValue(param.type),
-                };
-            });
+            const params = AST.getParameters(initialParams);
             params.push({
                 name: 'null',
                 type: null,

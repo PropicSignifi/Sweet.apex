@@ -38,12 +38,7 @@ const Func = {
                 type: funcClassName,
             });
 
-            const parameters = _.map(methodDeclaration.parameters, param => {
-                return {
-                    name: getValue(param.name),
-                    type: getValue(param.type),
-                };
-            });
+            const parameters = AST.getParameters(methodDeclaration.parameters);
             const returnType = getValue(methodDeclaration.returnType2);
 
             let castStatements = _.map(parameters, (param, index) => {
@@ -51,11 +46,7 @@ const Func = {
             }).join('\n');
             castStatements = _.isEmpty(castStatements) ? '' : castStatements + '\n\n';
 
-            const lines = [];
-            compile(methodDeclaration.body, {
-                lines,
-                indent: '',
-            });
+            const lines = AST.getCompiled(methodDeclaration.body);
 
             if(returnType === 'void') {
                 lines.push('');
@@ -78,7 +69,7 @@ const Func = {
             newNodes.push(AST.parseEmptyLine());
             newNodes.push(newFuncType);
 
-            const annotation = _.find(methodDeclaration.modifiers, modifier => modifier.node === 'Annotation' && getValue(modifier.typeName) === 'func');
+            const annotation = AST.findAnnotation(methodDeclaration.modifiers, 'func');
             AST.removeChild(methodDeclaration, 'modifiers', annotation);
             AST.removeChildren(methodDeclaration.body, 'statements');
 

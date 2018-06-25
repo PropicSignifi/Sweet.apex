@@ -11,7 +11,7 @@ const Rethrow = {
     },
 
     run: ({ current, parent, root, }) => {
-        const annotation = _.find(current.modifiers, modifier => modifier.node === 'Annotation' && getValue(modifier.typeName) === 'rethrow');
+        const annotation = AST.findAnnotation(current.modifiers, 'rethrow');
         if(!annotation.value) {
             throw new Error('value is required for @rethrow');
         }

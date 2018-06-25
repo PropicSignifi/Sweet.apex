@@ -12,7 +12,7 @@ const Log = {
 
     run: ({ current, parent, root, }) => {
         const typeDeclaration = current;
-        const annotation = _.find(typeDeclaration.modifiers, m => m.node === 'Annotation' && getValue(m.typeName) === 'log');
+        const annotation = AST.findAnnotation(typeDeclaration.modifiers, 'log');
         AST.removeChild(typeDeclaration, 'modifiers', annotation);
 
         const loggerCode = `public static final Log logger = Log.getLogger(${getValue(typeDeclaration.name)}.class);`;
