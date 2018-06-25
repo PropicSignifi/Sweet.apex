@@ -2,12 +2,14 @@ const _ = require('lodash');
 const fs = require('fs');
 const path = require('path');
 const transpile = require('./src/transpiler');
-const { time, timeEnd, } = require('./src/utils');
+const build = require('./src/builder');
+const { time, timeEnd, normalize, log, } = require('./src/utils');
 
 const [ , currentFileName, ...args ] = process.argv;
 
 let isDebugEnabled = false;
 let isPerfEnabled = false;
+let silent = false;
 let srcDir = null;
 let destDir = null;
 const suffix = '.apex';
@@ -18,8 +20,12 @@ while(true) {
         isDebugEnabled = true;
         _.pullAt(args, 0);
     }
-    if(arg === '--perf') {
+    else if(arg === '--perf') {
         isPerfEnabled = true;
+        _.pullAt(args, 0);
+    }
+    else if(arg === '-s') {
+        silent = true;
         _.pullAt(args, 0);
     }
     else {
@@ -40,6 +46,7 @@ const config = {
 _.assign(config, JSON.parse(fs.readFileSync(__dirname + path.sep + 'config.json', 'utf8')), {
     isDebugEnabled,
     isPerfEnabled,
+    silent,
 });
 
 if(srcDir) {
@@ -55,29 +62,13 @@ if(!config.srcDir || !config.destDir) {
     return;
 }
 
-const isDirectory = dir => {
-    try {
-        return fs.lstatSync(dir).isDirectory();
-    }
-    catch(e) {
-        return false;
-    }
-};
-
-const normalize = file => {
-    if(isDirectory(file)) {
-        file = file.endsWith(path.sep) ? file : file + path.sep;
-    }
-
-    return file;
-};
-
 config.srcDir = normalize(config.srcDir);
-config.destDir = normalize(config.destDir);
 
 if(!fs.existsSync(config.destDir)) {
     fs.mkdirSync(config.destDir);
 }
+
+config.destDir = normalize(config.destDir);
 
 config.cwd = __dirname;
 
@@ -88,7 +79,7 @@ const meta = `<?xml version="1.0" encoding="UTF-8"?>
 </ApexClass>
 `;
 
-const writeToFile = (fileName, content) => {
+const writeToFile = (fileName, content, config) => {
     time(`Write File ${fileName}`, config);
 
     return new Promise((resolve, reject) => {
@@ -103,8 +94,8 @@ const writeToFile = (fileName, content) => {
     });
 };
 
-const compileFile = fileName => {
-    console.log(`Compiling ${fileName} ...`);
+const compileFile = (fileName, config) => {
+    log(`Compiling ${fileName} ...`, config);
 
     const index = _.lastIndexOf(fileName, path.sep);
     const name = fileName.substring(index + 1, fileName.length - suffix.length);
@@ -124,9 +115,9 @@ const compileFile = fileName => {
 
             Promise.all([
                 writeToFile(`${name}.cls`, apexClass, config)
-                    .then(() => console.log(`Compiled ${config.destDir + name}.cls`)),
+                    .then(() => log(`Compiled ${config.destDir + name}.cls`, config)),
                 writeToFile(`${name}.cls-meta.xml`, meta, config)
-                    .then(() => console.log(`Compiled ${config.destDir + name}.cls-meta.xml`)),
+                    .then(() => log(`Compiled ${config.destDir + name}.cls-meta.xml`, config)),
             ]).then(resolve);
         });
     });
@@ -139,13 +130,13 @@ if(config.srcDir.endsWith(path.sep)) {
     p = Promise.all(
         _.chain(fs.readdirSync(config.srcDir))
             .filter(name => name.endsWith(suffix))
-            .map(name => compileFile(config.srcDir + name))
+            .map(name => compileFile(config.srcDir + name, config))
             .value()
     );
 }
 else {
     if(config.srcDir.endsWith(suffix)) {
-        p = compileFile(config.srcDir);
+        p = compileFile(config.srcDir, config);
     }
     else {
         console.error('Source file should have suffix: ' + suffix);
@@ -153,10 +144,11 @@ else {
     }
 }
 
-p.then(
+p.then(() => build(config))
+.then(
     () => {
         const end = Date.now();
-        console.log(`Completed after ${end - start} ms`);
+        log(`Completed after ${end - start} ms`, config);
     },
     error => console.error(error)
 );

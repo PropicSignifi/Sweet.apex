@@ -13,6 +13,18 @@ public class Sweet {
         throw new SweetException('Cannot reflect on this object');
     }
 
+    public static String readFile(String filename) {
+        if(!String.isBlank(filename)) {
+            List<StaticResource> srList = [ SELECT Id, Body FROM StaticResource WHERE Name = :filename LIMIT 1 ];
+            if(!srList.isEmpty()) {
+                String body = srList[0].Body.toString();
+                return body;
+            }
+        }
+
+        return null;
+    }
+
     public class AnonymousContext {
         private AnonymousContext parent;
         private Map<String, Object> context;

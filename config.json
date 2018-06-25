@@ -6,6 +6,9 @@
     "srcDir": "resources/",
     "destDir": "build/",
     "docDir": "docs/",
+    "fileSrcDir": "files/",
+    "fileDestDir": "build/staticresources/",
+    "silent": false,
     "features": [
         "apexdoc",
         "array_creation",

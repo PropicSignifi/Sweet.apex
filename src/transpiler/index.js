@@ -1,22 +1,22 @@
 const parse = require('../parser');
 const rebuild = require('../features');
 const compile = require('../compiler');
-const { time, timeEnd, } = require('../utils');
+const { time, timeEnd, log, } = require('../utils');
 
 const transpile = (src, config) => {
     time('Parse', config);
     const result = parse(src);
     timeEnd('Parse', config);
     if(config.isDebugEnabled) {
-        console.log(JSON.stringify(result, null, 4));
+        log(JSON.stringify(result, null, 4), config);
     }
 
     time('Rebuild', config);
     rebuild(result, config);
     timeEnd('Rebuild', config);
     if(config.isDebugEnabled) {
-        console.log('--------- After Rebuild ----------');
-        console.log(JSON.stringify(result, null, 4));
+        log('--------- After Rebuild ----------', config);
+        log(JSON.stringify(result, null, 4), config);
     }
 
     time('Compile', config);

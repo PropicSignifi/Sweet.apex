@@ -3,6 +3,7 @@ const path = require('path');
 const AST = require('../../ast');
 const getValue = require('../../valueProvider');
 const buildDoc = require('./doc_builder');
+const { log, } = require('../../utils');
 
 const writeToDoc = (fileName, content, config) => {
     if(config.docDir) {
@@ -19,12 +20,12 @@ const writeToDoc = (fileName, content, config) => {
                     return;
                 }
 
-                console.log(`Generated apex doc to ${fileName}`);
+                log(`Generated apex doc to ${fileName}`, config);
             });
         }
         else if(config.generateDoc === 'sync') {
             fs.writeFileSync(filePath, content);
-            console.log(`Generated apex doc to ${fileName}`);
+            log(`Generated apex doc to ${fileName}`, config);
         }
     }
 };

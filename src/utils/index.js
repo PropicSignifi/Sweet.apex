@@ -71,7 +71,30 @@ const timeEnd = (message, config) => {
         counter.end = Date.now();
         counter.duration = counter.end - counter.start;
 
-        console.log(`${message}: ${counter.duration}`);
+        log(`${message}: ${counter.duration}`, config);
+    }
+};
+
+const isDirectory = dir => {
+    try {
+        return fs.lstatSync(dir).isDirectory();
+    }
+    catch(e) {
+        return false;
+    }
+};
+
+const normalize = file => {
+    if(isDirectory(file)) {
+        file = file.endsWith(path.sep) ? file : file + path.sep;
+    }
+
+    return file;
+};
+
+const log = (message, config) => {
+    if(!config.silent) {
+        console.log(message);
     }
 };
 
@@ -87,4 +110,6 @@ module.exports = {
     getImplementsInterfaces,
     time,
     timeEnd,
+    normalize,
+    log,
 };
