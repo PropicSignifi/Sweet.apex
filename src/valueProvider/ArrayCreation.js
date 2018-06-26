@@ -6,7 +6,7 @@ const ArrayCreation = node => {
         initializer,
     } = node;
 
-    return `new ${getValue(type)}{ ${getValue(initializer)} }`;
+    return `new ${getValue(type)}${getValue(initializer)}`;
 };
 
 module.exports = ArrayCreation;

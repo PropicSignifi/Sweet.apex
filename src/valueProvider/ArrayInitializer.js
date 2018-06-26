@@ -6,7 +6,7 @@ const ArrayInitializer = node => {
         expressions,
     } = node;
 
-    return _.map(expressions, getValue).join(', ');
+    return "{ " + _.map(expressions, getValue).join(', ') + " }";
 };
 
 module.exports = ArrayInitializer;
