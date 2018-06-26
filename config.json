@@ -17,6 +17,7 @@
         "lambda",
         "switch",
         "file",
+        "inject",
         "not_null",
         "default_value",
         "optional",

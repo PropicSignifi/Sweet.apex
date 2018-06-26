@@ -50,6 +50,23 @@ private class SweetTest extends Sweet.BaseEnum {
         System.assertEquals(h1, h2);
     }
 
+    @isTest
+    private static void getBeanWithBoundTypeTest() {
+        Sweet.bind(Case.class, Account.class);
+        Object o = Sweet.getBean(Case.class);
+        System.assert(o instanceof Account);
+
+        Sweet.unbind(Case.class);
+        o = Sweet.getBean(Case.class);
+        System.assert(o instanceof Case);
+    }
+
+    @isTest
+    private static void getBeanWithNameTest() {
+        Object o = Sweet.getBean('demo');
+        System.assert(o instanceof Case);
+    }
+
     private class DummyReflectable implements Sweet.Reflectable {
         private Map<String, Object> data = new Map<String, Object>();
 

@@ -18,6 +18,66 @@ public class Sweet {
         'F' => 15
     };
 
+    private static List<BeanInfo> beanInfos = null;
+    private static Map<Type, Type> boundTypes = new Map<Type, Type>();
+
+    private static Map<String, Object> namedBeanCache = new Map<String, Object>();
+    private static Map<Type, Object> typedBeanCache = new Map<Type, Object>();
+
+    public static void bind(Type target, Type implementor) {
+        if(target != null && implementor != null) {
+            Sweet.boundTypes.put(target, implementor);
+        }
+    }
+
+    public static void unbind(Type target) {
+        if(target != null) {
+            Sweet.boundTypes.remove(target);
+        }
+    }
+
+    public static void setBeanInfos(List<BeanInfo> infos) {
+        if(infos != null) {
+            Sweet.beanInfos = infos;
+        }
+    }
+
+    public static Object getBean(String name) {
+        if(Sweet.beanInfos == null) {
+            Sweet.loadBeanInfos();
+        }
+
+        if(Sweet.namedBeanCache.containsKey(name)) {
+            return Sweet.namedBeanCache.get(name);
+        }
+
+        for(BeanInfo info : Sweet.beanInfos) {
+            if(info.name == name) {
+                Type beanType = Type.forName(info.type);
+                return beanType.newInstance();
+            }
+        }
+
+        return null;
+    }
+
+    public static Object getBean(Type targetType) {
+        if(targetType != null) {
+            if(Sweet.typedBeanCache.containsKey(targetType)) {
+                return Sweet.typedBeanCache.get(targetType);
+            }
+
+            Type implementorType = Sweet.boundTypes.get(targetType);
+            if(implementorType == null) {
+                implementorType = targetType;
+            }
+
+            return implementorType.newInstance();
+        }
+
+        return null;
+    }
+
     public static void assertNotNull(Object value, String message) {
         if(value == null) {
             throw new SweetException(message);
@@ -60,6 +120,22 @@ public class Sweet {
         }
 
         return (Integer)hash;
+    }
+
+    private static void loadBeanInfos() {
+        try {
+            String beansJSON = readFile('beans');
+            List<BeanInfo> infos = (List<BeanInfo>)JSON.deserialize(beansJSON, List<BeanInfo>.class);
+            Sweet.setBeanInfos(infos);
+        }
+        catch(Exception e) {
+            System.debug(LoggingLevel.Warn, 'Failed to load bean infos: ' + e.getMessage());
+        }
+    }
+
+    public class BeanInfo {
+        public String name;
+        public String type;
     }
 
     public class AnonymousContext {

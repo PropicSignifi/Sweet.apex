@@ -4,7 +4,7 @@ const AST = require('../../ast');
 const File = {
     accept: ({ current, parent, }) => {
         const accepted =
-            current.node === 'VariableDeclarationStatement' &&
+            (current.node === 'VariableDeclarationStatement' || current.node === 'FieldDeclaration') &&
             AST.hasAnnotation(current.modifiers, 'file');
         return accepted;
     },
