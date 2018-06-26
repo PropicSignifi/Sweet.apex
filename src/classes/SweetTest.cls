@@ -40,6 +40,16 @@ private class SweetTest extends Sweet.BaseEnum {
         System.assertEquals(1, c2.get('a'));
     }
 
+    @isTest
+    private static void generateHashCodeTest() {
+        Integer a = 1;
+        Integer b = 1;
+        Integer h1 = Sweet.generateHashCode(a);
+        Integer h2 = Sweet.generateHashCode(b);
+
+        System.assertEquals(h1, h2);
+    }
+
     private class DummyReflectable implements Sweet.Reflectable {
         private Map<String, Object> data = new Map<String, Object>();
 

@@ -24,6 +24,7 @@
         "log",
         "function",
         "action",
+        "identity",
         "reflect",
         "enum"
     ]

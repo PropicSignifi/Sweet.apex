@@ -1,4 +1,23 @@
 public class Sweet {
+    private static final Map<string, integer> HASH_CODE_VALS = new Map<string, integer>{
+        '0' => 0,
+        '1' => 1,
+        '2' => 2,
+        '3' => 3,
+        '4' => 4,
+        '5' => 5,
+        '6' => 6,
+        '7' => 7,
+        '8' => 8,
+        '9' => 9,
+        'A' => 10,
+        'B' => 11,
+        'C' => 12,
+        'D' => 13,
+        'E' => 14,
+        'F' => 15
+    };
+
     public static void assertNotNull(Object value, String message) {
         if(value == null) {
             throw new SweetException(message);
@@ -23,6 +42,24 @@ public class Sweet {
         }
 
         return null;
+    }
+
+    public static Integer generateHashCode(Object obj) {
+        String objJS = JSON.serialize(obj);
+        Blob b = Blob.valueOf(objJS);
+        Blob bHash = Crypto.generateMac('hmacSHA1', b, blob.valueOf('a key that does not matter'));
+        String objHex = EncodingUtil.convertToHex(bHash);
+
+        Long hash = Long.valueOf('2166136261');
+        Long prime = Long.valueOf('16777619');
+
+        for(String s : objHex.toUpperCase().split('')) {
+            if(String.isEmpty(s))
+                continue;
+            hash = ((hash ^ HASH_CODE_VALS.get(s)) * prime);
+        }
+
+        return (Integer)hash;
     }
 
     public class AnonymousContext {
