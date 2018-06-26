@@ -1,9 +1,14 @@
+const normalize = require('../template');
 const parse = require('../parser');
 const rebuild = require('../features');
 const compile = require('../compiler');
 const { time, timeEnd, log, } = require('../utils');
 
 const transpile = (src, config) => {
+    time('Normalize', config);
+    src = normalize(src, config);
+    timeEnd('Normalize', config);
+
     time('Parse', config);
     const result = parse(src);
     timeEnd('Parse', config);
