@@ -1,7 +1,6 @@
 const fs = require('fs');
 const path = require('path');
 const _ = require('lodash');
-const utils = require('../utils');
 
 let templates = null;
 
@@ -9,9 +8,7 @@ const loadTemplates = config => {
     const templates = {};
 
     if(config.templateDir) {
-        const templateDir = config.cwd ?
-            config.cwd + path.sep + utils.normalize(config.templateDir) :
-            utils.normalize(config.templateDir);
+        const templateDir = config.templateDir;
         _.each(fs.readdirSync(templateDir), fileName => {
             const name = fileName.endsWith('.js') ? fileName.substring(0, fileName.length - 3) : fileName;
             const template = require(templateDir + path.sep + fileName);
@@ -26,7 +23,7 @@ const loadTemplates = config => {
 };
 
 const normalize = (text, config) => {
-    if(!templates) {
+    if(_.isEmpty(templates)) {
         templates = loadTemplates(config);
     }
 

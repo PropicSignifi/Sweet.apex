@@ -72,6 +72,10 @@ config.destDir = normalize(config.destDir);
 
 config.cwd = __dirname;
 
+if(config.templateDir) {
+    config.templateDir = config.cwd + path.sep + normalize(config.templateDir);
+}
+
 const meta = `<?xml version="1.0" encoding="UTF-8"?>
 <ApexClass xmlns="http://soap.sforce.com/2006/04/metadata">
     <apiVersion>${config.apiVersion}</apiVersion>
