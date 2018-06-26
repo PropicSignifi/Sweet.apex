@@ -1676,7 +1676,7 @@ StringLiteral
     { return { node: 'StringLiteral', escapedValue: text() }; }
 
 TemplateStringLiteral
-    = "\`" (Escape / ![`] _)* "\`"                   // this " keeps the editor happy
+    = "\`" (![`] _)* "\`"                   // this " keeps the editor happy
     { return { node: 'TemplateStringLiteral', escapedValue: text() }; }
 
 Escape

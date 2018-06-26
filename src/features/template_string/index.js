@@ -9,7 +9,8 @@ const TemplateString = {
     },
 
     run: ({ current, parent, root, }) => {
-        const templateString = current.escapedValue.substring(1, current.escapedValue.length - 1);
+        let templateString = current.escapedValue.substring(1, current.escapedValue.length - 1);
+        templateString = templateString.replace(/(?:\r\n|\r|\n)/g, '\\n');
         const items = [];
         let startIndex = 0;
         let endIndex = 0;
