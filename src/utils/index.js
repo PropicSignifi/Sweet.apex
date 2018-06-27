@@ -95,6 +95,10 @@ const normalize = file => {
 };
 
 const log = (message, config) => {
+    if(!config) {
+        throw new Error('Config is not passed in');
+    }
+
     if(!config.silent) {
         console.log(message);
     }

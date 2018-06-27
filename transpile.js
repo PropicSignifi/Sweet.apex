@@ -161,6 +161,10 @@ else {
     }
 }
 
+const isFileExcluded = (file, config) => {
+    return _.some(config.scanExcludePatterns, pattern => new RegExp(pattern).test(file));
+};
+
 Promise.resolve(srcFiles)
     .then(files => {
         const names = _.map(files, getName);
@@ -169,7 +173,20 @@ Promise.resolve(srcFiles)
             .map(name => config.destDir + name)
             .value();
 
-        return Promise.all(_.map([ ...files, ...destFiles, ], file => Typings.scan(file, config)))
+        return Promise.resolve([ ...files, ...destFiles, ])
+            .then(files => {
+                return Promise.all(
+                    _.chain(files)
+                        .reject(file => isFileExcluded(file, config))
+                        .reject(file => !FileUpdates.hasChanged(file, config))
+                        .map(file =>
+                            Typings.scan(file, config)
+                                .then(() => log(`Scanned ${file}`, config))
+                                .then(() => FileUpdates.change(file, config))
+                        )
+                        .value()
+                );
+            })
             .then(data => {
                 log(`Scanned ${_.size(data)} files`, config);
                 return files;
@@ -179,6 +196,7 @@ Promise.resolve(srcFiles)
     .then(() => finalize(config))
     .then(() => build(config))
     .then(() => FileUpdates.flush(config))
+    .then(() => Typings.flush(config))
     .then(
         () => {
             const end = Date.now();

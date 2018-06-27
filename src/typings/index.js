@@ -1,36 +1,53 @@
 const _ = require('lodash');
 const fs = require('fs');
+const path = require('path');
 const build = require('./builder');
-const { time, timeEnd, getName, } = require('../utils');
+const { time, timeEnd, } = require('../utils');
 const FileUpdates = require('../utils/fileUpdates');
 const normalize = require('../template');
 const parse = require('../parser');
+const AST = require('../ast');
 
-const allTypings = {};
+let allTypings = null;
 
-const slim = typings => {
-    _.each(typings, (value, key) => {
-        if(_.isEmpty(value)) {
-            delete typings[key];
+const getAllTypings = config => {
+    if(!allTypings) {
+        const allTypingsPath = config.cacheDir + path.sep + 'allTypings.json';
+        if(fs.existsSync(allTypingsPath)) {
+            try {
+                allTypings = JSON.parse(fs.readFileSync(allTypingsPath, 'utf8'));
+            }
+            catch(e) {
+                console.error('Failed to load all typings', e);
+            }
         }
-        else {
-            slim(value);
-        }
-    });
+    }
+
+    if(!allTypings) {
+        allTypings = {};
+    }
+
+    return allTypings;
 };
 
-const add = node => {
-    const typings = build(node, {
+const flush = (config) => {
+    const allTypingsPath = config.cacheDir + path.sep + 'allTypings.json';
+    const allTypings = getAllTypings(config);
+    fs.writeFileSync(allTypingsPath, JSON.stringify(allTypings));
+};
+
+const add = (node, config) => {
+    const typeDeclaration = AST.getTopLevelType(node);
+
+    const typings = build(typeDeclaration, {
         includeComments: false,
     });
 
-    slim(typings);
-
+    const allTypings = getAllTypings(config);
     allTypings[typings.name] = typings;
 };
 
 const scan = (fileName, config) => {
-    const name = getName(fileName);
     time(`Scan file ${fileName}`, config);
 
     return new Promise((resolve, reject) => {
@@ -55,7 +72,7 @@ const scan = (fileName, config) => {
                     const result = parse(src);
                     timeEnd('Parse', config);
 
-                    add(result);
+                    add(result, config);
 
                     resolve(result);
                 }
@@ -77,6 +94,8 @@ const scan = (fileName, config) => {
 const Typings = {
     add,
     scan,
+    getAllTypings,
+    flush,
 };
 
 module.exports = Typings;

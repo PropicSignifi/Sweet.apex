@@ -10,6 +10,9 @@
     "fileDestDir": "build/staticresources/",
     "templateDir": "template/",
     "silent": false,
+    "clean": false,
+    "ignoreErrors": false,
+    "scanExcludePatterns": [".*Test.cls$"],
     "features": [
         "apexdoc",
         "array_creation",
