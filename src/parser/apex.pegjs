@@ -1555,11 +1555,13 @@ Keyword
       / "case"
       / "catch"
       / "class"
+      / "Class"
       / "continue"
       / "default"
       / "do"
       / "else"
       / "enum"
+      / "Enum"
       / "extends"
       / "false"
       / "final"
@@ -1569,6 +1571,7 @@ Keyword
       / "if"
       / "implements"
       / "instanceof"
+      / "instanceOf"
       / "interface"
       / "null"
       / "override"
@@ -1586,6 +1589,7 @@ Keyword
       / "try"
       / "virtual"
       / "void"
+      / "Void"
       / "while"
       ) !LetterOrDigit
 
@@ -1621,6 +1625,7 @@ THIS         = Indent "this"         !LetterOrDigit Spacing
 THROW        = Indent "throw"        !LetterOrDigit Spacing
 TRY          = Indent "try"          !LetterOrDigit Spacing
 VOID         = Indent "void"         !LetterOrDigit Spacing
+             / Indent "Void"         !LetterOrDigit Spacing
 WHILE        = Indent "while"        !LetterOrDigit Spacing
 SET          = Indent "set"          !LetterOrDigit Spacing
 GET          = Indent "get"          !LetterOrDigit Spacing
