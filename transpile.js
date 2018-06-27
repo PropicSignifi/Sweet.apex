@@ -185,7 +185,11 @@ Promise.resolve(srcFiles)
                         .map(file =>
                             Typings.scan(file, config)
                                 .then(() => log(`Scanned ${file}`, config))
-                                .then(() => FileUpdates.change(file, config))
+                                .then(() => {
+                                    if(_.includes(destFiles, file)) {
+                                        FileUpdates.change(file, config);
+                                    }
+                                })
                         )
                         .value()
                 );
