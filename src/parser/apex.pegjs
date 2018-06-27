@@ -1000,6 +1000,15 @@ UnaryExpressionNotPlusMinus
         expression: expr[3]
       };
     }
+    / expr:ArrowCastExpression
+    {
+      return {
+        node:      'ArrowCastExpression',
+        fromType:   expr[1],
+        toType:     expr[5],
+        expression: expr[7]
+      };
+    }
     / arg:Primary sel:Selector sels:Selector* operator:PostfixOp+
     {
       return operator.length > 1 ? TODO() : {
@@ -1023,6 +1032,9 @@ UnaryExpressionNotPlusMinus
 CastExpression
     = LPAR PrimitiveType RPAR UnaryExpression
     / LPAR ReferenceType RPAR UnaryExpressionNotPlusMinus
+
+ArrowCastExpression
+    = LPAR ReferenceType Indent ARROW Indent ReferenceType RPAR UnaryExpressionNotPlusMinus
 
 Primary
     = ParExpression

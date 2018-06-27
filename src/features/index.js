@@ -106,4 +106,12 @@ const rebuild = (node, config) => {
     timeEnd('Remove index', config);
 };
 
-module.exports = rebuild;
+const getFeatures = () => features;
+
+const getFeature = featureName => features[featureName];
+
+module.exports = {
+    rebuild,
+    getFeatures,
+    getFeature,
+};

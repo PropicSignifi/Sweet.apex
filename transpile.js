@@ -2,8 +2,9 @@ const _ = require('lodash');
 const fs = require('fs');
 const path = require('path');
 const transpile = require('./src/transpiler');
+const finalize = require('./src/finalizer');
 const build = require('./src/builder');
-const { time, timeEnd, normalize, log, } = require('./src/utils');
+const { time, timeEnd, normalize, log, writeToFile, } = require('./src/utils');
 
 const [ , currentFileName, ...args ] = process.argv;
 
@@ -83,21 +84,6 @@ const meta = `<?xml version="1.0" encoding="UTF-8"?>
 </ApexClass>
 `;
 
-const writeToFile = (fileName, content, config) => {
-    time(`Write File ${fileName}`, config);
-
-    return new Promise((resolve, reject) => {
-        fs.writeFile(config.destDir + fileName, content, (error, data) => {
-            timeEnd(`Write File ${fileName}`, config);
-            if(error) {
-                reject(error);
-            }
-
-            resolve(null);
-        });
-    });
-};
-
 const compileFile = (fileName, config) => {
     log(`Compiling ${fileName} ...`, config);
 
@@ -148,7 +134,8 @@ else {
     }
 }
 
-p.then(() => build(config))
+p.then(() => finalize(config))
+.then(() => build(config))
 .then(
     () => {
         const end = Date.now();

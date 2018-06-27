@@ -1,6 +1,6 @@
 const normalize = require('../template');
 const parse = require('../parser');
-const rebuild = require('../features');
+const { rebuild, } = require('../features');
 const compile = require('../compiler');
 const { time, timeEnd, log, } = require('../utils');
 

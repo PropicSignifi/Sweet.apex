@@ -93,23 +93,17 @@ const _parse = (type, content) => {
     return node;
 };
 
-const parseTypeDeclaration = content => {
-    return _parse('TypeDeclaration', content);
-};
+const parseTypeDeclaration = content => _parse('TypeDeclaration', content);
 
-const parseClassBodyDeclaration = content => {
-    return _parse('ClassBodyDeclaration', content);
-};
+const parseClassBodyDeclaration = content => _parse('ClassBodyDeclaration', content);
 
-const parseExpression = content => {
-    return _parse('Expression', content);
-};
+const parseExpression = content => _parse('Expression', content);
 
-const parseBlockStatement = line => {
-    return _parse('BlockStatement', line);
-};
+const parseBlockStatement = line => _parse('BlockStatement', line);
 
 const parseBlockStatements = lines => _.map(lines, parseBlockStatement);
+
+const parseCompilationUnit = content => _.parse('CompilationUnit', content);
 
 const getMethodSignature = (methodDeclaration, typeDeclaration) => {
     if(typeDeclaration) {
@@ -491,6 +485,7 @@ const AST = {
     parseTypeDeclaration,
     parseClassBodyDeclaration,
     parseExpression,
+    parseCompilationUnit,
     getMethodSignature,
     addIndex,
     removeIndex,

@@ -15,6 +15,7 @@
         "array_creation",
         "mod",
         "template_string",
+        "cast",
         "lambda",
         "switch",
         "file",

@@ -1,4 +1,6 @@
 const _ = require('lodash');
+const fs = require('fs');
+const path = require('path');
 const getValue = require('../valueProvider');
 const compile = require('../compiler');
 
@@ -98,6 +100,21 @@ const log = (message, config) => {
     }
 };
 
+const writeToFile = (fileName, content, config) => {
+    time(`Write File ${fileName}`, config);
+
+    return new Promise((resolve, reject) => {
+        fs.writeFile(config.destDir + fileName, content, (error, data) => {
+            timeEnd(`Write File ${fileName}`, config);
+            if(error) {
+                reject(error);
+            }
+
+            resolve(null);
+        });
+    });
+};
+
 module.exports = {
     addIndent,
     addComments,
@@ -112,4 +129,5 @@ module.exports = {
     timeEnd,
     normalize,
     log,
+    writeToFile,
 };
