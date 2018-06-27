@@ -136,7 +136,7 @@ const buildMethodDeclaration = (node, parent, typingsConfig) => {
     const annotations = getAnnotations(node, typingsConfig);
     const name = getValue(node.name);
     const constructor = node.constructor;
-    const returnType = getValue(node.returnType2);
+    const returnType = node.returnType2 ? getValue(node.returnType2) : null;
     const parameters = _.map(node.parameters, param => {
         return {
             name: getValue(param.name),

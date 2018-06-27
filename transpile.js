@@ -36,6 +36,7 @@ let isDebugEnabled = options.v;
 let isPerfEnabled = options.perf;
 let silent = options.s;
 let clean = options.c;
+let ignoreErrors = options.i;
 let srcDir = _.nth(items, 0);
 let destDir = _.nth(items, 1);
 
@@ -51,6 +52,7 @@ _.assign(config, JSON.parse(fs.readFileSync(__dirname + path.sep + 'config.json'
     isPerfEnabled,
     silent,
     clean,
+    ignoreErrors,
 });
 
 if(srcDir) {
@@ -126,7 +128,14 @@ const compileFile = (fileName, config) => {
                     .then(resolve);
                 }
                 catch(e) {
-                    reject(new Error(`Failed to compile ${fileName}:\n${e}`));
+                    if(config.ignoreErrors) {
+                        console.error(new Error(`Failed to compile ${fileName}:\n${e}`));
+                        resolve(null);
+                    }
+                    else {
+                        reject(new Error(`Failed to compile ${fileName}:\n${e}`));
+                        throw e;
+                    }
                 }
             });
         }

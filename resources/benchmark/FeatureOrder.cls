@@ -2,7 +2,6 @@ public class FeatureOrder {
     public static Integer init() {
         return 0;
     }
-
     public static Integer add(Integer a, Integer b) {
         return (Integer)F.add.runN(new List<Object>{ a, b });
     }
@@ -17,7 +16,6 @@ public class FeatureOrder {
         public AddFunc() {
             super(2);
         }
-
         public override Object execN(List<Object> args) {
             Integer a = args.get(0) == null ? null : (Integer)args.get(0);
             Integer b = args.get(1) == null ? null : (Integer)args.get(1);

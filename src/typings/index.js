@@ -45,9 +45,11 @@ const scan = (fileName, config) => {
                 }
 
                 try {
-                    time('Normalize', config);
-                    src = normalize(src, config);
-                    timeEnd('Normalize', config);
+                    if(!fileName.endsWith('.cls')) {
+                        time('Normalize', config);
+                        src = normalize(src, config);
+                        timeEnd('Normalize', config);
+                    }
 
                     time('Parse', config);
                     const result = parse(src);
@@ -58,7 +60,14 @@ const scan = (fileName, config) => {
                     resolve(result);
                 }
                 catch(e) {
-                    reject(new Error(`Failed to scan ${fileName}:\n${e}`));
+                    if(config.ignoreErrors) {
+                        console.error(new Error(`Failed to scan ${fileName}:\n${e}`));
+                        resolve(null);
+                    }
+                    else {
+                        reject(new Error(`Failed to scan ${fileName}:\n${e}`));
+                        throw e;
+                    }
                 }
             });
         }

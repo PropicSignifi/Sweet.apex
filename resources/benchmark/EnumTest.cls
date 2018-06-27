@@ -13,13 +13,10 @@ public class EnumTest extends Sweet.BaseEnum {
         return instances.get(name);
     }
 
-
     private String id;
-
     private EnumTest(String id) {
         this.id = id;
     }
-
     public String getId() {
         return this.id;
     }

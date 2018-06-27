@@ -5,11 +5,9 @@ public class Function {
     public static Integer add(Integer a, Integer b) {
         return (Integer)F.add.runN(new List<Object>{ a, b });
     }
-
     public static void run() {
         F.run.runN(new List<Object>{  });
     }
-
     public static void test() {
         System.debug(Function.F.run.run());
     }
@@ -25,7 +23,6 @@ public class Function {
         public AddFunc() {
             super(2);
         }
-
         public override Object execN(List<Object> args) {
             Integer a = args.get(0) == null ? null : (Integer)args.get(0);
             Integer b = args.get(1) == null ? null : (Integer)args.get(1);
@@ -38,7 +35,6 @@ public class Function {
         public RunFunc() {
             super(0);
         }
-
         public override Object execN(List<Object> args) {
             System.debug('Test');
 

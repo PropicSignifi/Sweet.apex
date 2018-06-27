@@ -15,7 +15,15 @@
   }
 
   function buildList(first, rest, index) {
-    return [first].concat(extractList(rest, index));
+    var list = [first].concat(extractList(rest, index));
+    var newList = [];
+    for(var i = 0; i < list.length; i++) {
+        if(list[i]) {
+            newList.push(list[i]);
+        }
+    }
+
+    return newList;
   }
 
   function buildTree(first, rest, builder) {
@@ -260,8 +268,8 @@ ClassBodyDeclaration
         modifiers: modifier === null ? [] : [makeModifier('static')]
       };
     }
-    / Indent modifiers:Modifier* EmptyLines member:MemberDecl            // ClassMemberDeclaration
-    { return mergeProps(member, { modifiers: modifiers }); }
+    / Indent first:Modifier? rest:(EmptyLines NonJavaDocComment? Modifier)* EmptyLines (EmptyLines NonJavaDocComment)* member:MemberDecl            // ClassMemberDeclaration
+    { return mergeProps(member, { modifiers: buildList(first, rest, 2) }); }
     / Indent comment:EndOfLineComment
     { return { node: "EndOfLineComment", comment: comment.value }; }
     / Indent comment:TraditionalComment
@@ -312,7 +320,7 @@ MemberDecl
     }
 
 MethodDeclaratorRest
-    = EmptyLines (EmptyLines CommentStatement)* params:FormalParameters dims:Dim*
+    = EmptyLines (EmptyLines NonJavaDocComment)* params:FormalParameters dims:Dim*
       body:(MethodBody / SEMI { return null; })
     {
       return {
@@ -324,7 +332,7 @@ MethodDeclaratorRest
     }
 
 VoidMethodDeclaratorRest
-    = EmptyLines (EmptyLines CommentStatement)* params:FormalParameters
+    = EmptyLines (EmptyLines NonJavaDocComment)* params:FormalParameters
       body:(MethodBody / SEMI { return null; })
     {
       return {
@@ -336,7 +344,7 @@ VoidMethodDeclaratorRest
     }
 
 ConstructorDeclaratorRest
-    = EmptyLines (EmptyLines CommentStatement)* params:FormalParameters body:MethodBody
+    = EmptyLines (EmptyLines NonJavaDocComment)* params:FormalParameters body:MethodBody
     {
       return {
         parameters:       params,
@@ -369,7 +377,7 @@ InterfaceDeclaration
     }
 
 InterfaceBody
-    = LWING decls:InterfaceBodyDeclaration* Indent RWING
+    = EmptyLines LWING decls:InterfaceBodyDeclaration* Indent RWING
     { return skipNulls(decls); }
 
 InterfaceBodyDeclaration
@@ -680,7 +688,7 @@ BlockStatement
 Statement
     = Block
     / BlockExpressionStatement
-    / Indent IF expr:ParExpression EmptyLines (EmptyLines CommentStatement)* then:Statement EmptyLines (EmptyLines CommentStatement)* alt:(ELSE Statement)?
+    / Indent IF expr:ParExpression EmptyLines (EmptyLines NonJavaDocComment)* then:Statement EmptyLines (EmptyLines NonJavaDocComment)* alt:(ELSE Statement)?
     {
       return {
         node:         'IfStatement',
@@ -689,7 +697,7 @@ Statement
         expression:    expr.expression,
       };
     }
-    / Indent FOR LPAR EmptyLines (EmptyLines CommentStatement)* init:ForInit? SEMI EmptyLines (EmptyLines CommentStatement)* expr:Expression? SEMI EmptyLines (EmptyLines CommentStatement)* up:ForUpdate? RPAR body:Statement
+    / Indent FOR LPAR EmptyLines (EmptyLines NonJavaDocComment)* init:ForInit? SEMI EmptyLines (EmptyLines NonJavaDocComment)* expr:Expression? SEMI EmptyLines (EmptyLines NonJavaDocComment)* up:ForUpdate? RPAR body:Statement
     {
       return {
         node:        'ForStatement',
@@ -923,31 +931,31 @@ ConditionalExpression
     / ConditionalOrExpression
 
 ConditionalOrExpression
-    = EmptyLines (EmptyLines CommentStatement)* EmptyLines first:ConditionalAndExpression EmptyLines (EmptyLines CommentStatement)* EmptyLines rest:(OROR ConditionalAndExpression)*
+    = EmptyLines (EmptyLines NonJavaDocComment)* EmptyLines first:ConditionalAndExpression EmptyLines (EmptyLines NonJavaDocComment)* EmptyLines rest:(OROR ConditionalAndExpression)*
     { return buildInfixExpr(first, rest); }
 
 ConditionalAndExpression
-    = EmptyLines (EmptyLines CommentStatement)* EmptyLines first:InclusiveOrExpression EmptyLines (EmptyLines CommentStatement)* EmptyLines rest:(ANDAND InclusiveOrExpression)*
+    = EmptyLines (EmptyLines NonJavaDocComment)* EmptyLines first:InclusiveOrExpression EmptyLines (EmptyLines NonJavaDocComment)* EmptyLines rest:(ANDAND InclusiveOrExpression)*
     { return buildInfixExpr(first, rest); }
 
 InclusiveOrExpression
-    = EmptyLines (EmptyLines CommentStatement)* EmptyLines first:ExclusiveOrExpression EmptyLines (EmptyLines CommentStatement)* EmptyLines rest:(OR ExclusiveOrExpression)*
+    = EmptyLines (EmptyLines NonJavaDocComment)* EmptyLines first:ExclusiveOrExpression EmptyLines (EmptyLines NonJavaDocComment)* EmptyLines rest:(OR ExclusiveOrExpression)*
     { return buildInfixExpr(first, rest); }
 
 ExclusiveOrExpression
-    = EmptyLines (EmptyLines CommentStatement)* EmptyLines first:AndExpression EmptyLines (EmptyLines CommentStatement)* EmptyLines rest:(HAT AndExpression)*
+    = EmptyLines (EmptyLines NonJavaDocComment)* EmptyLines first:AndExpression EmptyLines (EmptyLines NonJavaDocComment)* EmptyLines rest:(HAT AndExpression)*
     { return buildInfixExpr(first, rest); }
 
 AndExpression
-    = EmptyLines (EmptyLines CommentStatement)* EmptyLines first:EqualityExpression EmptyLines (EmptyLines CommentStatement)* EmptyLines rest:(AND EqualityExpression)*
+    = EmptyLines (EmptyLines NonJavaDocComment)* EmptyLines first:EqualityExpression EmptyLines (EmptyLines NonJavaDocComment)* EmptyLines rest:(AND EqualityExpression)*
     { return buildInfixExpr(first, rest); }
 
 EqualityExpression
-    = EmptyLines (EmptyLines CommentStatement)* EmptyLines first:RelationalExpression EmptyLines (EmptyLines CommentStatement)* EmptyLines rest:((EQUAL /  NOTEQUAL) RelationalExpression)*
+    = EmptyLines (EmptyLines NonJavaDocComment)* EmptyLines first:RelationalExpression EmptyLines (EmptyLines NonJavaDocComment)* EmptyLines rest:((EQUAL /  NOTEQUAL) RelationalExpression)*
     { return buildInfixExpr(first, rest); }
 
 RelationalExpression
-    = EmptyLines (EmptyLines CommentStatement)* EmptyLines first:ShiftExpression EmptyLines (EmptyLines CommentStatement)* EmptyLines rest:((LE / GE / LT / GT) ShiftExpression / INSTANCEOF ReferenceType )*
+    = EmptyLines (EmptyLines NonJavaDocComment)* EmptyLines first:ShiftExpression EmptyLines (EmptyLines NonJavaDocComment)* EmptyLines rest:((LE / GE / LT / GT) ShiftExpression / INSTANCEOF ReferenceType )*
     {
       return buildTree(first, rest, function(result, element) {
         return element[0][0] === 'instanceof' ? {
@@ -964,15 +972,15 @@ RelationalExpression
     }
 
 ShiftExpression
-    = EmptyLines (EmptyLines CommentStatement)* EmptyLines first:AdditiveExpression EmptyLines (EmptyLines CommentStatement)* EmptyLines rest:((SL / SR / BSR) AdditiveExpression)*
+    = EmptyLines (EmptyLines NonJavaDocComment)* EmptyLines first:AdditiveExpression EmptyLines (EmptyLines NonJavaDocComment)* EmptyLines rest:((SL / SR / BSR) AdditiveExpression)*
     { return buildInfixExpr(first, rest); }
 
 AdditiveExpression
-    = EmptyLines (EmptyLines CommentStatement)* EmptyLines first:MultiplicativeExpression EmptyLines (EmptyLines CommentStatement)* EmptyLines rest:((PLUS / MINUS) MultiplicativeExpression)*
+    = EmptyLines (EmptyLines NonJavaDocComment)* EmptyLines first:MultiplicativeExpression EmptyLines (EmptyLines NonJavaDocComment)* EmptyLines rest:((PLUS / MINUS) MultiplicativeExpression)*
     { return buildInfixExpr(first, rest); }
 
 MultiplicativeExpression
-    = EmptyLines (EmptyLines CommentStatement)* EmptyLines first:UnaryExpression EmptyLines (EmptyLines CommentStatement)* EmptyLines rest:((STAR / DIV / MOD) UnaryExpression)*
+    = EmptyLines (EmptyLines NonJavaDocComment)* EmptyLines first:UnaryExpression EmptyLines (EmptyLines NonJavaDocComment)* EmptyLines rest:((STAR / DIV / MOD) UnaryExpression)*
     { return buildInfixExpr(first, rest); }
 
 UnaryExpression
@@ -1496,6 +1504,15 @@ CommentStatement
       )
     { return commentStatement; }
 
+NonJavaDocComment
+    = nonJavaDocComment:(
+      comment:TraditionalComment [\r\n\u000C]*
+      { return comment; }
+      / comment:EndOfLineComment [\r\n\u000C]*
+      { return comment; }
+      )
+    { return nonJavaDocComment; }
+
 JavaDocComment
     = "/**" comment:MultilineCommentLetter* "*/" [\r\n\u000C]?
     { return { value: "/**" + comment.join("") + "*/" }; }
@@ -1580,6 +1597,7 @@ DEFAULT      = Indent "default"      !LetterOrDigit Spacing
 DO           = Indent "do"           !LetterOrDigit Spacing
 ELSE         = Indent "else"         !LetterOrDigit Spacing
 ENUM         = Indent "enum"         !LetterOrDigit Spacing
+             / Indent "Enum"         !LetterOrDigit Spacing
 EXTENDS      = Indent "extends"      !LetterOrDigit Spacing
 FINALLY      = Indent "finally"      !LetterOrDigit Spacing
 FINAL        = Indent "final"        !LetterOrDigit Spacing
@@ -1590,6 +1608,7 @@ IMPORT       = Indent "import"       !LetterOrDigit Spacing
 INTERFACE    = Indent "interface"    !LetterOrDigit Spacing
 INSTANCEOF   = Indent "instanceof"   !LetterOrDigit Spacing
 NEW          = Indent "new"          !LetterOrDigit Spacing
+             / Indent "New"          !LetterOrDigit Spacing
 PACKAGE      = Indent "package"      !LetterOrDigit Spacing
 RETURN       = Indent "return"       !LetterOrDigit Spacing
 STATIC       = Indent "static"       !LetterOrDigit Spacing
@@ -1723,7 +1742,8 @@ DIVEQU          =            "/="      Spacing
 DOT             = EmptyLines "."       Spacing
 ELLIPSIS        =            "..."     Spacing
 EQU             =            "="![=>]  Spacing
-EQUAL           =            "=="      Spacing
+EQUAL           =            "=="![=]  Spacing
+                /            "==="     Spacing
 GE              =            ">="      Spacing
 GT              =            ">"![=>]  Spacing
 HAT             =            "^"!"="   Spacing

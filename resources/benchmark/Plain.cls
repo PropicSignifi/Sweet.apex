@@ -7,10 +7,7 @@ private class Plain extends Func implements Queueable {
      * Public field
      * */
     public static final String id = 'Plain';
-
-    // Private field
     private static Integer count;
-
     private Type t1 = List<String>.class;
     private Type t2 = Func.FuncException.class;
     String name {
@@ -20,7 +17,6 @@ private class Plain extends Func implements Queueable {
             return 'Hello ' + name;
         }
     }
-
     private static Map<String, Object> mMap = new Map<String, Object>{ 'name' => 'value' };
     private static List<Object> mList = new List<Object>{ 1, 2, 3 };
     private static List<SObject> accounts = [ SELECT Id FROM Account LIMIT 10 ];
@@ -30,16 +26,13 @@ private class Plain extends Func implements Queueable {
     static {
         count = 0;
     }
-
     public Plain(String name) {
         super(-1);
         this.name = name;
     }
-
     public Plain() {
         this(null);
     }
-
     public override Object execN(List<Object> args) {
         Integer i = (count > 0) ? 1 : 2;
         Integer total = 0;
@@ -84,17 +77,14 @@ private class Plain extends Func implements Queueable {
 
         return args;
     }
-
     public void execute(QueueableContext context) {
     }
-
     @isTest
     private static void simpleTest() {
         System.assert(false);
 
         return;
     }
-
     @isTest
     private static void testRunAs() {
         User admin = DummyRecordCreator.admin;
@@ -102,15 +92,12 @@ private class Plain extends Func implements Queueable {
             System.debug('Run As');
         }
     }
-
     public abstract class CustomClass {
         public abstract void init();
     }
-
     public interface CustomInterface {
         void init();
     }
-
     public enum CustomEnum {
         One,
         Two,

@@ -1,6 +1,4 @@
 public class ActionDemo {
-
-
     private static Action.Registry registry = new Action.Registry();
 
     static {
@@ -32,7 +30,6 @@ public class ActionDemo {
             param('b', Integer.class, 'The second number');
             this.returnRaw();
         }
-
         public override Object execAction(Object arg0, Object arg1) {
             Integer a = (Integer)arg0;
             Integer b = (Integer)arg1;
@@ -47,7 +44,6 @@ public class ActionDemo {
             param('id', String.class, 'id');
 
         }
-
         public override Object execAction(Object arg0) {
             String id = (String)arg0;
             System.debug('Started');
@@ -64,7 +60,6 @@ public class ActionDemo {
             param('s4', String.class, 's4');
             this.returnRaw();
         }
-
         public override Object execActionN(List<Object> args) {
             String s1 = (String)args.get(0);
             String s2 = (String)args.get(1);
