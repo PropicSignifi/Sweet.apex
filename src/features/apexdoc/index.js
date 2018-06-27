@@ -2,7 +2,7 @@ const fs = require('fs');
 const path = require('path');
 const AST = require('../../ast');
 const getValue = require('../../valueProvider');
-const buildDoc = require('./doc_builder');
+const buildDoc = require('../../typings/builder');
 const { log, } = require('../../utils');
 
 const writeToDoc = (fileName, content, config) => {
@@ -42,7 +42,9 @@ const ApexDoc = {
     run: ({ current, parent, root, config, }) => {
         const fileName = getValue(current.name);
 
-        const docs = buildDoc(current, config);
+        const docs = buildDoc(current, {
+            includeComments: true,
+        });
 
         writeToDoc(`${fileName}.json`, JSON.stringify(docs, null, 4), config);
     },

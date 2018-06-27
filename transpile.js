@@ -15,6 +15,9 @@ const options = {};
 const items = [];
 while(true) {
     const arg = _.first(args);
+    if(!arg) {
+        break;
+    }
     if(arg.startsWith('-')) {
         options[_.trimStart(arg, '-')] = true;
     }
@@ -32,8 +35,8 @@ let isDebugEnabled = options.v;
 let isPerfEnabled = options.perf;
 let silent = options.s;
 let clean = options.c;
-let srcDir = _.nth(args, 0);
-let destDir = _.nth(args, 1);
+let srcDir = _.nth(items, 0);
+let destDir = _.nth(items, 1);
 
 const usage = () => {
     console.error(`Usage: node ${_.chain(currentFileName).split(path.sep).last().value()} <srcDir> <destDir>`);
@@ -127,18 +130,16 @@ const compileFile = (fileName, config) => {
 
 const start = Date.now();
 
-let p = null;
+let srcFiles = [];
 if(config.srcDir.endsWith(path.sep)) {
-    p = Promise.all(
-        _.chain(fs.readdirSync(config.srcDir))
-            .filter(name => name.endsWith(suffix))
-            .map(name => compileFile(config.srcDir + name, config))
-            .value()
-    );
+    srcFiles = _.chain(fs.readdirSync(config.srcDir))
+        .filter(name => name.endsWith(suffix))
+        .map(name => config.srcDir + name)
+        .value();
 }
 else {
     if(config.srcDir.endsWith(suffix)) {
-        p = compileFile(config.srcDir, config);
+        srcFiles = [ config.srcDir ];
     }
     else {
         console.error('Source file should have suffix: ' + suffix);
@@ -146,13 +147,15 @@ else {
     }
 }
 
-p.then(() => finalize(config))
-.then(() => build(config))
-.then(() => FileUpdates.flush(config))
-.then(
-    () => {
-        const end = Date.now();
-        log(`Completed after ${end - start} ms`, config);
-    },
-    error => console.error(error)
-);
+Promise.resolve(srcFiles)
+    .then(files => Promise.all(_.map(files, file => compileFile(file, config))))
+    .then(() => finalize(config))
+    .then(() => build(config))
+    .then(() => FileUpdates.flush(config))
+    .then(
+        () => {
+            const end = Date.now();
+            log(`Completed after ${end - start} ms`, config);
+        },
+        error => console.error(error)
+    );
