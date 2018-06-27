@@ -87,6 +87,8 @@ if(!fs.existsSync(config.cacheDir)) {
     fs.mkdirSync(config.cacheDir);
 }
 
+config.libraryDir = config.cwd + path.sep  + normalize('library');
+
 const meta = `<?xml version="1.0" encoding="UTF-8"?>
 <ApexClass xmlns="http://soap.sforce.com/2006/04/metadata">
     <apiVersion>${config.apiVersion}</apiVersion>

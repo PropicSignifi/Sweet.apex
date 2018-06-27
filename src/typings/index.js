@@ -9,6 +9,7 @@ const parse = require('../parser');
 const AST = require('../ast');
 
 let allTypings = null;
+let libraryTypings = null;
 
 const getAllTypings = config => {
     if(!allTypings) {
@@ -27,7 +28,23 @@ const getAllTypings = config => {
         allTypings = {};
     }
 
-    return allTypings;
+    if(!libraryTypings) {
+        libraryTypings = {};
+
+        _.each(fs.readdirSync(config.libraryDir), subdir => {
+            const libraryTypingsPath = config.libraryDir + path.sep + subdir + path.sep + 'typings.json';
+            if(fs.existsSync(libraryTypingsPath)) {
+                try {
+                    libraryTypings[subdir] = JSON.parse(fs.readFileSync(libraryTypingsPath, 'utf8'));
+                }
+                catch(e) {
+                    console.error(`Failed to load library typings for ${subdir}`, e);
+                }
+            }
+        });
+    }
+
+    return _.assign({}, libraryTypings, { _: allTypings });
 };
 
 const flush = (config) => {
