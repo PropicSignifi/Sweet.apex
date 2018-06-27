@@ -1005,7 +1005,7 @@ UnaryExpressionNotPlusMinus
       return {
         node:      'CastExpression',
         type:       expr[1],
-        expression: expr[3]
+        expression: expr[4]
       };
     }
     / expr:ArrowCastExpression
@@ -1014,7 +1014,7 @@ UnaryExpressionNotPlusMinus
         node:      'ArrowCastExpression',
         fromType:   expr[1],
         toType:     expr[5],
-        expression: expr[7]
+        expression: expr[8]
       };
     }
     / arg:Primary sel:Selector sels:Selector* operator:PostfixOp+
@@ -1038,11 +1038,11 @@ UnaryExpressionNotPlusMinus
     / Primary
 
 CastExpression
-    = LPAR PrimitiveType RPAR UnaryExpression
-    / LPAR ReferenceType RPAR UnaryExpressionNotPlusMinus
+    = LPAR PrimitiveType RPAR EmptyLines UnaryExpression
+    / LPAR ReferenceType RPAR EmptyLines UnaryExpressionNotPlusMinus
 
 ArrowCastExpression
-    = LPAR ReferenceType Indent ARROW Indent ReferenceType RPAR UnaryExpressionNotPlusMinus
+    = LPAR ReferenceType Indent ARROW Indent ReferenceType RPAR EmptyLines UnaryExpressionNotPlusMinus
 
 Primary
     = ParExpression
@@ -1186,17 +1186,17 @@ PostfixOp
     ) { return op[0]; /* remove ending spaces */ }
 
 Selector
-    = DOT id:Identifier args:Arguments
+    = DOT EmptyLines id:Identifier args:Arguments
     { return { node: 'MethodInvocation', arguments: args, name: id, typeArguments: [] }; }
-    / DOT id:Identifier
+    / DOT EmptyLines id:Identifier
     { return { node: 'FieldAccess', name: id }; }
-    / DOT ret:ExplicitGenericInvocation
+    / DOT EmptyLines ret:ExplicitGenericInvocation
     { return ret; }
-    / DOT THIS
+    / DOT EmptyLines THIS
     { return TODO(/* Any sample ? */); }
-    / DOT SUPER suffix:SuperSuffix
+    / DOT EmptyLines SUPER suffix:SuperSuffix
     { return suffix; }
-    / DOT NEW args:NonWildcardTypeArguments? ret:InnerCreator
+    / DOT EmptyLines NEW args:NonWildcardTypeArguments? ret:InnerCreator
     { return mergeProps(ret, { typeArguments: optionalList(args) }); }
     / expr:DimExpr
     { return { node: 'ArrayAccess', index: expr }; }
@@ -1241,7 +1241,7 @@ PrimitiveType
     = BasicType
 
 Arguments
-    = LPAR EmptyLines args:(first:Expression rest:(COMMA EmptyLines Expression)* { return buildList(first, rest, 2); })? EmptyLines RPAR
+    = EmptyLines LPAR EmptyLines args:(first:Expression rest:(COMMA EmptyLines Expression)* { return buildList(first, rest, 2); })? EmptyLines RPAR
     { return optionalList(args); }
 
 Creator
@@ -1322,7 +1322,7 @@ ArrayElementValuePair
     }
 
 ArrayInitializer
-    = LWING
+    = EmptyLines LWING
       init:(
         first:ArrayElementValuePair rest:(COMMA ArrayElementValuePair)*
         { return buildList(first, rest, 1); }
@@ -1410,6 +1410,7 @@ Modifier
         / "without sharing"
         / "testmethod"
         / "testMethod"
+        / "TestMethod"
         ) !LetterOrDigit Spacing
       { return makeModifier(keyword); }
 
@@ -1592,6 +1593,7 @@ BREAK        = Indent "break"        !LetterOrDigit Spacing
 CASE         = Indent "case"         !LetterOrDigit Spacing
 CATCH        = Indent "catch"        !LetterOrDigit Spacing
 CLASS        = Indent "class"        !LetterOrDigit Spacing
+             / Indent "Class"        !LetterOrDigit Spacing
 CONTINUE     = Indent "continue"     !LetterOrDigit Spacing
 DEFAULT      = Indent "default"      !LetterOrDigit Spacing
 DO           = Indent "do"           !LetterOrDigit Spacing
@@ -1607,6 +1609,7 @@ IMPLEMENTS   = Indent "implements"   !LetterOrDigit Spacing
 IMPORT       = Indent "import"       !LetterOrDigit Spacing
 INTERFACE    = Indent "interface"    !LetterOrDigit Spacing
 INSTANCEOF   = Indent "instanceof"   !LetterOrDigit Spacing
+             / Indent "instanceOf"   !LetterOrDigit Spacing
 NEW          = Indent "new"          !LetterOrDigit Spacing
              / Indent "New"          !LetterOrDigit Spacing
 PACKAGE      = Indent "package"      !LetterOrDigit Spacing
@@ -1647,16 +1650,12 @@ Literal
     { return literal; }
 
 IntegerLiteral
-    = ( HexNumeral
-      / BinaryNumeral
-      / OctalNumeral            // May be a prefix of HexNumeral or BinaryNumeral
-      / DecimalNumeral          // May be a prefix of OctalNumeral
-      ) [lL]?
+    = DecimalNumeral [lL]?
     { return { node: 'NumberLiteral', token: text() }; }
 
 DecimalNumeral
     = "0"
-    / [1-9]([_]*[0-9])*
+    / [0-9]([_]*[0-9])*
 
 HexNumeral
     = ("0x" / "0X") HexDigits
@@ -1668,8 +1667,7 @@ OctalNumeral
     = "0" ([_]*[0-7])+
 
 FloatLiteral
-    = ( HexFloat
-    / DecimalFloat )
+    = DecimalFloat
     { return { node: 'NumberLiteral', token: text() }; }
 
 DecimalFloat
@@ -1677,6 +1675,7 @@ DecimalFloat
     / "." Digits Exponent? [fFdD]?
     / Digits Exponent [fFdD]?
     / Digits Exponent? [fFdD]
+    / Digits
 
 Exponent
     = [eE] [+\-]? Digits
@@ -1759,7 +1758,8 @@ MINUS           =            "-"![=\-] Spacing
 MINUSEQU        =            "-="      Spacing
 MOD             =            "%"!"="   Spacing
 MODEQU          =            "%="      Spacing
-NOTEQUAL        =            "!="      Spacing
+NOTEQUAL        =            "!="![=]  Spacing
+                /            "!=="      Spacing
 OR              =            "|"![=|]  Spacing
 OREQU           =            "|="      Spacing
 OROR            =            "||"      Spacing
