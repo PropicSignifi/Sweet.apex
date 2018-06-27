@@ -1,6 +1,6 @@
-const _ = require('lodash');
 const fs = require('fs');
 const path = require('path');
+const { getName, } = require('./index');
 
 let fileUpdates = null;
 
@@ -22,13 +22,6 @@ const getFileUpdates = config => {
     }
 
     return fileUpdates;
-};
-
-const getName = fileName => {
-    const startIndex = _.lastIndexOf(fileName, path.sep);
-    const endIndex = _.lastIndexOf(fileName, '.');
-    const name = fileName.substring(startIndex + 1, endIndex);
-    return name;
 };
 
 const hasChanged = (fileName, config) => {

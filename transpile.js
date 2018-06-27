@@ -4,8 +4,9 @@ const path = require('path');
 const transpile = require('./src/transpiler');
 const finalize = require('./src/finalizer');
 const build = require('./src/builder');
-const { time, timeEnd, normalize, log, writeToFile, } = require('./src/utils');
+const { time, timeEnd, normalize, log, writeToFile, getName, } = require('./src/utils');
 const FileUpdates = require('./src/utils/fileUpdates');
+const Typings = require('./src/typings');
 
 const [ , currentFileName, ...args ] = process.argv;
 
@@ -94,8 +95,7 @@ const meta = `<?xml version="1.0" encoding="UTF-8"?>
 const compileFile = (fileName, config) => {
     log(`Compiling ${fileName} ...`, config);
 
-    const index = _.lastIndexOf(fileName, path.sep);
-    const name = fileName.substring(index + 1, fileName.length - suffix.length);
+    const name = getName(fileName);
 
     time(`Read file ${fileName}`, config);
 
@@ -111,18 +111,23 @@ const compileFile = (fileName, config) => {
                     reject(error);
                 }
 
-                time(`Transpile`, config);
-                const apexClass = transpile(src, config);
-                timeEnd(`Transpile`, config);
+                try {
+                    time(`Transpile`, config);
+                    const apexClass = transpile(src, config);
+                    timeEnd(`Transpile`, config);
 
-                Promise.all([
-                    writeToFile(`${name}.cls`, apexClass, config)
-                        .then(() => log(`Compiled ${config.destDir + name}.cls`, config)),
-                    writeToFile(`${name}.cls-meta.xml`, meta, config)
-                        .then(() => log(`Compiled ${config.destDir + name}.cls-meta.xml`, config)),
-                ])
-                .then(() => FileUpdates.change(fileName, config))
-                .then(resolve);
+                    Promise.all([
+                        writeToFile(`${name}.cls`, apexClass, config)
+                            .then(() => log(`Compiled ${config.destDir + name}.cls`, config)),
+                        writeToFile(`${name}.cls-meta.xml`, meta, config)
+                            .then(() => log(`Compiled ${config.destDir + name}.cls-meta.xml`, config)),
+                    ])
+                    .then(() => FileUpdates.change(fileName, config))
+                    .then(resolve);
+                }
+                catch(e) {
+                    reject(new Error(`Failed to compile ${fileName}:\n${e}`));
+                }
             });
         }
     });
@@ -148,6 +153,19 @@ else {
 }
 
 Promise.resolve(srcFiles)
+    .then(files => {
+        const names = _.map(files, getName);
+        const destFiles = _.chain(fs.readdirSync(config.destDir))
+            .filter(name => name.endsWith('.cls') && !_.includes(names, getName(name)))
+            .map(name => config.destDir + name)
+            .value();
+
+        return Promise.all(_.map([ ...files, ...destFiles, ], file => Typings.scan(file, config)))
+            .then(data => {
+                log(`Scanned ${_.size(data)} files`, config);
+                return files;
+            });
+    })
     .then(files => Promise.all(_.map(files, file => compileFile(file, config))))
     .then(() => finalize(config))
     .then(() => build(config))

@@ -115,6 +115,13 @@ const writeToFile = (fileName, content, config) => {
     });
 };
 
+const getName = fileName => {
+    const startIndex = _.lastIndexOf(fileName, path.sep);
+    const endIndex = _.lastIndexOf(fileName, '.');
+    const name = fileName.substring(startIndex + 1, endIndex);
+    return name;
+};
+
 module.exports = {
     addIndent,
     addComments,
@@ -130,4 +137,5 @@ module.exports = {
     normalize,
     log,
     writeToFile,
+    getName,
 };
