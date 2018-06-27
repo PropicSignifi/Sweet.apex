@@ -82,9 +82,7 @@ const rebuild = (node, config) => {
 
     const fList = config.features;
 
-    if(!features) {
-        features = loadFeatures();
-    }
+    const features = getFeatures();
 
     time('Add index', config);
     AST.addIndex(node);
@@ -106,9 +104,15 @@ const rebuild = (node, config) => {
     timeEnd('Remove index', config);
 };
 
-const getFeatures = () => features;
+const getFeatures = () => {
+    if(!features) {
+        features = loadFeatures();
+    }
 
-const getFeature = featureName => features[featureName];
+    return features;
+};
+
+const getFeature = featureName => getFeatures[featureName];
 
 module.exports = {
     rebuild,

@@ -8,34 +8,31 @@ const { time, timeEnd, normalize, log, writeToFile, } = require('./src/utils');
 
 const [ , currentFileName, ...args ] = process.argv;
 
-let isDebugEnabled = false;
-let isPerfEnabled = false;
-let silent = false;
-let srcDir = null;
-let destDir = null;
 const suffix = '.apex';
 
+const options = {};
+const items = [];
 while(true) {
     const arg = _.first(args);
-    if(arg === '-v') {
-        isDebugEnabled = true;
-        _.pullAt(args, 0);
-    }
-    else if(arg === '--perf') {
-        isPerfEnabled = true;
-        _.pullAt(args, 0);
-    }
-    else if(arg === '-s') {
-        silent = true;
-        _.pullAt(args, 0);
+    if(arg.startsWith('-')) {
+        options[_.trimStart(arg, '-')] = true;
     }
     else {
+        items.push(arg);
+    }
+
+    _.pullAt(args, 0);
+    if(_.isEmpty(args)) {
         break;
     }
 }
 
-srcDir = _.nth(args, 0);
-destDir = _.nth(args, 1);
+let isDebugEnabled = options.v;
+let isPerfEnabled = options.perf;
+let silent = options.s;
+let clean = options.c;
+let srcDir = _.nth(args, 0);
+let destDir = _.nth(args, 1);
 
 const usage = () => {
     console.error(`Usage: node ${_.chain(currentFileName).split(path.sep).last().value()} <srcDir> <destDir>`);
@@ -77,6 +74,22 @@ if(config.templateDir) {
     config.templateDir = config.cwd + path.sep + normalize(config.templateDir);
 }
 
+config.cacheDir = config.cwd + path.sep  + normalize('cache');
+if(!fs.existsSync(config.cacheDir)) {
+    fs.mkdirSync(config.cacheDir);
+}
+
+const fileUpdates = {};
+const fileUpdatesPath = config.cacheDir + path.sep + 'fileUpdates.json';
+if(fs.existsSync(fileUpdatesPath)) {
+    try {
+        _.assign(fileUpdates, JSON.parse(fs.readFileSync(fileUpdatesPath, 'utf8')));
+    }
+    catch(e) {
+        console.error('Failed to load file updates', e);
+    }
+}
+
 const meta = `<?xml version="1.0" encoding="UTF-8"?>
 <ApexClass xmlns="http://soap.sforce.com/2006/04/metadata">
     <apiVersion>${config.apiVersion}</apiVersion>
@@ -93,23 +106,32 @@ const compileFile = (fileName, config) => {
     time(`Read file ${fileName}`, config);
 
     return new Promise((resolve, reject) => {
-        fs.readFile(fileName, 'utf8', (error, src) => {
-            timeEnd(`Read file ${fileName}`, config);
-            if(error) {
-                reject(error);
-            }
+        const lastUpdated = fs.statSync(fileName).mtimeMs;
+        if(!clean && fileUpdates[name] && Number(fileUpdates[name] >= lastUpdated)) {
+            log(`Skipped ${fileName}`, config);
+            resolve(null);
+        }
+        else {
+            fs.readFile(fileName, 'utf8', (error, src) => {
+                timeEnd(`Read file ${fileName}`, config);
+                if(error) {
+                    reject(error);
+                }
 
-            time(`Transpile`, config);
-            const apexClass = transpile(src, config);
-            timeEnd(`Transpile`, config);
+                time(`Transpile`, config);
+                const apexClass = transpile(src, config);
+                timeEnd(`Transpile`, config);
 
-            Promise.all([
-                writeToFile(`${name}.cls`, apexClass, config)
-                    .then(() => log(`Compiled ${config.destDir + name}.cls`, config)),
-                writeToFile(`${name}.cls-meta.xml`, meta, config)
-                    .then(() => log(`Compiled ${config.destDir + name}.cls-meta.xml`, config)),
-            ]).then(resolve);
-        });
+                Promise.all([
+                    writeToFile(`${name}.cls`, apexClass, config)
+                        .then(() => log(`Compiled ${config.destDir + name}.cls`, config)),
+                    writeToFile(`${name}.cls-meta.xml`, meta, config)
+                        .then(() => log(`Compiled ${config.destDir + name}.cls-meta.xml`, config)),
+                ])
+                .then(() => fileUpdates[name] = Date.now())
+                .then(resolve);
+            });
+        }
     });
 };
 
@@ -136,6 +158,9 @@ else {
 
 p.then(() => finalize(config))
 .then(() => build(config))
+.then(() => {
+    fs.writeFileSync(fileUpdatesPath, JSON.stringify(fileUpdates));
+})
 .then(
     () => {
         const end = Date.now();
