@@ -134,6 +134,7 @@ const compileFile = (fileName, config) => {
                     }
                     else {
                         reject(new Error(`Failed to compile ${fileName}:\n${e}`));
+                        console.error(`Failed to compile ${fileName}`);
                         throw e;
                     }
                 }

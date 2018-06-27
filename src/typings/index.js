@@ -100,6 +100,7 @@ const scan = (fileName, config) => {
                     }
                     else {
                         reject(new Error(`Failed to scan ${fileName}:\n${e}`));
+                        console.error(`Failed to scan ${fileName}`);
                         throw e;
                     }
                 }
