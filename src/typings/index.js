@@ -36,6 +36,23 @@ const flush = (config) => {
     fs.writeFileSync(allTypingsPath, JSON.stringify(allTypings));
 };
 
+const slim = target => {
+    if(_.isPlainObject(target)) {
+        return _.chain(target)
+            .toPairs()
+            .reject(pair => _.isEmpty(pair[1]))
+            .map(([key, value]) => [key, slim(value)])
+            .fromPairs()
+            .value();
+    }
+    else if(_.isArray(target)) {
+        return _.map(target, slim);
+    }
+    else {
+        return target;
+    }
+};
+
 const add = (node, config) => {
     const typeDeclaration = AST.getTopLevelType(node);
 
@@ -44,7 +61,7 @@ const add = (node, config) => {
     });
 
     const allTypings = getAllTypings(config);
-    allTypings[typings.name] = typings;
+    allTypings[typings.name] = slim(typings);
 };
 
 const scan = (fileName, config) => {
