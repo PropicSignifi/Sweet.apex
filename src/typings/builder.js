@@ -1,7 +1,31 @@
+/**
+ * MIT License
+ *
+ * Copyright (c) 2018 Click to Cloud Pty Ltd
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ **/
 const _ = require('lodash');
 const AST = require('../ast');
 const getValue = require('../valueProvider');
 
+// Build the comments
 const buildComments = (node, parent, typingsConfig) => {
     if(!typingsConfig.includeComments) {
         return {};
@@ -29,6 +53,7 @@ const buildComments = (node, parent, typingsConfig) => {
     return _.isEmpty(comments) ? {} : parseComment(_.first(comments));
 };
 
+// Parse the comments and extract possible annotations
 const parseComment = comment => {
     const data = {
         value: '',
@@ -76,36 +101,46 @@ const parseComment = comment => {
     return data;
 };
 
+// Get the name of the AST node
 const getName = (node, typingsConfig) => getValue(node.name);
 
+// Get the modifiers of the AST node
 const getModifiers = (node, typingsConfig) => _.chain(node.modifiers).filter(m => m.node === 'Modifier').map(getValue).value();
 
+// Get the annotations of the AST node
 const getAnnotations = (node, typingsConfig) => _.chain(node.modifiers).filter(m => m.node === 'Annotation').map(AST.getAnnotation).value();
 
+// Get the super class type of the AST node
 const getSuperclassType = (node, typingsConfig) => node.superclassType ? getValue(node.superclassType) : null;
 
+// Get the super interface types of the AST node
 const getSuperInterfaceTypes = (node, typingsConfig) => _.map(node.superInterfaceTypes, getValue);
 
+// Get the type parameters of the AST node
 const getTypeParameters = (node, typingsConfig) => _.map(node.typeParameters, getValue);
 
+// Build the member class declarations of the AST node
 const buildMemberClassDeclarations = (node, typingsConfig) =>
     _.chain(node.bodyDeclarations)
         .filter(n => n.node === 'TypeDeclaration' && !n.interface)
         .map(n => buildClassDeclaration(n, node, typingsConfig))
         .value();
 
+// Build the member interface declarations of the AST node
 const buildMemberInterfaceDeclarations = (node, typingsConfig) =>
     _.chain(node.bodyDeclarations)
         .filter(n => n.node === 'TypeDeclaration' && n.interface)
         .map(n => buildInterfaceDeclaration(n, node, typingsConfig))
         .value();
 
+// Build the member enum declarations of the AST node
 const buildMemberEnumDeclarations = (node, typingsConfig) =>
     _.chain(node.bodyDeclarations)
         .filter(n => n.node === 'EnumDeclaration')
         .map(n => buildEnumDeclaration(n, node, typingsConfig))
         .value();
 
+// Build the field declaration of the AST node
 const buildFieldDeclaration = (node, parent, typingsConfig) => {
     const modifiers = getModifiers(node, typingsConfig);
     const annotations = getAnnotations(node, typingsConfig);
@@ -125,12 +160,14 @@ const buildFieldDeclaration = (node, parent, typingsConfig) => {
         .value();
 };
 
+// Build the field declarations of the AST node
 const buildFieldDeclarations = (node, typingsConfig) =>
     _.chain(node.bodyDeclarations)
         .filter(n => n.node === 'FieldDeclaration')
         .map(n => buildFieldDeclaration(n, node, typingsConfig))
         .value();
 
+// Build the method declaration of the AST node
 const buildMethodDeclaration = (node, parent, typingsConfig) => {
     const modifiers = getModifiers(node, typingsConfig);
     const annotations = getAnnotations(node, typingsConfig);
@@ -156,12 +193,14 @@ const buildMethodDeclaration = (node, parent, typingsConfig) => {
     };
 };
 
+// Build the method declarations of the AST node
 const buildMethodDeclarations = (node, typingsConfig) =>
     _.chain(node.bodyDeclarations)
         .filter(n => n.node === 'MethodDeclaration')
         .map(n => buildMethodDeclaration(n, node, typingsConfig))
         .value();
 
+// Build the class declaration of the AST node
 const buildClassDeclaration = (node, parent, typingsConfig) => {
     return {
         type: 'Class',
@@ -180,6 +219,7 @@ const buildClassDeclaration = (node, parent, typingsConfig) => {
     };
 };
 
+// Build the interface declaration of the AST node
 const buildInterfaceDeclaration = (node, parent, typingsConfig) => {
     return {
         type: 'Interface',
@@ -196,6 +236,7 @@ const buildInterfaceDeclaration = (node, parent, typingsConfig) => {
     };
 };
 
+// Build the enum declaration of the AST node
 const buildEnumDeclaration = (node, parent, typingsConfig) => {
     return {
         type: 'Enum',
@@ -212,6 +253,7 @@ const buildEnumDeclaration = (node, parent, typingsConfig) => {
     };
 };
 
+// Build the doc object
 const buildDoc = (node, typingsConfig) => {
     if(node.node === 'TypeDeclaration') {
         if(node.interface) {

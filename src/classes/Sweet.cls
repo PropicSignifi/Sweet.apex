@@ -1,4 +1,28 @@
+/**
+ * MIT License
+ *
+ * Copyright (c) 2018 Click to Cloud Pty Ltd
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ **/
 public class Sweet {
+    // Values used for hash code generation
     private static final Map<string, integer> HASH_CODE_VALS = new Map<string, integer>{
         '0' => 0,
         '1' => 1,
@@ -18,30 +42,58 @@ public class Sweet {
         'F' => 15
     };
 
+    // Bean infos
     private static List<BeanInfo> beanInfos = null;
+
+    // Bound types
     private static Map<Type, Type> boundTypes = new Map<Type, Type>();
 
+    // Cache for the named beans
     private static Map<String, Object> namedBeanCache = new Map<String, Object>();
+
+    // Cache for the typed beans
     private static Map<Type, Object> typedBeanCache = new Map<Type, Object>();
 
+    /**
+     * Bind the target type to the implementor type
+     *
+     * @param target
+     * @param implementor
+     * */
     public static void bind(Type target, Type implementor) {
         if(target != null && implementor != null) {
             Sweet.boundTypes.put(target, implementor);
         }
     }
 
+    /**
+     * Unbind the target type
+     *
+     * @param target
+     * */
     public static void unbind(Type target) {
         if(target != null) {
             Sweet.boundTypes.remove(target);
         }
     }
 
+    /**
+     * Set the bean info list
+     *
+     * @param infos The bean info list
+     * */
     public static void setBeanInfos(List<BeanInfo> infos) {
         if(infos != null) {
             Sweet.beanInfos = infos;
         }
     }
 
+    /**
+     * Get the bean with the name
+     *
+     * @param name The name of the bean
+     * @return Object
+     * */
     public static Object getBean(String name) {
         if(Sweet.beanInfos == null) {
             Sweet.loadBeanInfos();
@@ -61,6 +113,12 @@ public class Sweet {
         return null;
     }
 
+    /**
+     * Get the bean by the target type
+     *
+     * @param targetType The target type
+     * @return Object
+     * */
     public static Object getBean(Type targetType) {
         if(targetType != null) {
             if(Sweet.typedBeanCache.containsKey(targetType)) {
@@ -78,12 +136,24 @@ public class Sweet {
         return null;
     }
 
+    /**
+     * Assert the object is not null
+     *
+     * @param value The target object
+     * @param message The assertion message
+     * */
     public static void assertNotNull(Object value, String message) {
         if(value == null) {
             throw new SweetException(message);
         }
     }
 
+    /**
+     * Reflect on the object
+     *
+     * @param o The target object
+     * @return Reflection
+     * */
     public static Reflection reflect(Object o) {
         if(o instanceof Reflectable) {
             return new Reflection((Reflectable)o);
@@ -92,6 +162,12 @@ public class Sweet {
         throw new SweetException('Cannot reflect on this object');
     }
 
+    /**
+     * Read the content of the file(static resource)
+     *
+     * @param filename The name of the file(static resource)
+     * @return String
+     * */
     public static String readFile(String filename) {
         if(!String.isBlank(filename)) {
             List<StaticResource> srList = [ SELECT Id, Body FROM StaticResource WHERE Name = :filename LIMIT 1 ];
@@ -104,6 +180,12 @@ public class Sweet {
         return null;
     }
 
+    /**
+     * Generate the hash code
+     *
+     * @param obj The object to generate the hash code
+     * @return Integer
+     * */
     public static Integer generateHashCode(Object obj) {
         String objJS = JSON.serialize(obj);
         Blob b = Blob.valueOf(objJS);
@@ -133,11 +215,17 @@ public class Sweet {
         }
     }
 
+    /**
+     * The bean info
+     * */
     public class BeanInfo {
         public String name;
         public String type;
     }
 
+    /**
+     * The anonymous context to be used by the Func
+     * */
     public class AnonymousContext {
         private AnonymousContext parent;
         private Map<String, Object> context;
@@ -160,6 +248,9 @@ public class Sweet {
         }
     }
 
+    /**
+     * The base class for the Enum
+     * */
     public virtual class BaseEnum {
         private String name;
         private Integer ordinal;
@@ -180,39 +271,82 @@ public class Sweet {
             return this.name;
         }
 
+        /**
+         * Get the ordinal of the enum constant
+         *
+         * @return Integer
+         * */
         public Integer ordinal() {
             return this.ordinal;
         }
     }
 
+    /**
+     * The reflection infor
+     * */
     public class Reflection {
         private Reflectable target;
 
+        /**
+         * Wrap the reflectable object
+         * */
         public Reflection(Reflectable target) {
             this.target = target;
         }
 
+        /**
+         * Get all the field names
+         *
+         * @return List<String>
+         * */
         public List<String> getFieldNames() {
             return this.target.reflect_getFieldNames();
         }
 
+        /**
+         * Get the field value
+         *
+         * @param name The name of the field
+         * @return Object
+         * */
         public Object getFieldValue(String name) {
             return this.target.reflect_getFieldValue(name);
         }
 
+        /**
+         * Set the field value
+         *
+         * @param name The name of the field
+         * @param value The value of the field
+         * */
         public void setFieldValue(String name, Object value) {
             this.target.reflect_setFieldValue(name, value);
         }
 
+        /**
+         * Get the method names
+         *
+         * @return List<String>
+         * */
         public List<String> getMethodNames() {
             return this.target.reflect_getMethodNames();
         }
 
+        /**
+         * Invoke the method
+         *
+         * @param name The name of the method
+         * @param args The arguments of the method
+         * @return Object
+         * */
         public Object invokeMethod(String name, List<Object> args) {
             return this.target.reflect_invokeMethod(name, args);
         }
     }
 
+    /**
+     * The reflectable interface, to mark an apex class to be reflectable
+     * */
     public interface Reflectable {
         List<String> reflect_getFieldNames();
 

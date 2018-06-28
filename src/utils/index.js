@@ -1,14 +1,39 @@
+/**
+ * MIT License
+ *
+ * Copyright (c) 2018 Click to Cloud Pty Ltd
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ **/
 const _ = require('lodash');
 const fs = require('fs');
 const path = require('path');
 const getValue = require('../valueProvider');
 const compile = require('../compiler');
 
+// Add indent to the content
 const addIndent = (content, indent) => {
     const lines = _.split(content, '\n');
     return _.map(lines, line => indent + line).join('\n');
 };
 
+// Add comments to the lines
 const addComments = (lines, indent, comments) => {
     if(!_.isEmpty(comments)) {
         _.each(comments, comment => {
@@ -17,6 +42,7 @@ const addComments = (lines, indent, comments) => {
     }
 };
 
+// Add body declarations
 const addBodyDeclarations = (lines, indent, bodyDeclarations) => {
     _.each(bodyDeclarations, bodyDeclaration => {
         compile(bodyDeclaration, {
@@ -26,6 +52,7 @@ const addBodyDeclarations = (lines, indent, bodyDeclarations) => {
     });
 };
 
+// Add annotations
 const addAnnotations = (lines, indent, annotations) => {
     _.each(_.filter(annotations, ann => ann.node === 'Annotation'), ann => {
         compile(ann, {
@@ -35,29 +62,35 @@ const addAnnotations = (lines, indent, annotations) => {
     });
 };
 
+// Get the combined annotations as a string
 const getAnnotations = modifiers => {
     const ret = _.map(_.filter(modifiers, modifier => modifier.node === 'Annotation'), getValue).join(' ');
     return _.isEmpty(ret) ? '' : ret + ' ';
 };
 
+// Get the combined modifiers as a string
 const getModifiers = modifiers => {
     const ret = _.map(_.filter(modifiers, modifier => modifier.node === 'Modifier'), getValue).join(' ');
     return _.isEmpty(ret) ? '' : ret + ' ';
 };
 
+// Get the combined type parameters as a string
 const getTypeParameters = typeParameters =>
     _.isEmpty(typeParameters) ?
         '' :
         '<' + _.map(typeParameters, getValue).join(', ') + '>';
 
+// Get the extends super class as a string
 const getExtendsSuperClass = superclassType =>
     superclassType ? ' extends ' + getValue(superclassType) : '';
 
+// Get the implements interfaces as a string
 const getImplementsInterfaces = superInterfaceTypes =>
     _.isEmpty(superInterfaceTypes) ? '' : ' implements ' + _.map(superInterfaceTypes, getValue).join(', ');
 
 const perfCounters = {};
 
+// Start the performance timing
 const time = (message, config) => {
     if(config.isPerfEnabled) {
         perfCounters[message] = {
@@ -67,6 +100,7 @@ const time = (message, config) => {
     }
 };
 
+// Stop the performance timing
 const timeEnd = (message, config) => {
     if(config.isPerfEnabled) {
         const counter = perfCounters[message];
@@ -77,6 +111,7 @@ const timeEnd = (message, config) => {
     }
 };
 
+// Check if the file is a directory
 const isDirectory = dir => {
     try {
         return fs.lstatSync(dir).isDirectory();
@@ -86,6 +121,7 @@ const isDirectory = dir => {
     }
 };
 
+// Normalize the file name
 const normalize = file => {
     if(isDirectory(file)) {
         file = file.endsWith(path.sep) ? file : file + path.sep;
@@ -94,6 +130,7 @@ const normalize = file => {
     return file;
 };
 
+// Log the message
 const log = (message, config) => {
     if(!config) {
         throw new Error('Config is not passed in');
@@ -104,6 +141,7 @@ const log = (message, config) => {
     }
 };
 
+// Write to the file into the destination directory
 const writeToFile = (fileName, content, config) => {
     time(`Write File ${fileName}`, config);
 
@@ -119,6 +157,7 @@ const writeToFile = (fileName, content, config) => {
     });
 };
 
+// Get the name(without suffix) from the filename
 const getName = fileName => {
     const startIndex = _.lastIndexOf(fileName, path.sep);
     const endIndex = _.lastIndexOf(fileName, '.');

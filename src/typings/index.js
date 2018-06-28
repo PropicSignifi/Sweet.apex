@@ -1,3 +1,26 @@
+/**
+ * MIT License
+ *
+ * Copyright (c) 2018 Click to Cloud Pty Ltd
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ **/
 const _ = require('lodash');
 const fs = require('fs');
 const path = require('path');
@@ -8,9 +31,13 @@ const normalize = require('../template');
 const parse = require('../parser');
 const AST = require('../ast');
 
+// Typings for all the files in the source directory and destination directory
 let allTypings = null;
+
+// Typings for the Salesforce apex library classes
 let libraryTypings = null;
 
+// Get all the typings from the source and destination directories
 const getAllTypings = config => {
     if(!allTypings) {
         const allTypingsPath = config.cacheDir + path.sep + 'allTypings.json';
@@ -31,6 +58,7 @@ const getAllTypings = config => {
     return allTypings;
 };
 
+// Get all the typings from library apex classes
 const getLibraryTypings = config => {
     if(!libraryTypings) {
         libraryTypings = {};
@@ -51,12 +79,14 @@ const getLibraryTypings = config => {
     return libraryTypings;
 };
 
+// Flush the infos to the local storage
 const flush = (config) => {
     const allTypingsPath = config.cacheDir + path.sep + 'allTypings.json';
     const allTypings = getAllTypings(config);
     fs.writeFileSync(allTypingsPath, JSON.stringify(allTypings));
 };
 
+// Slim the typing info, removing empty fields
 const slim = target => {
     if(_.isPlainObject(target)) {
         return _.chain(target)
@@ -74,6 +104,7 @@ const slim = target => {
     }
 };
 
+// Add typings from the AST node
 const add = (node, config) => {
     const typeDeclaration = AST.getTopLevelType(node);
 
@@ -84,11 +115,13 @@ const add = (node, config) => {
     addTyping(typing, config);
 };
 
+// Add typings
 const addTyping = (typing, config) => {
     const allTypings = getAllTypings(config);
     allTypings[typing.name] = slim(typing);
 };
 
+// Scan the file and add typings
 const scan = (fileName, config) => {
     time(`Scan file ${fileName}`, config);
 
@@ -134,6 +167,7 @@ const scan = (fileName, config) => {
     });
 };
 
+// The global typings object
 const Typings = {
     add,
     addTyping,

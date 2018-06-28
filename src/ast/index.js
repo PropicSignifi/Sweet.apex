@@ -1,8 +1,32 @@
+/**
+ * MIT License
+ *
+ * Copyright (c) 2018 Click to Cloud Pty Ltd
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ **/
 const _ = require('lodash');
 const parse = require('../parser');
 const getValue = require('../valueProvider');
 const compile = require('../compiler');
 
+// Traverse the AST nodes
 const _traverse = (node, parent, callback, skip) => {
     if(!node) {
         return;
@@ -61,22 +85,27 @@ const _traverse = (node, parent, callback, skip) => {
     }
 };
 
+// Traverse the AST nodes
 const traverse = (node, callback, skip) => {
     _traverse(node, null, callback, skip);
 };
 
+// Add parent indexes through the AST nodes
+// Parent indexes are added to make node referencing more convenient
 const addIndex = root => {
     traverse(root, (curr, parent) => {
         curr.parent = parent;
     });
 };
 
+// Remove parent indexes from the AST nodes
 const removeIndex = root => {
     traverse(root, (curr, parent) => {
         curr.parent = null;
     });
 };
 
+// Get the parent of the AST node
 const getParent = (root, current) => {
     if(!root || !current) {
         throw new Error('Root and current are required to get parent node');
@@ -85,6 +114,7 @@ const getParent = (root, current) => {
     return current.parent;
 };
 
+// Parse the content from the given start rule
 const _parse = (type, content) => {
     const node = parse(content, {
         startRule: type,
@@ -93,18 +123,25 @@ const _parse = (type, content) => {
     return node;
 };
 
+// Parse the type declaration
 const parseTypeDeclaration = content => _parse('TypeDeclaration', content);
 
+// Parse the class body declaration
 const parseClassBodyDeclaration = content => _parse('ClassBodyDeclaration', content);
 
+// Parse the expression
 const parseExpression = content => _parse('Expression', content);
 
+// Parse the block statement
 const parseBlockStatement = line => _parse('BlockStatement', line);
 
+// Parse the block statements
 const parseBlockStatements = lines => _.map(lines, parseBlockStatement);
 
+// Parse the compilation unit
 const parseCompilationUnit = content => _.parse('CompilationUnit', content);
 
+// Get the method signature from the type and method
 const getMethodSignature = (methodDeclaration, typeDeclaration) => {
     if(typeDeclaration) {
         const typeName = getValue(typeDeclaration.name);
@@ -117,6 +154,7 @@ const getMethodSignature = (methodDeclaration, typeDeclaration) => {
     }
 };
 
+// Transform the current AST node into the target node
 const transform = (srcNode, destNode) => {
     if(!srcNode || !destNode) {
         return;
@@ -137,18 +175,25 @@ const transform = (srcNode, destNode) => {
     addIndex(srcNode);
 };
 
+// Find the target modifier name from the list of modifiers
 const findModifier = (modifiers, target) => _.find(modifiers, { node: 'Modifier', keyword: target });
 
+// Check if the list of modifiers contains the target modifier name
 const hasModifier = (modifiers, target) => !!findModifier(modifiers, target);
 
+// Find the target annotation by name from the list of modifiers
+// In Sweet.apex, modifiers and annotations are all listed in modifiers
 const findAnnotation = (modifiers, target) => _.find(modifiers, modifier => modifier.node === 'Annotation' && getValue(modifier.typeName) === target);
 
+// Check if the list of modifiers contains the target annotation by name
 const hasAnnotation = (modifiers, target) => !!findAnnotation(modifiers, target);
 
+// Create a parsed empty line
 const parseEmptyLine = () => ({
     node: 'LineEmpty',
 });
 
+// Find the next AST node of the current node
 const findNext = (parent, current) => {
     if(!parent || !current) {
         return null;
@@ -173,6 +218,7 @@ const findNext = (parent, current) => {
     return next;
 };
 
+// Find the previous AST node of the current node
 const findPrev = (parent, current) => {
     if(!parent || !current) {
         return null;
@@ -197,6 +243,7 @@ const findPrev = (parent, current) => {
     return prev;
 };
 
+// Set the child AST node to the given name of the parent
 const setChild = (parent, name, child) => {
     if(parent && name && child) {
         parent[name] = child;
@@ -206,6 +253,7 @@ const setChild = (parent, name, child) => {
     }
 };
 
+// Remove the child from the given name of the parent
 const removeChild = (parent, name, child) => {
     if(parent && name) {
         if(_.isArray(parent[name])) {
@@ -226,8 +274,10 @@ const removeChild = (parent, name, child) => {
     }
 };
 
+// Remove the children from the given name of the parent
 const removeChildren = removeChild;
 
+// Prepend a child to the given name of the parent
 const prependChild = (parent, name, child) => {
     if(parent && name && child) {
         if(!parent[name]) {
@@ -244,6 +294,7 @@ const prependChild = (parent, name, child) => {
     }
 };
 
+// Prepend children to the given name of the parent
 const prependChildren = (parent, name, children) => {
     if(parent && name && children) {
         if(!parent[name]) {
@@ -262,6 +313,7 @@ const prependChildren = (parent, name, children) => {
     }
 };
 
+// Append a child to the given name of the parent
 const appendChild = (parent, name, child) => {
     if(parent && name && child) {
         if(!parent[name]) {
@@ -278,6 +330,7 @@ const appendChild = (parent, name, child) => {
     }
 };
 
+// Append children to the given name of the parent
 const appendChildren = (parent, name, children) => {
     if(parent && name && children) {
         if(!parent[name]) {
@@ -296,6 +349,7 @@ const appendChildren = (parent, name, children) => {
     }
 };
 
+// Insert a child before the target to the given name of the parent
 const insertChildBefore = (parent, name, target, child) => {
     if(parent && name && target && child) {
         if(!parent[name]) {
@@ -315,6 +369,7 @@ const insertChildBefore = (parent, name, target, child) => {
     }
 };
 
+// Insert a child after the target to the given name of the parent
 const insertChildAfter = (parent, name, target, child) => {
     if(parent && name && target && child) {
         if(!parent[name]) {
@@ -334,6 +389,7 @@ const insertChildAfter = (parent, name, target, child) => {
     }
 };
 
+// Insert children before the target to the given name of the parent
 const insertChildrenBefore = (parent, name, target, children) => {
     if(parent && name && target && children) {
         if(!parent[name]) {
@@ -356,6 +412,7 @@ const insertChildrenBefore = (parent, name, target, children) => {
     }
 };
 
+// Insert children after the target to the given name of the parent
 const insertChildrenAfter = (parent, name, target, children) => {
     if(parent && name && target && children) {
         if(!parent[name]) {
@@ -378,6 +435,7 @@ const insertChildrenAfter = (parent, name, target, children) => {
     }
 };
 
+// Get the unique name of the AST node
 const getUniqueName = node => {
     const items = [];
     let curr = node;
@@ -394,6 +452,7 @@ const getUniqueName = node => {
     return _.join(items, '_');
 };
 
+// Get the value of the annotation
 const getAnnotationValue = annotation => {
     if(annotation.value) {
         return getValue(annotation.value);
@@ -411,6 +470,7 @@ const getAnnotationValue = annotation => {
     }
 };
 
+// Get a simplified version of the annotation
 const getAnnotation = annotation => {
     const data = {
         typeName: getValue(annotation.typeName),
@@ -431,22 +491,27 @@ const getAnnotation = annotation => {
     return data;
 };
 
+// Get the top level type
 const getTopLevelType = root => {
     return root.types[0];
 };
 
+// Get the enclosing type of this AST node
 const getEnclosingType = node => {
     return _getEnclosing('TypeDeclaration', node);
 };
 
+// Get the enclosing method of this AST node
 const getEnclosingMethod = node => {
     return _getEnclosing('MethodDeclaration', node);
 };
 
+// Get the enclosing field of this AST node
 const getEnclosingField = node => {
     return _getEnclosing('FieldDeclaration', node);
 };
 
+// Get the enclosing AST node of the given node with the type
 const _getEnclosing = (type, node) => {
     let current = node;
     while(current) {
@@ -460,6 +525,7 @@ const _getEnclosing = (type, node) => {
     return current;
 };
 
+// Get a simplified version of parameters
 const getParameters = parameters => _.map(parameters, param => {
     return {
         name: getValue(param.name),
@@ -467,6 +533,7 @@ const getParameters = parameters => _.map(parameters, param => {
     };
 });
 
+// Get the compiled string of the AST node
 const getCompiled = node => {
     const lines = [];
     compile(node, {
