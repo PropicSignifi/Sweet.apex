@@ -89,7 +89,11 @@ const Aspect = {
                     return;
                 }
 
-                let aspectPattern = _.trim(getAspectPattern(annotation), "'");
+                let aspectPattern = getAspectPattern(annotation);
+                if(aspectPattern.startsWith('{') && aspectPattern.endsWith('}')) {
+                    aspectPattern = '[' + _.trim(aspectPattern, '{}') + ']';
+                }
+                aspectPattern = eval(aspectPattern);
                 if(!aspectPattern) {
                     throw new Error(`Aspect pattern is not specified for ${name}.${method.name}`);
                 }

@@ -4,7 +4,7 @@ public class AspectDemo {
         return (Integer)result + 1;
     }
 
-    @beforeMethod('AspectDemo.run')
+    @beforeMethod({ 'AspectDemo.run', 'Other..*' })
     public static void beforeRun(Object target, List<Object> args) {
         System.debug('Before running');
     }

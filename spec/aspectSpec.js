@@ -44,7 +44,7 @@ Typings.addTyping({
             "annotations": [
                 {
                     "typeName": "beforeMethod",
-                    "value": "'AspectDemo.run'"
+                    "value": "{ 'AspectDemo.run', 'Other..*' }"
                 }
             ],
             "modifiers": [
