@@ -12,9 +12,9 @@ With `@notNull`, we can specify the parameter value is not null. Otherwise, asse
 
 ```java
 public class NotNullDemo {
-        public static Integer increment(@notNull Integer i) {
-                    return i + 1;
-                        }
+    public static Integer increment(@notNull Integer i) {
+        return i + 1;
+    }
 }
 ```
 
@@ -24,9 +24,9 @@ With `@identity`, `equals` and `hashCode` are automatically generated for our Ap
 ```java
 @identity
 public class IdentityDemo {
-        private String name;
-            private Integer id;
-                private Boolean active;
+    private String name;
+    private Integer id;
+    private Boolean active;
 }
 ```
 
@@ -35,11 +35,11 @@ With template strings, you no longer need to concatenate strings.
 
 ```java
 public class TemplateStringDemo {
-        public static void run() {
-                    String name = 'Sweet.apex';
-                            Integer count = 0;
-                                    String result = `Greeting ${name} for ${count} time(s)`;
-                                        }
+    public static void run() {
+        String name = 'Sweet.apex';
+        Integer count = 0;
+        String result = `Greeting ${name} for ${count} time(s)`;
+    }
 }
 ```
 
@@ -48,14 +48,14 @@ With `@rethrow`, you can catch any exception thrown from this method and rethrow
 
 ```java
 public class RethrowDemo {
-        @AuraEnabled
-            @rethrow(AuraHandledException)
-                public static String getMessage() {
-                            // Custom code
-                                    throw new DmlException('For Demo Purpose');
-                                            // Custom code
-                                                    return null;
-                                                        }
+    @AuraEnabled
+    @rethrow(AuraHandledException)
+    public static String getMessage() {
+        // Custom code
+        throw new DmlException('For Demo Purpose');
+        // Custom code
+        return null;
+    }
 }
 ```
 
@@ -64,10 +64,10 @@ Casting between collections in Apex is hard, but Sweet.apex makes it easy.
 
 ```java
 public class CastingDemo {
-        public static void main() {
-                    Set<Object> set1 = new Set<Object>{ 'a', 'b' };
-                            Set<String> set2 = (Set<Object> => Set<String>)set1;
-                                }
+    public static void main() {
+        Set<Object> set1 = new Set<Object>{ 'a', 'b' };
+        Set<String> set2 = (Set<Object> => Set<String>)set1;
+    }
 }
 ```
 
@@ -76,16 +76,16 @@ Want to define your custom operators? Go ahead.
 
 ```java
 public class OperatorDemo {
-        @operator
-            public static Integer add(Integer a, Integer b) {
-                        return a + b;
-                            }
+    @operator
+    public static Integer add(Integer a, Integer b) {
+        return a + b;
+    }
 
-                                public static void main() {
-                                            Integer a = 1;
-                                                    Integer b = 2;
-                                                            System.debug(a add b);
-                                                                }
+    public static void main() {
+        Integer a = 1;
+        Integer b = 2;
+        System.debug(a add b);
+    }
 }
 ```
 
@@ -130,11 +130,11 @@ Go to any directory(`/Users/wilson/sweet_apex/src`, for example), and write a si
 
 ```java
 public class HelloSweetApex {
-        public static void main() {
-                    Integer a = 5;
-                            Integer b = 7;
-                                    System.debug(a % b);
-                                        }
+    public static void main() {
+        Integer a = 5;
+        Integer b = 7;
+        System.debug(a % b);
+    }
 }
 ```
 
@@ -154,11 +154,11 @@ Go to `/Users/wilson/sweet_apex/build` and check what has been generated. You ca
 
 ```java
 public class HelloSweetApex {
-        public static void main() {
-                    Integer a = 5;
-                            Integer b = 7;
-                                    System.debug(Math.mod(a, b));
-                                        }
+    public static void main() {
+        Integer a = 5;
+        Integer b = 7;
+        System.debug(Math.mod(a, b));
+    }
 }
 ```
 
