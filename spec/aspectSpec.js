@@ -2,6 +2,7 @@ const fs = require('fs');
 const path = require('path');
 const transpile = require('../src/transpiler');
 const Typings = require('../src/typings');
+const { getFeature, } = require('../src/features');
 
 const targetFile = 'AspectDemo';
 const config = {
@@ -94,6 +95,8 @@ function joinPath(items) {
 
 describe("aspect feature", function() {
     it("should convert aspects", function() {
+        getFeature('aspect').setUp(config);
+
         const content = fs.readFileSync(joinPath(['resources', 'aspect', targetFile + '.apex']), 'utf8');
         const result = transpile(content, config);
         const benchmark = fs.readFileSync(joinPath(['resources', 'benchmark', targetFile + '.cls']), 'utf8');

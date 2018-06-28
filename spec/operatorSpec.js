@@ -2,6 +2,7 @@ const fs = require('fs');
 const path = require('path');
 const transpile = require('../src/transpiler');
 const Typings = require('../src/typings');
+const { getFeature, } = require('../src/features');
 
 const targetFile = 'OperatorDemo';
 const config = {
@@ -56,6 +57,8 @@ function joinPath(items) {
 
 describe("operator feature", function() {
     it("should convert custom operators", function() {
+        getFeature('operator').setUp(config);
+
         const content = fs.readFileSync(joinPath(['resources', 'operator', targetFile + '.apex']), 'utf8');
         const result = transpile(content, config);
         const benchmark = fs.readFileSync(joinPath(['resources', 'benchmark', targetFile + '.cls']), 'utf8');

@@ -25,6 +25,7 @@ const _ = require('lodash');
 const fs = require('fs');
 const path = require('path');
 const transpile = require('./src/transpiler');
+const setUp = require('./src/setUp');
 const finalize = require('./src/finalizer');
 const build = require('./src/builder');
 const { time, timeEnd, normalize, log, writeToFile, getName, } = require('./src/utils');
@@ -249,16 +250,19 @@ Promise.resolve(srcFiles)
                 return files;
             });
     })
-    // Stage 2 Transpiling
+    // Stage 2 Set up
+    // Run the setup
+    .then(() => setUp(config)) // Run finalize
+    // Stage 3 Transpiling
     // Transpile all the source files
     .then(files => Promise.all(_.map(files, file => compileFile(file, config)))) // Compile files
-    // Stage 3 Finalizing
+    // Stage 4 Finalizing
     // Run the finalization
     .then(() => finalize(config)) // Run finalize
-    // Stage 4 Building
+    // Stage 5 Building
     // Build other files
     .then(() => build(config)) // Run build
-    // Stage 5 Finishing
+    // Stage 6 Finishing
     // Persist tracking information and finish the process
     .then(() => FileUpdates.flush(config)) // Flush file update infos to local storage
     .then(() => Typings.flush(config)) // Flush typings info to local storage
