@@ -137,6 +137,14 @@ if(!fs.existsSync(config.cacheDir)) {
 
 config.libraryDir = config.cwd + path.sep  + normalize('library');
 
+if(config.clean) {
+    _.each(fs.readdirSync(config.cacheDir), file => {
+        fs.unlinkSync(config.cacheDir + path.sep + file);
+    });
+
+    log('Cleaned cache', config);
+}
+
 // Meta content for apex class files
 const meta = `<?xml version="1.0" encoding="UTF-8"?>
 <ApexClass xmlns="http://soap.sforce.com/2006/04/metadata">
