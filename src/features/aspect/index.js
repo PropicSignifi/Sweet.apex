@@ -51,13 +51,29 @@ const getAspectPattern = annotation => {
     return null;
 };
 
-const checkValidAspectMethod = method => {
+const checkValidAspectMethod = (method, type, aspectType) => {
     if(!_.includes(method.modifiers, 'public') && !_.includes(method.modifiers, 'global')) {
-        return 'Method should be either public or global';
+        return `Method should be either public or global for ${type.name}.${method.name}`;
     }
 
     if(!_.includes(method.modifiers, 'static')) {
-        return 'Method should be static';
+        return `Method should be static for ${type.name}.${method.name}`;
+    }
+
+    if(aspectType === 'beforeMethod') {
+        if(!(_.size(method.parameters) === 2 &&
+            (method.parameters[0].type) === 'Object' &&
+            (method.parameters[1].type) === 'List<Object>')) {
+            return `Method parameters are incorrect for ${type.name}.${method.name}`;
+        }
+    }
+    else if(aspectType === 'afterMethod') {
+        if(!(_.size(method.parameters) === 3 &&
+            (method.parameters[0].type) === 'Object' &&
+            (method.parameters[1].type) === 'List<Object>' &&
+            (method.parameters[2].type) === 'Object')) {
+            return `Method parameters are incorrect for ${type.name}.${method.name}`;
+        }
     }
 
     return null;
@@ -78,7 +94,7 @@ const Aspect = {
                     throw new Error(`Aspect pattern is not specified for ${name}.${method.name}`);
                 }
 
-                const msg = checkValidAspectMethod(method);
+                const msg = checkValidAspectMethod(method, typing, annotation.typeName);
                 if(msg) {
                     throw new Error(msg);
                 }
@@ -129,7 +145,7 @@ const Aspect = {
             _.each(beforeAspects, aspect => {
                 const args = [
                     isStatic ? typeName + '.class' : 'this',
-                    ...(_.map(current.parameters, param => getValue(param.name))),
+                    `new List<Object>{ ${_.map(current.parameters, param => getValue(param.name)).join(', ')} }`,
                 ];
                 const beforeCode = `${aspect.type}.${aspect.method}(${args.join(', ')});`;
                 beforeCodes.push(beforeCode);
@@ -139,8 +155,8 @@ const Aspect = {
             _.each(afterAspects, aspect => {
                 const args = [
                     isStatic ? typeName + '.class' : 'this',
-                    ...(_.map(current.parameters, param => getValue(param.name))),
-                    'ret',
+                    `new List<Object>{ ${_.map(current.parameters, param => getValue(param.name)).join(', ')} }`,
+                    hasReturn ? 'ret' : 'null',
                 ];
                 const afterCode = `${hasReturn ? 'ret = (' + returnType + ')' : ''}${aspect.type}.${aspect.method}(${args.join(', ')});`;
                 afterCodes.push(afterCode);

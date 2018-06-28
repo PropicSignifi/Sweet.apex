@@ -252,7 +252,10 @@ Promise.resolve(srcFiles)
     })
     // Stage 2 Set up
     // Run the setup
-    .then(() => setUp(config)) // Run finalize
+    .then(files => {
+        setUp(config);
+        return files;
+    })
     // Stage 3 Transpiling
     // Transpile all the source files
     .then(files => Promise.all(_.map(files, file => compileFile(file, config)))) // Compile files

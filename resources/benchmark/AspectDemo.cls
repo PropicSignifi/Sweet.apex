@@ -1,17 +1,17 @@
 public class AspectDemo {
-    public static Integer afterVersion(Type targetType, Integer base, Integer result) {
-        return result + 1;
+    public static Integer afterVersion(Object target, List<Object> args, Object result) {
+        return (Integer)result + 1;
     }
-    public static void beforeRun(AspectDemo target) {
+    public static void beforeRun(Object target, List<Object> args) {
         System.debug('Before running');
     }
     public void run() {
-        AspectDemo.beforeRun(this);
+        AspectDemo.beforeRun(this, new List<Object>{  });
         aspect_run();
     }
     public static Integer version(Integer base) {
         Integer ret = aspect_version(base);
-        ret = (Integer)AspectDemo.afterVersion(AspectDemo.class, base, ret);
+        ret = (Integer)AspectDemo.afterVersion(AspectDemo.class, new List<Object>{ base }, ret);
         return ret;
     }
     private void aspect_run() {

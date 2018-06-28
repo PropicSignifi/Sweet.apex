@@ -41,21 +41,21 @@ const getOperatorName = annotation => {
     return null;
 };
 
-const checkValidOperatorMethod = method => {
+const checkValidOperatorMethod = (method, type) => {
     if(!_.includes(method.modifiers, 'public') && !_.includes(method.modifiers, 'global')) {
-        return 'Method should be either public or global';
+        return `Method should be either public or global for ${type.name}.${method.name}`;
     }
 
     if(!_.includes(method.modifiers, 'static')) {
-        return 'Method should be static';
+        return `Method should be static for ${type.name}.${method.name}`;
     }
 
     if(method.returnType === 'void') {
-        return 'Method should have a return type';
+        return `Method should have a return type for ${type.name}.${method.name}`;
     }
 
     if(_.size(method.parameters) !== 2) {
-        return 'Method should expect exactly two parameters';
+        return `Method should expect exactly two parameters for ${type.name}.${method.name}`;
     }
 
     return null;
@@ -76,7 +76,7 @@ const Operator = {
                     operatorName = method.name;
                 }
 
-                const msg = checkValidOperatorMethod(method);
+                const msg = checkValidOperatorMethod(method, typing);
                 if(msg) {
                     throw new Error(msg);
                 }

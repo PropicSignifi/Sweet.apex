@@ -26,16 +26,16 @@ Typings.addTyping({
             "name": "afterVersion",
             "parameters": [
                 {
-                    "name": "targetType",
-                    "type": "Type"
+                    "name": "target",
+                    "type": "Object"
                 },
                 {
-                    "name": "base",
-                    "type": "Integer"
+                    "name": "args",
+                    "type": "List<Object>"
                 },
                 {
                     "name": "result",
-                    "type": "Integer"
+                    "type": "Object"
                 }
             ],
             "returnType": "Integer"
@@ -55,7 +55,11 @@ Typings.addTyping({
             "parameters": [
                 {
                     "name": "target",
-                    "type": "AspectDemo"
+                    "type": "Object"
+                },
+                {
+                    "name": "args",
+                    "type": "List<Object>"
                 }
             ],
             "returnType": "void"

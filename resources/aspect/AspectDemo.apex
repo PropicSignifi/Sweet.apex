@@ -1,11 +1,11 @@
 public class AspectDemo {
     @afterMethod('AspectDemo.version')
-    public static Integer afterVersion(Type targetType, Integer base, Integer result) {
-        return result + 1;
+    public static Integer afterVersion(Object target, List<Object> args, Object result) {
+        return (Integer)result + 1;
     }
 
     @beforeMethod('AspectDemo.run')
-    public static void beforeRun(AspectDemo target) {
+    public static void beforeRun(Object target, List<Object> args) {
         System.debug('Before running');
     }
 
