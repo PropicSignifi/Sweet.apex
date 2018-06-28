@@ -171,69 +171,91 @@ The next thing is definitely running your DX tools to deploy the code to your Or
 Currently, Sweet.apex supports the following features:
 
 - action
+
 Convert a method to an Action. For more details on Action, please check [Action.apex](https://github.com/Click-to-Cloud/Action.apex)
 
 - apexdoc
+
 Generate simple JSON files representing Sweet Apex class structures and comments, which can be further used to create pretty documentation sites.
 
 - array creation
+
 Simplify how you create lists and maps.
 
 - aspect
+
 Adopt aspects before and after your method invocations. Check AOP(Aspect Oriented Programming) for details.
 
 - cast
+
 Cast between collections of different lists, sets and maps.
 
 - default value
+
 Specify the default value of method parameters.
 
 - enum
+
 Create enums that have custom methods.
 
 - file
+
 Build files to static resources.
 
 - function
+
 Convert methods to functions. Check [R.apex](https://github.com/Click-to-Cloud/R.apex) for more details on Funcs.
 
 - identity
+
 Generate `equals` and `hashCode` methods.
 
 - inject
+
 Inject beans to variables. Check DI(Dependency Injection).
 
 - lambda
+
 Convert lambda expressions to anonymous functions.
 
 - log
+
 Create logger object for the class. Check [Log.apex](https://github.com/Click-to-Cloud/Log.apex) for details.
 
 - mod
+
 Support modulo operator `%`.
 
 - not null
+
 Assert method parameters are not null.
 
 - operator
+
 Define custom operators from static methods.
 
 - optional
+
 Create methods that support optional parameters.
 
 - reflect
+
 Add reflection behavior to the class.
 
 - rethrow
+
 Catch any exception thrown from the method and rethrow it with a wrapped one.
 
 - switch
+
 Support `switch-case` syntax.
 
 - template
+
 Support custom code template.
 
 - template string
+
 Avoid concatenating strings.
 
 ## Feature Request
