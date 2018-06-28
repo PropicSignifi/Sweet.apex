@@ -18,5 +18,10 @@ describe("cast feature", function() {
         const benchmark = fs.readFileSync(joinPath(['resources', 'benchmark', targetFile + '.cls']), 'utf8');
 
         expect(result).toEqual(benchmark);
+
+        const castUtilsContent = fs.readFileSync(joinPath(['resources', 'benchmark', 'cast_Utils.cls']), 'utf8');
+        const castUtilsExpect = fs.readFileSync(joinPath(['resources', 'benchmark', 'cast_Utils.cls.expect']), 'utf8');
+
+        expect(castUtilsContent).toEqual(castUtilsExpect);
     });
 });
