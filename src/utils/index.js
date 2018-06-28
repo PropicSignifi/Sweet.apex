@@ -165,6 +165,9 @@ const getName = fileName => {
     return name;
 };
 
+// Copy file from one location to another
+const copyFile = (src, dest) => fs.createReadStream(src).pipe(fs.createWriteStream(dest));
+
 module.exports = {
     addIndent,
     addComments,
@@ -181,4 +184,5 @@ module.exports = {
     log,
     writeToFile,
     getName,
+    copyFile,
 };

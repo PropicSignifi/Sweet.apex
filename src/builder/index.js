@@ -1,7 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 const _ = require('lodash');
-const { normalize, log, } = require('../utils');
+const { normalize, log, copyFile, } = require('../utils');
 
 const writeToFile = (fileName, content, config) => {
     return new Promise((resolve, reject) => {
@@ -43,6 +43,13 @@ const buildFile = (fileName, config) => {
     });
 };
 
+const apexFiles = [
+    `Sweet.cls`,
+    `Sweet.cls-meta.xml`,
+    `SweetTest.cls`,
+    `SweetTest.cls-meta.xml`,
+];
+
 const build = config => {
     if(!config.fileSrcDir) {
         console.error('Build stage is skipped because fileSrcDir is not set.');
@@ -65,7 +72,11 @@ const build = config => {
         _.chain(fs.readdirSync(config.fileSrcDir))
             .map(name => buildFile(config.fileSrcDir + name, config))
             .value()
-    );
+    ).then(() => {
+        _.each(apexFiles, apexFile => {
+            copyFile(config.cwd + path.sep + 'src' + path.sep + 'classes' + path.sep + apexFile, config.destDir + apexFile);
+        });
+    });
 };
 
 module.exports = build;
