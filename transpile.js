@@ -73,6 +73,9 @@ let clean = options.c;
 // Whether to continue transpilation despite of single failures
 let ignoreErrors = options.i;
 
+// Whether to print CLI help
+let showHelp = options.h;
+
 // The source directory, where your '.apex' files reside
 let srcDir = _.nth(items, 0);
 
@@ -82,8 +85,34 @@ let destDir = _.nth(items, 1);
 // Specify features to run with
 let features = _.nth(items, 2);
 
+const help = `Sweet Apex Transpilation Usage:
+
+Usage: node ${_.chain(currentFileName).split(path.sep).last().value()} [-options] [srcDir] [destDir] [features]
+
+Where:
+    srcDir     -> The source directory or the single source file, using './resources' by default
+    destDir    -> The destination diretory where the Apex classes reside, using './build' by default
+    features   -> The list of features enabled, separated by comma, using all features by default
+
+Options:
+    -v         -> Show debug information, false by default
+    --perf     -> Show performance information, false by default
+    -s         -> Silent mode, disabling all prints, false by default
+    -c         -> Clean mode, removing all cache files, false by default
+    -i         -> Ignore errors, continuing even if there are errors, false by default
+    -h         -> Show this help message
+
+Note:
+    All these can be configured in 'config.json'.
+`;
+
+if(showHelp) {
+    console.log(help);
+    return;
+}
+
 const usage = () => {
-    console.error(`Usage: node ${_.chain(currentFileName).split(path.sep).last().value()} <srcDir> <destDir>`);
+    console.error(`Usage: node ${_.chain(currentFileName).split(path.sep).last().value()} [-options] [srcDir] [destDir] [features]`);
 };
 
 const config = {
