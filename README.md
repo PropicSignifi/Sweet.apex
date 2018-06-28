@@ -1,5 +1,5 @@
 # Sweet.apex
-Sweet.apex is a library that adds fancy language features into your Salesforce Apex code.
+Sweet.apex is the next generation of Apex development, transpiling Sweet Apex(a feature-rich Apex-like code) to Apex classes.
 
 ## Why Sweet.apex?
 Have you ever dreamed of using custom annotations in Apex? Have you ever wondered if you could eliminate some Apex boilerplate codes? Sweet.apex is here to make your dreams come true, by providing some of the most amazing features right at your disposal.
@@ -31,7 +31,7 @@ public class IdentityDemo {
 ```
 
 ### Template String
-With template strings, you no longer need to concatenate strings.
+With template strings, we no longer need to concatenate strings.
 
 ```java
 public class TemplateStringDemo {
@@ -44,7 +44,7 @@ public class TemplateStringDemo {
 ```
 
 ### Rethrow Exceptions
-With `@rethrow`, you can catch any exception thrown from this method and rethrow it in a wrapped exception, particularly useful in Salesforce Lightning server controllers.
+With `@rethrow`, we can catch any exception thrown from this method and rethrow it in a wrapped exception, particularly useful in Salesforce Lightning server controllers.
 
 ```java
 public class RethrowDemo {
@@ -72,7 +72,7 @@ public class CastingDemo {
 ```
 
 ### Custom Operators
-Want to define your custom operators? Go ahead.
+Want to define custom operators? Go ahead.
 
 ```java
 public class OperatorDemo {
@@ -96,10 +96,10 @@ Yes and no.
 
 Technically speaking, they are Sweet Apex codes, cousins of Apex codes, yet with more powers. In some way, they are equivalent to Apex codes, and we will see shortly.
 
-Well, the code snippets above are just starters. We have much more fascinating main courses afterwards, but we are not going to show them here, as this is intended for you to get started. If you want to check it out, visit our documentation site for details.
+Well, the code snippets above are just starters. We have much more fascinating main courses afterwards, but we are not going to show them here, as this is intended for us to get started. If you want to check it out, visit our documentation site for details.
 
 ## Inspirations
-Before we reveal the secret of Sweet.apex, we would like to introduce one important Salesforce technique, SFDX. This is the developer-friendly command line tool that helps us do lots of things and creates many possibilities. Without DX, it would be nearly impossible to deploy your Apex code directly from locally to your Orgs. Yes, SFDX paves the way for building a brand-new development process, and let's take a closer look at this.
+Before we reveal the secret of Sweet.apex, we would like to introduce one important Salesforce technique, SFDX. This is a developer-friendly command line tool that helps us do lots of things and creates many possibilities. Without DX, it would be nearly impossible to deploy our Apex code directly from locally to our Orgs. Yes, SFDX paves the way for building a brand-new development process, and let's take a closer look at this.
 
 The time when we used to edit Apex files in the Salesforce console has long gone and now we can work locally on these files before deploying them using SFDX. Deploying Apex files has never been easier. Take that advantage to its best and keep on.
 
@@ -107,7 +107,7 @@ The Apex classes are the only acceptable source codes for Salesforce, but not fo
 
 This innovating source file can be of any kind, with any features, only if it can be converted to Apex classes. To make things easier, we adopt similar grammar with Salesforce Apex in this source file and name it the Sweet Apex file.
 
-Sweet Apex files are bridged to Apex classes by one technique, **transpilation**, which is a process to compile from one source file to another source file. Simply put, we **transpile** Sweet Apex codes into Apex classes, then deploying them by SFDX.
+Sweet Apex files are bridged to Apex classes by one technique, **transpilation**, which is a process to compile from one kind of source file to another kind. Simply put, we **transpile** Sweet Apex codes into Apex classes, then deploying them by SFDX.
 
 ## Getting Started
 
@@ -149,7 +149,7 @@ node transpile.js /Users/wilson/sweet_apex/src /Users/wilson/sweet_apex/build
 
 Wait until it says it's completed.
 
-### Transipled Apex Class
+### Transpiled Apex Class
 Go to `/Users/wilson/sweet_apex/build` and check what has been generated. You can find a file called `HelloSweetApex.cls`, and it looks like this:
 
 ```java
