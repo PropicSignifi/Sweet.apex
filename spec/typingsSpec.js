@@ -6,7 +6,7 @@ const config = {
 
 describe("Sweet.apex", function() {
     it("should load library typings", function() {
-        const typings = Typings.getAllTypings(config);
+        const typings = Typings.getLibraryTypings(config);
         expect(typings.System.String).not.toBeNull();
     });
 });

@@ -980,7 +980,11 @@ AdditiveExpression
     { return buildInfixExpr(first, rest); }
 
 MultiplicativeExpression
-    = EmptyLines (EmptyLines NonJavaDocComment)* EmptyLines first:UnaryExpression EmptyLines (EmptyLines NonJavaDocComment)* EmptyLines rest:((STAR / DIV / MOD) UnaryExpression)*
+    = EmptyLines (EmptyLines NonJavaDocComment)* EmptyLines first:BinaryOperatorExpression EmptyLines (EmptyLines NonJavaDocComment)* EmptyLines rest:((STAR / DIV / MOD) BinaryOperatorExpression)*
+    { return buildInfixExpr(first, rest); }
+
+BinaryOperatorExpression
+    = EmptyLines (EmptyLines NonJavaDocComment)* EmptyLines first:UnaryExpression EmptyLines (EmptyLines NonJavaDocComment)* EmptyLines rest:(BINARY_OPERATOR UnaryExpression)*
     { return buildInfixExpr(first, rest); }
 
 UnaryExpression
@@ -1729,6 +1733,7 @@ UnicodeEscape
 //  Separators, Operators
 //-------------------------------------------------------------------------
 
+BINARY_OPERATOR =            Identifier Spacing
 ARROW           =            "=>"      Spacing
 AT              =            "@"       Spacing
 AND             =            "&"![=&]  Spacing

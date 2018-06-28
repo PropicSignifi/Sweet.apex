@@ -53,7 +53,6 @@ private class Plain extends Func implements Queueable {
         while(total > 0) {
             total -= 1;
         }
-
         upsert accounts Id;
 
         do {

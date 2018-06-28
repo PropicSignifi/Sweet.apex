@@ -43,6 +43,18 @@ const runGroup = (group, feature) => {
     }
 };
 
+const setUp = (config, feature) => {
+    if(_.isFunction(feature.setUp)) {
+        feature.setUp(config);
+    }
+};
+
+const tearDown = (config, feature) => {
+    if(_.isFunction(feature.tearDown)) {
+        feature.tearDown(config);
+    }
+};
+
 const rebuildWithFeature = (node, feature, config) => {
     const collected = [];
 
@@ -88,16 +100,32 @@ const rebuild = (node, config) => {
     AST.addIndex(node);
     timeEnd('Add index', config);
 
+    time('Set up', config);
     _.each(fList, featureName => {
         const feature = features[featureName];
         if(!feature) {
             throw new Error(`No such feature "${featureName}" cound be found`);
         }
 
+        setUp(config, feature);
+    });
+    timeEnd('Set up', config);
+
+    _.each(fList, featureName => {
+        const feature = features[featureName];
+
         time(`Rebuild with ${featureName}`, config);
         rebuildWithFeature(node, feature, config);
         timeEnd(`Rebuild with ${featureName}`, config);
     });
+
+    time('Tear down', config);
+    _.each(fList, featureName => {
+        const feature = features[featureName];
+
+        tearDown(config, feature);
+    });
+    timeEnd('Tear down', config);
 
     time('Remove index', config);
     AST.removeIndex(node);

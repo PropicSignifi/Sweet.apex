@@ -17,6 +17,7 @@
         "apexdoc",
         "array_creation",
         "mod",
+        "operator",
         "template_string",
         "cast",
         "lambda",

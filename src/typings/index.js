@@ -28,6 +28,10 @@ const getAllTypings = config => {
         allTypings = {};
     }
 
+    return allTypings;
+};
+
+const getLibraryTypings = config => {
     if(!libraryTypings) {
         libraryTypings = {};
 
@@ -44,7 +48,7 @@ const getAllTypings = config => {
         });
     }
 
-    return _.assign({}, libraryTypings, { _: allTypings });
+    return libraryTypings;
 };
 
 const flush = (config) => {
@@ -73,12 +77,16 @@ const slim = target => {
 const add = (node, config) => {
     const typeDeclaration = AST.getTopLevelType(node);
 
-    const typings = build(typeDeclaration, {
+    const typing = build(typeDeclaration, {
         includeComments: false,
     });
 
+    addTyping(typing, config);
+};
+
+const addTyping = (typing, config) => {
     const allTypings = getAllTypings(config);
-    allTypings[typings.name] = slim(typings);
+    allTypings[typing.name] = slim(typing);
 };
 
 const scan = (fileName, config) => {
@@ -128,8 +136,10 @@ const scan = (fileName, config) => {
 
 const Typings = {
     add,
+    addTyping,
     scan,
     getAllTypings,
+    getLibraryTypings,
     flush,
 };
 
