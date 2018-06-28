@@ -79,6 +79,9 @@ let srcDir = _.nth(items, 0);
 // The destination directory, where your '.cls' files reside
 let destDir = _.nth(items, 1);
 
+// Specify features to run with
+let features = _.nth(items, 2);
+
 const usage = () => {
     console.error(`Usage: node ${_.chain(currentFileName).split(path.sep).last().value()} <srcDir> <destDir>`);
 };
@@ -94,6 +97,10 @@ _.assign(config, JSON.parse(fs.readFileSync(__dirname + path.sep + 'config.json'
     clean,
     ignoreErrors,
 });
+
+if(features) {
+    config.features = _.split(features, ',');
+}
 
 if(srcDir) {
     config.srcDir = srcDir;
