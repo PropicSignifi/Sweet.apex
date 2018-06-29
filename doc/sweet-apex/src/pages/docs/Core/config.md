@@ -23,6 +23,7 @@ You can also specify some config items through command line options, which take 
 ## Configuration Items
 
 | Config Item | Description |
+| ----------- | ----------- |
 | apiVersion | The api version of the generated Apex classes |
 | isDebugEnabled | Whether debug is enabled, same as '-v' option |
 | isPerfEnabled | Whether performance logging is enabled, same as '--perf' option |
