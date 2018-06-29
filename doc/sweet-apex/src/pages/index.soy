@@ -1,0 +1,130 @@
+---
+title: "Home"
+description: "Sweet.apex is the next generation of Apex development, transpiling Sweet Apex(a feature-rich Apex-like code) to Apex classes."
+---
+
+{namespace pageIndex}
+
+/**
+ */
+{template .render}
+	{@param site: ?}
+
+	{call main.render data="all"}
+		{param content kind="html"}
+			{call .header data="all" /}
+			{call .why /}
+			{call .features /}
+			{call .how /}
+			{call .highlights /}
+			{call Footer.render data="all" /}
+		{/param}
+	{/call}
+{/template}
+
+/**
+ */
+{template .header}
+	{@param site: ?}
+
+	<header class="header">
+		<div class="container">
+			<h1 class="header-title">{$site.title}</h1>
+			<h2 class="header-subtitle">{$site.index.description}</h2>
+			<div class="btn-group">
+				<a href="/sweet-apex/tutorials/getting_started/step_1.html" class="btn btn-accent btn-sm">Get Started</a>
+				<a href="https://github.com/Click-to-Cloud/Sweet.apex/" class="btn btn-success btn-sm">GitHub</a>
+				<a href="/" onclick="location.assign('/')" class="btn btn-default btn-sm">Not Interested</a>
+			</div>
+		</div>
+	</header>
+{/template}
+
+/**
+ */
+{template .why}
+	<article class="about">
+		<div class="container">
+			<div class="row">
+				<div class="col-md-12 col-md-offset-2">
+					<h3 class="about-title">Why Sweet.apex?</h3>
+					<p class="about-description">Have you ever dreamed of using custom annotations in Apex? Have you ever wondered if you could eliminate some Apex boilerplate codes? Sweet.apex is here to make your dreams come true, by providing some of the most amazing features right at your disposal.</p>
+				</div>
+			</div>
+		</div>
+	</article>
+{/template}
+
+/**
+ */
+{template .features}
+	<div class="features">
+		<div class="container">
+			<div class="row">
+				<section class="feature col-md-4 col-md-offset-2">
+					<h3 class="feature-title">Fascinating Features</h3>
+					<p class="feature-description">Sweet.apex offers some fascinating features you may have wanted for long.</p>
+				</section>
+				<section class="feature col-md-4">
+					<h3 class="feature-title">Productive</h3>
+					<p class="feature-description">Sweet.apex features can help you eliminate boilerplates and focus on real core codes.</p>
+				</section>
+				<section class="feature col-md-4">
+					<h3 class="feature-title">Plugin System</h3>
+					<p class="feature-description">Sweet.apex delivers all its features in a form of plugins, and you can add your own plugins.</p>
+				</section>
+			</div>
+		</div>
+	</div>
+{/template}
+
+/**
+ */
+{template .how}
+	<article class="about">
+		<div class="container">
+			<div class="row">
+				<div class="col-md-12 col-md-offset-2">
+					<h3 class="about-title">It's transforming your mind</h3>
+					<p class="about-description">It completely changes how you would develop Apex, bringing you to a new world.</p>
+				</div>
+			</div>
+		</div>
+	</article>
+{/template}
+
+/**
+ */
+{template .highlights}
+	<div class="highlights">
+		<div class="container">
+			<section class="highlight row">
+				<div class="col-md-6 col-md-offset-2">
+					<h4 class="highlight-title">Feature Rich</h4>
+					<p class="highlight-description">Sweet.apex aims to provide features that solve your pain points, and new features are continuously coming.</p>
+				</div>
+				<div class="col-md-5 col-md-offset-1">
+					<img class="highlight-image" src="/sweet-apex/images/highlight_1.png" alt="Feature Rich" height="200">
+				</div>
+			</section>
+			<section class="highlight row">
+				<div class="col-md-6 col-md-push-9">
+					<h4 class="highlight-title">Lightweight</h4>
+					<p class="highlight-description">Sweet.apex eliminates boilerplates and makes your code more lightweight.</p>
+				</div>
+				<div class="col-md-5 col-md-offset-2 col-md-pull-6">
+					<img class="highlight-image" src="/sweet-apex/images/highlight_2.png" alt="Lightweight" height="200">
+				</div>
+			</section>
+			<section class="highlight row">
+				<div class="col-md-6 col-md-offset-2">
+					<h4 class="highlight-title">Extensible</h4>
+					<p class="highlight-description">Sweet.apex is built on plugins and welcomes new features.</p>
+				</div>
+				<div class="col-md-5 col-md-offset-1">
+					<img class="highlight-image" src="/sweet-apex/images/highlight_3.png" alt="Extensible" height="200">
+				</div>
+			</section>
+		</div>
+	</div>
+{/template}
