@@ -57,7 +57,12 @@ const transpile = (src, config) => {
     // Stage 4 Compiling
     // Compile AST nodes into string representation
     time('Compile', config);
-    const apexClass = compile(result);
+    const context = {
+        lines: config.generatedClassComment ? [ config.generatedClassComment ] : [],
+        indent: '',
+        toString: true,
+    };
+    const apexClass = compile(result, context);
     timeEnd('Compile', config);
 
     return apexClass;

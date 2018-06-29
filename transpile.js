@@ -76,6 +76,9 @@ let ignoreErrors = options.i;
 // Whether to print CLI help
 let showHelp = options.h;
 
+// Whether to empty generated class comment
+let emptyGeneratedClassComment = options.e;
+
 // The source directory, where your '.apex' files reside
 let srcDir = _.nth(items, 0);
 
@@ -100,6 +103,7 @@ Options:
     -s         -> Silent mode, disabling all prints, false by default
     -c         -> Clean mode, removing all cache files, false by default
     -i         -> Ignore errors, continuing even if there are errors, false by default
+    -e         -> Empty generated class comment, false by default
     -h         -> Show this help message
 
 Note:
@@ -129,6 +133,10 @@ _.assign(config, JSON.parse(fs.readFileSync(__dirname + path.sep + 'config.json'
 
 if(features) {
     config.features = _.split(features, ',');
+}
+
+if(emptyGeneratedClassComment) {
+    config.generatedClassComment = '';
 }
 
 if(srcDir) {

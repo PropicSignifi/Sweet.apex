@@ -2,5 +2,6 @@ node_modules/
 cache/
 build/
 docs/
+!doc/sweet-apex/src/pages/docs
 resources/Test.apex
 .vscode/
