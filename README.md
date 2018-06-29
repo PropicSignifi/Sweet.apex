@@ -170,91 +170,91 @@ The next thing is definitely running your DX tools to deploy the code to your Or
 ## Features
 Currently, Sweet.apex supports the following features:
 
-- action
+- [action](https://click-to-cloud.github.io/sweet-apex/docs/Features/action.html)
 
 Convert a method to an Action. For more details on Action, please check [Action.apex](https://github.com/Click-to-Cloud/Action.apex)
 
-- apexdoc
+- [apexdoc](https://click-to-cloud.github.io/sweet-apex/docs/Features/apexdoc.html)
 
 Generate simple JSON files representing Sweet Apex class structures and comments, which can be further used to create pretty documentation sites.
 
-- array creation
+- [array creation](https://click-to-cloud.github.io/sweet-apex/docs/Features/array_creation.html)
 
 Simplify how you create lists and maps.
 
-- aspect
+- [aspect](https://click-to-cloud.github.io/sweet-apex/docs/Features/aspect.html)
 
 Adopt aspects before and after your method invocations. Check AOP(Aspect Oriented Programming) for details.
 
-- cast
+- [cast](https://click-to-cloud.github.io/sweet-apex/docs/Features/cast.html)
 
 Cast between collections of different lists, sets and maps.
 
-- default value
+- [default value](https://click-to-cloud.github.io/sweet-apex/docs/Features/default_value.html)
 
 Specify the default value of method parameters.
 
-- enum
+- [enum](https://click-to-cloud.github.io/sweet-apex/docs/Features/enum.html)
 
 Create enums that have custom methods.
 
-- file
+- [file](https://click-to-cloud.github.io/sweet-apex/docs/Features/file.html)
 
 Build files to static resources.
 
-- function
+- [function](https://click-to-cloud.github.io/sweet-apex/docs/Features/function.html)
 
 Convert methods to functions. Check [R.apex](https://github.com/Click-to-Cloud/R.apex) for more details on Funcs.
 
-- identity
+- [identity](https://click-to-cloud.github.io/sweet-apex/docs/Features/identity.html)
 
 Generate `equals` and `hashCode` methods.
 
-- inject
+- [inject](https://click-to-cloud.github.io/sweet-apex/docs/Features/inject.html)
 
 Inject beans to variables. Check DI(Dependency Injection).
 
-- lambda
+- [lambda](https://click-to-cloud.github.io/sweet-apex/docs/Features/lambda.html)
 
 Convert lambda expressions to anonymous functions.
 
-- log
+- [log](https://click-to-cloud.github.io/sweet-apex/docs/Features/log.html)
 
 Create logger object for the class. Check [Log.apex](https://github.com/Click-to-Cloud/Log.apex) for details.
 
-- mod
+- [mod](https://click-to-cloud.github.io/sweet-apex/docs/Features/mod.html)
 
 Support modulo operator `%`.
 
-- not null
+- [not null](https://click-to-cloud.github.io/sweet-apex/docs/Features/not_null.html)
 
 Assert method parameters are not null.
 
-- operator
+- [operator](https://click-to-cloud.github.io/sweet-apex/docs/Features/operator.html)
 
 Define custom operators from static methods.
 
-- optional
+- [optional](https://click-to-cloud.github.io/sweet-apex/docs/Features/optional.html)
 
 Create methods that support optional parameters.
 
-- reflect
+- [reflect](https://click-to-cloud.github.io/sweet-apex/docs/Features/reflect.html)
 
 Add reflection behavior to the class.
 
-- rethrow
+- [rethrow](https://click-to-cloud.github.io/sweet-apex/docs/Features/rethrow.html)
 
 Catch any exception thrown from the method and rethrow it with a wrapped one.
 
-- switch
+- [switch](https://click-to-cloud.github.io/sweet-apex/docs/Features/switch.html)
 
 Support `switch-case` syntax.
 
-- template
+- [template](https://click-to-cloud.github.io/sweet-apex/docs/Features/template.html)
 
 Support custom code template.
 
-- template string
+- [template string](https://click-to-cloud.github.io/sweet-apex/docs/Features/template_string.html)
 
 Avoid concatenating strings.
 
