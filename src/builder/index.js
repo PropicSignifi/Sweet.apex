@@ -50,7 +50,7 @@ const apexFiles = [
     `SweetTest.cls-meta.xml`,
 ];
 
-const build = config => {
+const build = (config, copyApexFiles) => {
     if(!config.fileSrcDir) {
         console.error('Build stage is skipped because fileSrcDir is not set.');
         return;
@@ -73,9 +73,11 @@ const build = config => {
             .map(name => buildFile(config.fileSrcDir + name, config))
             .value()
     ).then(() => {
-        _.each(apexFiles, apexFile => {
-            copyFile(config.cwd + path.sep + 'src' + path.sep + 'classes' + path.sep + apexFile, config.destDir + apexFile);
-        });
+        if(copyApexFiles) {
+            _.each(apexFiles, apexFile => {
+                copyFile(config.cwd + path.sep + 'src' + path.sep + 'classes' + path.sep + apexFile, config.destDir + apexFile);
+            });
+        }
     });
 };
 

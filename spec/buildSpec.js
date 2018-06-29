@@ -15,7 +15,7 @@ function joinPath(items) {
 
 describe("Sweet compile", function() {
     it("should build files", function() {
-        build(config).then(() => {
+        build(config, false).then(() => {
             const content = fs.readFileSync(joinPath([config.fileSrcDir, targetFile + '.json']), 'utf8');
             const benchmark = fs.readFileSync(joinPath([config.fileDestDir, targetFile + '.resource']), 'utf8');
 
