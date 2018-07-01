@@ -51,8 +51,8 @@ const Action = {
             if(!AST.hasAnnotation(current.modifiers, 'AuraEnabled')) {
                 throw new Error('@AuraEnabled should be present');
             }
-            if(!AST.hasModifier(current.modifiers, 'public')) {
-                throw new Error('Should be public method');
+            if(!AST.hasModifier(current.modifiers, 'public') && !AST.hasModifier(current.modifiers, 'global')) {
+                throw new Error('Should be public/global method');
             }
             if(!AST.hasModifier(current.modifiers, 'static')) {
                 throw new Error('Should be static method');
