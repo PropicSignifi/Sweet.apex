@@ -1,49 +1,48 @@
 /*
  * This file is used to validate plain old Apex syntax.
  * */
-@isTest
-private class Plain extends Func implements Queueable {
+class PlainScript extends Func {
     /**
      * Public field
      * */
-    public static final String id = 'Plain';
-    private static Integer count;
-    private Type t1 = List<String>.class;
-    private Type t2 = Func.FuncException.class;
-    String name {
+    let id = 'Plain';
+    let count;
+    let t1 = List<String>.class;
+    let t2 = Func.FuncException.class;
+    let name {
         private set;
 
         get {
             return 'Hello ' + name;
         }
     }
-    private static Map<String, Object> mMap = new Map<String, Object>{ 'name' => 'value' };
-    private static List<Object> mList = new List<Object>{ 1, 2, 3 };
-    private static List<SObject> accounts = [ SELECT Id FROM Account LIMIT 10 ];
-    private static List<SObject> accounts1 = [ SELECT Id FROM Account
+    let mMap = { 'name': 'value' };
+    let mList = [ 1, 2, 3 ];
+    let accounts = [ SELECT Id FROM Account LIMIT 10 ];
+    let accounts1 = [ SELECT Id FROM Account
             LIMIT 10 ];
 
     static {
         count = 0;
     }
-    public Plain(String name) {
+    Plain(name) {
         super(-1);
         this.name = name;
     }
-    public Plain() {
+    Plain() {
         this(null);
     }
-    public override Object execN(List<Object> args) {
-        Integer i = (count > 0) ? 1 : 2;
-        Integer total = 0;
+    function execN(args) {
+        let i = (count > 0) ? 1 : 2;
+        let total = 0;
 
         for(i = 0; i < 10 ; i++) {
             total = total + i;
         }
-        total += (Integer)mList[0];
+        total += mList[0];
 
         if(total > 20) {
-            for(Object obj : mList) {
+            for(let obj of mList) {
                 System.debug(obj);
             }
         } else {
@@ -68,7 +67,7 @@ private class Plain extends Func implements Queueable {
         try {
             throw new DmlException();
         }
-        catch(Exception e) {
+        catch(e) {
             System.debug(e);
         }
         finally {
@@ -77,26 +76,24 @@ private class Plain extends Func implements Queueable {
 
         return args;
     }
-    public void execute(QueueableContext context) {
+    function execute(context) {
     }
-    @isTest
-    private static void simpleTest() {
+    function simpleTest() {
         System.assert(false);
 
         return;
     }
-    @isTest
-    private static void testRunAs() {
-        User admin = DummyRecordCreator.admin;
+    function testRunAs() {
+        let admin = DummyRecordCreator.admin;
         System.runAs(admin) {
             System.debug('Run As');
         }
     }
-    public abstract class CustomClass {
-        public abstract void init();
+    class CustomClass {
+        function init();
     }
-    public interface CustomInterface {
-        void init();
+    interface CustomInterface {
+        function init();
     }
     public enum CustomEnum {
         One,

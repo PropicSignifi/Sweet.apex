@@ -79,6 +79,9 @@ let showHelp = options.h;
 // Whether to empty generated class comment
 let emptyGeneratedClassComment = options.e;
 
+// Generate javascript
+let generateJavaScript = options.j;
+
 // The source directory, where your '.apex' files reside
 let srcDir = _.nth(items, 0);
 
@@ -104,6 +107,7 @@ Options:
     -c         -> Clean mode, removing all cache files, false by default
     -i         -> Ignore errors, continuing even if there are errors, false by default
     -e         -> Empty generated class comment, false by default
+    -j         -> Generate JavaScript for debugging purpose, false by default
     -h         -> Show this help message
 
 Note:
@@ -129,6 +133,7 @@ _.assign(config, JSON.parse(fs.readFileSync(__dirname + path.sep + 'config.json'
     silent,
     clean,
     ignoreErrors,
+    generateJavaScript,
 });
 
 if(features) {
@@ -174,6 +179,10 @@ if(!fs.existsSync(config.cacheDir)) {
 
 config.libraryDir = config.cwd + path.sep  + normalize('library');
 
+if(config.isDebugEnabled) {
+    log(`Config: ${JSON.stringify(config, null, 4)}`, config);
+}
+
 if(config.clean) {
     _.each(fs.readdirSync(config.cacheDir), file => {
         fs.unlinkSync(config.cacheDir + path.sep + file);
@@ -215,13 +224,17 @@ const compileFile = (fileName, config) => {
                     const apexClass = transpile(src, config);
                     timeEnd(`Transpile`, config);
 
-                    Promise.all([
-                        writeToFile(`${name}.cls`, apexClass, config)
-                            .then(() => log(`Compiled ${config.destDir + name}.cls`, config)),
-                        writeToFile(`${name}.cls-meta.xml`, meta, config)
-                            .then(() => log(`Compiled ${config.destDir + name}.cls-meta.xml`, config)),
-                    ])
-                    .then(() => FileUpdates.change(fileName, config))
+                    let p = generateJavaScript ?
+                        writeToFile(`${name}.js`, apexClass, config)
+                            .then(() => log(`Compiled ${config.destDir + name}.js`, config)) :
+                        Promise.all([
+                            writeToFile(`${name}.cls`, apexClass, config)
+                                .then(() => log(`Compiled ${config.destDir + name}.cls`, config)),
+                            writeToFile(`${name}.cls-meta.xml`, meta, config)
+                                .then(() => log(`Compiled ${config.destDir + name}.cls-meta.xml`, config)),
+                        ]);
+
+                    p.then(() => FileUpdates.change(fileName, config))
                     .then(resolve);
                 }
                 catch(e) {

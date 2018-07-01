@@ -25,7 +25,9 @@ const _ = require('lodash');
 const fs = require('fs');
 const path = require('path');
 const getValue = require('../valueProvider');
+const getValueScript = require('../valueProviderScript');
 const compile = require('../compiler');
+const compileScript = require('../compilerScript');
 
 // Add indent to the content
 const addIndent = (content, indent) => {
@@ -46,6 +48,15 @@ const addComments = (lines, indent, comments) => {
 const addBodyDeclarations = (lines, indent, bodyDeclarations) => {
     _.each(bodyDeclarations, bodyDeclaration => {
         compile(bodyDeclaration, {
+            lines,
+            indent: indent + '    ',
+        });
+    });
+};
+
+const addBodyDeclarationsScript = (lines, indent, bodyDeclarations) => {
+    _.each(bodyDeclarations, bodyDeclaration => {
+        compileScript(bodyDeclaration, {
             lines,
             indent: indent + '    ',
         });
@@ -172,6 +183,7 @@ module.exports = {
     addIndent,
     addComments,
     addBodyDeclarations,
+    addBodyDeclarationsScript,
     addAnnotations,
     getModifiers,
     getAnnotations,

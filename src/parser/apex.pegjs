@@ -666,7 +666,13 @@ BlockStatements
     = BlockStatement*
 
 BlockStatement
-    = Indent op:DMLOperator Indent operand:Expression Indent rest:Expression? SEMI
+    = Indent comment:EndOfLineComment
+    { return { node: "EndOfLineComment", comment: comment.value }; }
+    / Indent comment:TraditionalComment
+    { return { node: "TraditionalComment", comment: comment.value }; }
+    / Indent comment:JavaDocComment
+    { return { node: "JavaDocComment", comment: comment.value }; }
+    / Indent op:DMLOperator Indent operand:Expression Indent rest:Expression? SEMI
     {
         return {
             node: 'DMLStatement',
@@ -758,12 +764,6 @@ Statement
     { return statement; }
     / Indent id:Identifier COLON statement:Statement
     { return { node: 'LabeledStatement', label: id, body: statement }; }
-    / Indent comment:EndOfLineComment
-    { return { node: "EndOfLineComment", comment: comment.value }; }
-    / Indent comment:TraditionalComment
-    { return { node: "TraditionalComment", comment: comment.value }; }
-    / Indent comment:JavaDocComment
-    { return { node: "JavaDocComment", comment: comment.value }; }
     / Indent !LetterOrDigit [\r\n\u000C]
     { return { node: "LineEmpty" }; }
 
@@ -1595,6 +1595,12 @@ Keyword
       / "void"
       / "Void"
       / "while"
+      / "insert"
+      / "update"
+      / "upsert"
+      / "delete"
+      / "undelete"
+      / "merge"
       ) !LetterOrDigit
 
 BREAK        = Indent "break"        !LetterOrDigit Spacing

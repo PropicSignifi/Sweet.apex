@@ -25,6 +25,7 @@ const normalize = require('../template');
 const parse = require('../parser');
 const { rebuild, } = require('../features');
 const compile = require('../compiler');
+const compileScript = require('../compilerScript');
 const { time, timeEnd, log, } = require('../utils');
 
 // Run the transpilation process
@@ -62,7 +63,7 @@ const transpile = (src, config) => {
         indent: '',
         toString: true,
     };
-    const apexClass = compile(result, context);
+    const apexClass = config.generateJavaScript ? compileScript(result, context) : compile(result, context);
     timeEnd('Compile', config);
 
     return apexClass;
