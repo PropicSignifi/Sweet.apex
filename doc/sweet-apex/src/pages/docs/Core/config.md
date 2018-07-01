@@ -39,6 +39,7 @@ You can also specify some config items through command line options, which take 
 | ignoreErrors | Wheter to continue in case of errors, same as '-i' option |
 | scanExcludePatterns | The pattern of files to be excluded in the scanning stage |
 | generatedClassComment | Set the generated class comment |
+| generateJavaScript | Compile Sweet Apex to JavaScript, for development purpose only |
 | features | The list of features enabled, separated by comma |
 
 </article>

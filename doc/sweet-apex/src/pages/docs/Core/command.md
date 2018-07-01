@@ -53,5 +53,6 @@ You can specify command options.
 | -i | Ignore errors, continuing even if a file fails |
 | -h | Show command line help |
 | -e | Empty the generated class comment |
+| -j | Generate JavaScript instead of Apex classes, for development purpose only |
 
 </article>

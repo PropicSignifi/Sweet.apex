@@ -27,3 +27,15 @@ jasmine
 ```
 
 </article>
+
+<article id="3">
+
+## Generate Test Data
+
+Make sure that you generate the test data with only the target feature enabled
+
+```bash
+node transpile.js resource/ build/ mod -c
+```
+
+</article>
