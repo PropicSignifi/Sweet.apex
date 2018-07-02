@@ -258,5 +258,9 @@ Support custom code template.
 
 Avoid concatenating strings.
 
+- [script](https://click-to-cloud.github.io/sweet-apex/docs/Features/script.html)
+
+Generate JavaScript equivalent functions from Apex methods.
+
 ## Feature Request
 If you have any feature request, you can submit it in the issues. Or you can submit a PR to implement your own feature.

@@ -34,6 +34,9 @@ You can also specify some config items through command line options, which take 
 | fileSrcDir | The source directory of the files |
 | fileDestDir | The destination directory of the files, compiled to static resources |
 | templateDir | The directory where the templates reside |
+| scriptDir | The directory for the generated javascript |
+| scriptName | The generated javascript file name |
+| scriptAppName | The main javascript object name exposed |
 | silent | Whether silent mode is enabled, same as '-s' option |
 | clean | Whether to clean all cache, same as '-c' option |
 | ignoreErrors | Wheter to continue in case of errors, same as '-i' option |

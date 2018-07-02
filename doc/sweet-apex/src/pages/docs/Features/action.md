@@ -97,7 +97,7 @@ public class ActionDemo {
 
 ## Usage
 
-`@action` can only be used on public static methods with `@AuraEnabled`.
+`@action` can only be used on public/global static methods with `@AuraEnabled`.
 
 Some variations are:
 
