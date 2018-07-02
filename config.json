@@ -9,6 +9,9 @@
     "fileSrcDir": "files/",
     "fileDestDir": "build/staticresources/",
     "templateDir": "template/",
+    "scriptDir": "script/",
+    "scriptName": "sweetApp",
+    "scriptAppName": "$SweetApp",
     "silent": false,
     "clean": false,
     "ignoreErrors": false,
@@ -35,6 +38,7 @@
         "action",
         "identity",
         "reflect",
-        "enum"
+        "enum",
+        "script"
     ]
 }

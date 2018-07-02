@@ -3,5 +3,7 @@ cache/
 build/
 docs/
 !doc/sweet-apex/src/pages/docs
+script/
+!src/features/script
 resources/Test.apex
 .vscode/

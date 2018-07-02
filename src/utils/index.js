@@ -168,6 +168,22 @@ const writeToFile = (fileName, content, config) => {
     });
 };
 
+// Write to the file into the script directory
+const writeToScriptFile = (fileName, content, config) => {
+    time(`Write File ${fileName}`, config);
+
+    return new Promise((resolve, reject) => {
+        fs.writeFile(config.scriptDir + fileName, content, (error, data) => {
+            timeEnd(`Write File ${fileName}`, config);
+            if(error) {
+                reject(error);
+            }
+
+            resolve(null);
+        });
+    });
+};
+
 // Get the name(without suffix) from the filename
 const getName = fileName => {
     const startIndex = _.lastIndexOf(fileName, path.sep);
@@ -195,6 +211,7 @@ module.exports = {
     normalize,
     log,
     writeToFile,
+    writeToScriptFile,
     getName,
     copyFile,
 };

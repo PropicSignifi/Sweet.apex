@@ -172,9 +172,14 @@ if(config.templateDir) {
     config.templateDir = config.cwd + path.sep + normalize(config.templateDir);
 }
 
-config.cacheDir = config.cwd + path.sep  + normalize('cache');
+config.cacheDir = config.cwd + path.sep + normalize('cache');
 if(!fs.existsSync(config.cacheDir)) {
     fs.mkdirSync(config.cacheDir);
+}
+
+config.scriptDir = config.scriptDir || config.cwd + path.sep + normalize('script');
+if(!fs.existsSync(config.scriptDir)) {
+    fs.mkdirSync(config.scriptDir);
 }
 
 config.libraryDir = config.cwd + path.sep  + normalize('library');
