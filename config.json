@@ -28,6 +28,7 @@
         "switch",
         "file",
         "inject",
+        "script",
         "not_null",
         "default_value",
         "optional",
@@ -38,7 +39,6 @@
         "action",
         "identity",
         "reflect",
-        "enum",
-        "script"
+        "enum"
     ]
 }

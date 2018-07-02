@@ -74,7 +74,7 @@ const checkValidAspectMethod = (method, type, aspectType) => {
         if(!(_.size(method.parameters) === 2 &&
             (method.parameters[0].type) === 'Sweet.MethodInfo' &&
             (method.parameters[1].type) === 'List<Object>')) {
-            return `Method parameters are incorrect for ${type.name}.${method.name}`;
+            return `Method parameters are incorrect for ${type.name}.${method.name}: ${JSON.stringify(method.parameters)}`;
         }
     }
     else if(aspectType === 'afterMethod') {
@@ -82,7 +82,7 @@ const checkValidAspectMethod = (method, type, aspectType) => {
             (method.parameters[0].type) === 'Sweet.MethodInfo' &&
             (method.parameters[1].type) === 'List<Object>' &&
             (method.parameters[2].type) === 'Object')) {
-            return `Method parameters are incorrect for ${type.name}.${method.name}`;
+            return `Method parameters are incorrect for ${type.name}.${method.name}: ${JSON.stringify(method.parameters)}`;
         }
     }
 

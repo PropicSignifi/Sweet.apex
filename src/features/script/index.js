@@ -98,7 +98,7 @@ const generateScript = config => {
 
 ${generateTypeDeclarationsScript(config)}
 
-    ${generateMethodsScript(config)}
+${generateMethodsScript(config)}
 
 ${generateTypesScript(config)}
 

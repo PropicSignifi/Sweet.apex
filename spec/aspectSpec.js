@@ -26,8 +26,8 @@ Typings.addTyping({
             "name": "afterVersion",
             "parameters": [
                 {
-                    "name": "target",
-                    "type": "Object"
+                    "name": "methodInfo",
+                    "type": "Sweet.MethodInfo"
                 },
                 {
                     "name": "args",
@@ -54,8 +54,8 @@ Typings.addTyping({
             "name": "beforeRun",
             "parameters": [
                 {
-                    "name": "target",
-                    "type": "Object"
+                    "name": "methodInfo",
+                    "type": "Sweet.MethodInfo"
                 },
                 {
                     "name": "args",
