@@ -100,6 +100,9 @@ const Aspect = {
                 }
 
                 let aspectPattern = getAspectPattern(annotation);
+                if(!aspectPattern) {
+                    throw new Error('Aspect pattern is required');
+                }
                 if(aspectPattern.startsWith('{') && aspectPattern.endsWith('}')) {
                     aspectPattern = '[' + _.trim(aspectPattern, '{}') + ']';
                 }
@@ -159,7 +162,7 @@ const Aspect = {
             const beforeCodes = [];
             _.each(beforeAspects, aspect => {
                 const args = [
-                    `new Sweet.MethodInfo('${methodName}', ${typeName}.class, ${isStatic ? 'null' : 'this'}, new List<Type>{ ${_.map(current.parameters, param => getValue(param.type)).join(', ')} })`,
+                    `new Sweet.MethodInfo('${methodName}', ${typeName}.class, ${isStatic ? 'null' : 'this'}, new List<Type>{ ${_.map(current.parameters, param => getValue(param.type) + '.class').join(', ')} })`,
                     `new List<Object>{ ${_.map(current.parameters, param => getValue(param.name)).join(', ')} }`,
                 ];
                 const beforeCode = `${aspect.type}.${aspect.method}(${args.join(', ')});`;
