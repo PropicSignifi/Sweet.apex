@@ -35,7 +35,7 @@ jasmine
 Make sure that you generate the test data with only the target feature enabled
 
 ```bash
-node transpile.js resource/ build/ mod -c
+node transpile.js resource/ build/ mod -c -e
 ```
 
 </article>

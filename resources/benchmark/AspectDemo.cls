@@ -1,8 +1,8 @@
 public class AspectDemo {
-    public static Integer afterVersion(Object target, List<Object> args, Object result) {
+    public static Integer afterVersion(Sweet.MethodInfo method, List<Object> args, Object result) {
         return (Integer)result + 1;
     }
-    public static void beforeRun(Object target, List<Object> args) {
+    public static void beforeRun(Sweet.MethodInfo method, List<Object> args) {
         System.debug('Before running');
     }
     public void run() {

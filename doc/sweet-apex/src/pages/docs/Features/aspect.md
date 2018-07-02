@@ -34,7 +34,7 @@ You need to have some basic understanding of Aspect Oriented Programming.
 ```javascript
 public class AspectDemo {
     @afterMethod('AspectDemo.version')
-    public static Integer afterVersion(Object target, List<Object> args, Object result) {
+    public static Integer afterVersion(Sweet.MethodInfo method, List<Object> args, Object result) {
         return (Integer)result + 1;
     }
 
@@ -52,7 +52,7 @@ public class AspectDemo {
 
 ```javascript
 public class AspectDemo {
-    public static Integer afterVersion(Object target, List<Object> args, Object result) {
+    public static Integer afterVersion(Sweet.MethodInfo method, List<Object> args, Object result) {
         return (Integer)result + 1;
     }
     public static Integer version(Integer base) {

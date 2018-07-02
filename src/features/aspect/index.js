@@ -72,14 +72,14 @@ const checkValidAspectMethod = (method, type, aspectType) => {
 
     if(aspectType === 'beforeMethod') {
         if(!(_.size(method.parameters) === 2 &&
-            (method.parameters[0].type) === 'Object' &&
+            (method.parameters[0].type) === 'Sweet.MethodInfo' &&
             (method.parameters[1].type) === 'List<Object>')) {
             return `Method parameters are incorrect for ${type.name}.${method.name}`;
         }
     }
     else if(aspectType === 'afterMethod') {
         if(!(_.size(method.parameters) === 3 &&
-            (method.parameters[0].type) === 'Object' &&
+            (method.parameters[0].type) === 'Sweet.MethodInfo' &&
             (method.parameters[1].type) === 'List<Object>' &&
             (method.parameters[2].type) === 'Object')) {
             return `Method parameters are incorrect for ${type.name}.${method.name}`;
