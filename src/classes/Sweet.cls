@@ -224,6 +224,23 @@ public class Sweet {
     }
 
     /**
+     * The method info
+     * */
+    public class MethodInfo {
+        public String name;
+        public Object invoker;
+        public Type invokerType;
+        public List<Type> paramTypes;
+
+        public MethodInfo(String name, Type invokerType, Object invoker, List<Type> paramTypes) {
+            this.name = name;
+            this.invokerType = invokerType;
+            this.invoker = invoker;
+            this.paramTypes = paramTypes;
+        }
+    }
+
+    /**
      * The anonymous context to be used by the Func
      * */
     public class AnonymousContext {

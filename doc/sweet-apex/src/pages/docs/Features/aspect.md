@@ -57,7 +57,7 @@ public class AspectDemo {
     }
     public static Integer version(Integer base) {
         Integer ret = aspect_version(base);
-        ret = (Integer)AspectDemo.afterVersion(AspectDemo.class, new List<Object>{ base }, ret);
+        ret = (Integer)AspectDemo.afterVersion(new Sweet.MethodInfo('version', AspectDemo.class, null, new List<Type>{ Integer.class }), new List<Object>{ base }, ret);
         return ret;
     }
     private static Integer aspect_version(Integer base) {
@@ -79,7 +79,7 @@ public/global static methods that accept the following arguments.
 
 Method name is not important but it should be expecting `(Object, List<Object>)`.
 
-The first argument will be the target object invoking this method, or the target class if it is a static method.
+The first argument will be the method info for this aspect.
 
 The second argument will be the list of arguments passed to the target method.
 
@@ -87,7 +87,7 @@ The second argument will be the list of arguments passed to the target method.
 
 Method name is not important but it should be expecting `(Object, List<Object>, Object)`.
 
-The first argument will be the target object invoking this method, or the target class if it is a static method.
+The first argument will be the method info for this aspect.
 
 The second argument will be the list of arguments passed to the target method.
 

@@ -35,7 +35,17 @@ const AspectType = {
 
 const findMatchedAspects = (method, type) => {
     const signature = AST.getMethodSignature(method, type);
-    return _.filter(aspects, aspect => new RegExp(aspect.pattern).test(signature));
+    return _.filter(aspects, aspect => {
+        if(_.isString(aspect.pattern)) {
+            return new RegExp(aspect.pattern).test(signature);
+        }
+        else if(_.isArray(aspect.pattern)) {
+            return _.some(aspect.pattern, p => new RegExp(p).test(signature));
+        }
+        else {
+            return false;
+        }
+    });
 };
 
 const getAspectPattern = annotation => {
@@ -136,6 +146,7 @@ const Aspect = {
         if(!_.isEmpty(aspects)) {
             const name = getValue(current.name);
             const typeName = getValue(parent.name);
+            const methodName = getValue(current.name);
             const returnType = getValue(current.returnType2);
             const isStatic = AST.hasModifier(current.modifiers, 'static');
             const hasReturn = returnType !== 'void';
@@ -148,7 +159,7 @@ const Aspect = {
             const beforeCodes = [];
             _.each(beforeAspects, aspect => {
                 const args = [
-                    isStatic ? typeName + '.class' : 'this',
+                    `new Sweet.MethodInfo('${methodName}', ${typeName}.class, ${isStatic ? 'null' : 'this'}, new List<Type>{ ${_.map(current.parameters, param => getValue(param.type)).join(', ')} })`,
                     `new List<Object>{ ${_.map(current.parameters, param => getValue(param.name)).join(', ')} }`,
                 ];
                 const beforeCode = `${aspect.type}.${aspect.method}(${args.join(', ')});`;
@@ -158,7 +169,7 @@ const Aspect = {
             const afterCodes = [];
             _.each(afterAspects, aspect => {
                 const args = [
-                    isStatic ? typeName + '.class' : 'this',
+                    `new Sweet.MethodInfo('${methodName}', ${typeName}.class, ${isStatic ? 'null' : 'this'}, new List<Type>{ ${_.map(current.parameters, param => getValue(param.type) + '.class').join(', ')} })`,
                     `new List<Object>{ ${_.map(current.parameters, param => getValue(param.name)).join(', ')} }`,
                     hasReturn ? 'ret' : 'null',
                 ];
