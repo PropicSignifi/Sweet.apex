@@ -297,7 +297,7 @@ Promise.resolve(srcFiles)
             .map(name => config.destDir + name)
             .value();
 
-        return Promise.resolve([ ...files, ...destFiles, ])
+        return Promise.resolve(config.scanDestDir ? [ ...files, ...destFiles, ] : files)
             .then(files => {
                 return Promise.all(
                     _.chain(files)

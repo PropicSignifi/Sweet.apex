@@ -16,6 +16,7 @@
     "clean": false,
     "ignoreErrors": false,
     "scanExcludePatterns": [".*Test.cls$"],
+    "scanDestDir": false,
     "generatedClassComment": "// This is a generated file. Please do not modify it.",
     "features": [
         "apexdoc",
