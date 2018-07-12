@@ -71,7 +71,7 @@ const Action = {
             }
 
             const methodName = getValue(current.name);
-            const actionName = _.capitalize(methodName) + 'Action';
+            const actionName = _.upperFirst(methodName) + 'Action';
             actionNames.push(actionName);
 
             const parameters = AST.getParameters(current.parameters);

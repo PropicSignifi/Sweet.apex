@@ -55,7 +55,7 @@ const Func = {
             }
 
             const methodName = getValue(methodDeclaration.name);
-            const funcClassName = _.capitalize(methodName) + 'Func';
+            const funcClassName = _.upperFirst(methodName) + 'Func';
             newFuncs.push({
                 name: methodName,
                 type: funcClassName,
