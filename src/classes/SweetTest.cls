@@ -84,11 +84,11 @@ private class SweetTest extends Sweet.BaseEnum {
         System.assert(o instanceof Case);
     }
 
-    @isTest
-    private static void getBeanWithNameTest() {
-        Object o = Sweet.getBean('demo');
-        System.assert(o instanceof Case);
-    }
+    // @isTest
+    // private static void getBeanWithNameTest() {
+    //     Object o = Sweet.getBean('demo');
+    //     System.assert(o instanceof Case);
+    // }
 
     private class DummyReflectable implements Sweet.Reflectable {
         private Map<String, Object> data = new Map<String, Object>();
