@@ -16,21 +16,16 @@ if(_.size(args) !== 2) {
 
 const [ classesDir, outputDir ] = args;
 
-const COMMENT_PATTERN_1 = /\/\*(.|[\n\r])*?\*\//gm;
-const COMMENT_PATTERN_2 = /\/\/.*/g;
-const TEST_PATTERN = /@isTest/gi;
+const TEST_PATTERN = '@isTest';
+
+const MAX_COLUMN_SIZE = 32000;
 
 let numOfLines = 0;
 
 _.each(fs.readdirSync(classesDir), fileName => {
     const fileContent = fs.readFileSync(classesDir + path.sep + fileName, 'utf8');
     if(fileName.endsWith('.cls')) {
-        const strippedFileContent = _.chain(fileContent)
-            .replace(COMMENT_PATTERN_1, '')
-            .replace(COMMENT_PATTERN_2, '')
-            .value();
-
-        const isTest = TEST_PATTERN.test(strippedFileContent);
+        const isTest = new RegExp(TEST_PATTERN, 'gi').test(fileContent);
         let newFileContent = '';
         if(isTest) {
             newFileContent = `@isTest
@@ -42,12 +37,59 @@ private class ${fileName.substring(0, fileName.length - 4)} {
 }`;
         }
         else {
-            newFileContent = _.chain(strippedFileContent)
+            const newLines = _.chain(fileContent)
                 .split('\n')
-                .join('')
+                .map(function(line) {
+                    let pos = 0;
+                    while(true) {
+                        pos = line.indexOf('//', pos);
+                        if(pos < 0) {
+                            break;
+                        }
+
+                        const counts = _.countBy(line.substring(0, pos), _.identity);
+                        if(!counts["'"] || counts["'"] % 2 === 0) {
+                            line = line.substring(0, pos);
+                        }
+                        else {
+                            pos += 1;
+                        }
+                    }
+
+                    return line;
+                })
+                .reduce(function(piles, line) {
+                    if(_.isEmpty(piles)) {
+                        return [{
+                            count: _.size(line),
+                            lines: [line],
+                        }];
+                    }
+                    else {
+                        const pile = _.last(piles);
+                        const count = _.size(line);
+                        if(count + pile.count > MAX_COLUMN_SIZE) {
+                            const newPile = {
+                                count,
+                                lines: [line],
+                            };
+                            piles.push(newPile);
+                        }
+                        else {
+                            pile.lines.push(line);
+                            pile.count += count;
+                        }
+
+                        return piles;
+                    }
+                }, [])
+                .map(function(pile) {
+                    return _.join(pile.lines, '');
+                })
                 .value();
 
-            numOfLines++;
+            numOfLines += _.size(newLines);
+            newFileContent = _.join(newLines, '\n');
         }
 
         fs.writeFileSync(outputDir + path.sep + fileName, newFileContent);
@@ -76,7 +118,7 @@ const fakeTestCode = `@isTest
 private class fake_DummyCodeTest {
     @isTest
     private static void testIdle() {
-        System.assert(fake_DummyCode.idle(), ${numOfFakeTestLines});
+        System.assertEquals(fake_DummyCode.idle(), ${numOfFakeTestLines});
     }
 }`;
 
