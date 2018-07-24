@@ -104,13 +104,21 @@ private class ${fileName.substring(0, fileName.length - 4)} {
     console.log('Processed ' + fileName);
 });
 
-const numOfFakeTestLines = numOfLines * 4;
+const numOfFakeTestLines = numOfLines * 6;
+
+const numOfLinesInMethod = 2000;
+const numOfMethods = Math.ceil(numOfFakeTestLines / numOfLinesInMethod);
+
+const fakeTestMethod = i => `    public static void idle${i}() {
+        Integer i = 0;
+${_.repeat('        i++;\n', numOfLinesInMethod)}
+    }`;
 
 const fakeTestClass = `public class fake_DummyCode {
-    public static Integer idle() {
-        Integer i = 0;
-${_.repeat('        i++;\n', numOfFakeTestLines)}
-        return i;
+${_.map(_.range(0, numOfMethods), fakeTestMethod).join('\n')}
+
+    public static void idle() {
+${_.map(_.range(0, numOfMethods), i => `        idle${i}();\n`).join('\n')}
     }
 }`;
 
@@ -118,7 +126,8 @@ const fakeTestCode = `@isTest
 private class fake_DummyCodeTest {
     @isTest
     private static void testIdle() {
-        System.assertEquals(fake_DummyCode.idle(), ${numOfFakeTestLines});
+        fake_DummyCode.idle();
+        System.assert(true);
     }
 }`;
 
