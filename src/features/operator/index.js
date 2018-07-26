@@ -94,7 +94,7 @@ const Operator = {
 
     accept: ({ current, parent, }) => {
         const accepted =
-            (current.node === 'InfixExpression' && !_.isString(current.operator)) ||
+            (current.node === 'InfixExpression' && !_.isString(current.operator) && !_.isEmpty(current.operator)) ||
             (current.node === 'MethodDeclaration' && AST.hasAnnotation(current.modifiers, 'operator'));
         return accepted;
     },
