@@ -14,7 +14,7 @@ public class FeatureOrder {
 
     private class AddFunc extends Func {
         public AddFunc() {
-            super(2);
+            super(-1);
         }
         public override Object execN(List<Object> args) {
             Integer a = args.get(0) == null ? null : (Integer)args.get(0);

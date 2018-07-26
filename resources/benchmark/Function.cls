@@ -21,7 +21,7 @@ public class Function {
 
     private class AddFunc extends Func {
         public AddFunc() {
-            super(2);
+            super(-1);
         }
         public override Object execN(List<Object> args) {
             Integer a = args.get(0) == null ? null : (Integer)args.get(0);
@@ -33,7 +33,7 @@ public class Function {
 
     private class RunFunc extends Func {
         public RunFunc() {
-            super(0);
+            super(-1);
         }
         public override Object execN(List<Object> args) {
             System.debug('Test');

@@ -13,7 +13,7 @@ public class Lambda {
     private class AnonymousFunc0 extends Func {
         private Sweet.AnonymousContext anonymous_context;
         public AnonymousFunc0(Sweet.AnonymousContext context) {
-            super(1);
+            super(-1);
             this.anonymous_context = context;
         }
         public override Object execN(List<Object> args) {
@@ -25,7 +25,7 @@ public class Lambda {
     private class AnonymousFunc1 extends Func {
         private Sweet.AnonymousContext anonymous_context;
         public AnonymousFunc1(Sweet.AnonymousContext context) {
-            super(0);
+            super(-1);
             this.anonymous_context = context;
         }
         public override Object execN(List<Object> args) {
@@ -37,7 +37,7 @@ public class Lambda {
     private class AnonymousFunc2 extends Func {
         private Sweet.AnonymousContext anonymous_context;
         public AnonymousFunc2(Sweet.AnonymousContext context) {
-            super(0);
+            super(-1);
             this.anonymous_context = context;
         }
         public override Object execN(List<Object> args) {
@@ -50,7 +50,7 @@ public class Lambda {
     private class AnonymousFunc3 extends Func {
         private Sweet.AnonymousContext anonymous_context;
         public AnonymousFunc3(Sweet.AnonymousContext context) {
-            super(0);
+            super(-1);
             this.anonymous_context = context;
         }
         public override Object execN(List<Object> args) {
@@ -62,7 +62,7 @@ public class Lambda {
     private class AnonymousFunc4 extends Func {
         private Sweet.AnonymousContext anonymous_context;
         public AnonymousFunc4(Sweet.AnonymousContext context) {
-            super(0);
+            super(-1);
             this.anonymous_context = context;
         }
         public override Object execN(List<Object> args) {

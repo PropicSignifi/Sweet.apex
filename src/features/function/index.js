@@ -79,7 +79,7 @@ const Func = {
             const newFuncTypeContent =
                 `private class ${funcClassName} extends Func {
                     public ${funcClassName}() {
-                        super(${_.size(parameters)});
+                        super(-1);
                     }
 
                     public override Object execN(List<Object> args) {

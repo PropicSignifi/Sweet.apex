@@ -83,7 +83,7 @@ const Lambda = {
                     private Sweet.AnonymousContext anonymous_context;
 
                     public AnonymousFunc${index}(Sweet.AnonymousContext context) {
-                        super(${_.size(parameters)});
+                        super(-1);
 
                         this.anonymous_context = context;
                     }
