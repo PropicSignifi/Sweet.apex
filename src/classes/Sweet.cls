@@ -48,6 +48,9 @@ public class Sweet {
     // Bound types
     private static Map<Type, Type> boundTypes = new Map<Type, Type>();
 
+    // Bound objects
+    private static Map<Type, Object> boundObjects = new Map<Type, Object>();
+
     // Cache for the named beans
     private static Map<String, Object> namedBeanCache = new Map<String, Object>();
 
@@ -74,6 +77,29 @@ public class Sweet {
     public static void unbind(Type target) {
         if(target != null) {
             Sweet.boundTypes.remove(target);
+        }
+    }
+
+    /**
+     * Bind the target type to the object implementor
+     *
+     * @param target
+     * @param implementor
+     * */
+    public static void bindObject(Type target, Object implementor) {
+        if(target != null && implementor != null) {
+            Sweet.boundObjects.put(target, implementor);
+        }
+    }
+
+    /**
+     * Unbind the target type
+     *
+     * @param target
+     * */
+    public static void unbindObject(Type target) {
+        if(target != null) {
+            Sweet.boundObjects.remove(target);
         }
     }
 
@@ -125,12 +151,21 @@ public class Sweet {
                 return Sweet.typedBeanCache.get(targetType);
             }
 
+            Object implementor = Sweet.boundObjects.get(targetType);
+            if(implementor != null) {
+                Sweet.typedBeanCache.put(targetType, implementor);
+                return implementor;
+            }
+
             Type implementorType = Sweet.boundTypes.get(targetType);
             if(implementorType == null) {
                 implementorType = targetType;
             }
 
-            return implementorType.newInstance();
+            Object ret = implementorType.newInstance();
+            Sweet.typedBeanCache.put(targetType, ret);
+
+            return ret;
         }
 
         return null;

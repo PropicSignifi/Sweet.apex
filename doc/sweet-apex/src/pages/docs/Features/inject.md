@@ -78,6 +78,7 @@ To inject a typed bean, you need to bind the type first.
 
 ```javascript
 Sweet.bind(Case.class, Account.class); // Bind Case.class to be created by Account.class
+Sweet.bindObject(Case.class, mockCase); // Bind Case.class to a created object
 ```
 
 If no bindings are found, the original type will be used to create the instance.
