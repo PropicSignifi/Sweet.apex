@@ -31,12 +31,16 @@ const castRequests = {};
 const isValid = type => type && type.node === 'ParameterizedType' && _.includes(['List', 'Set', 'Map'], getValue(type.type));
 
 const getTypeNameInMethod = type => {
+    let typeName = null;
     if(type.node === 'ParameterizedType') {
-        return `${getValue(type.type)}_${_.map(type.typeArguments, getTypeNameInMethod).join('_')}`;
+        typeName = `${getValue(type.type)}_${_.map(type.typeArguments, getTypeNameInMethod).join('_')}`;
     }
     else {
-        return getValue(type.name);
+        typeName = getValue(type.name);
     }
+
+    typeName = typeName.replace('__', '_');
+    return typeName;
 };
 
 const getCastMethodName = (fromType, toType) => `cast_${getTypeNameInMethod(fromType)}_to_${getTypeNameInMethod(toType)}`;
