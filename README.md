@@ -262,5 +262,9 @@ Avoid concatenating strings.
 
 Generate JavaScript equivalent functions from Apex methods.
 
+- [tagged_string](https://click-to-cloud.github.io/sweet-apex/docs/Features/tagged_string.html)
+
+Add custom tags to prefix strings.
+
 ## Feature Request
 If you have any feature request, you can submit it in the issues. Or you can submit a PR to implement your own feature.

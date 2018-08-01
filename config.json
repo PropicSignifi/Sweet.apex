@@ -24,6 +24,7 @@
         "mod",
         "operator",
         "template_string",
+        "tagged_string",
         "cast",
         "lambda",
         "switch",

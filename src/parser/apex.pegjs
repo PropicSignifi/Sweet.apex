@@ -1655,6 +1655,7 @@ Literal
       / IntegerLiteral          // May be a prefix of FloatLiteral
       / StringLiteral
       / TemplateStringLiteral
+      / TaggedStringLiteral
       / "true"  !LetterOrDigit
       { return { node: 'BooleanLiteral', booleanValue: true }; }
       / "false" !LetterOrDigit
@@ -1723,6 +1724,10 @@ StringLiteral
 TemplateStringLiteral
     = "\`" (![`] _)* "\`"                   // this " keeps the editor happy
     { return { node: 'TemplateStringLiteral', escapedValue: text() }; }
+
+TaggedStringLiteral
+    = Identifier "\`" (![`] _)* "\`"                   // this " keeps the editor happy
+    { return { node: 'TaggedStringLiteral', escapedValue: text() }; }
 
 Escape
     = "\\" ([btnfr"'\\] / OctalEscape / UnicodeEscape)     // this " keeps the editor happy
