@@ -98,7 +98,7 @@ public class SweetAnnotations implements Sweet.Annotations {
     }
 
     {
-        registerAnnotation('AnnotationDemo', new AnnotationDemo.MyAnnotation().name('Test'));
+        registerAnnotation(AnnotationDemo.class.getName(), new AnnotationDemo.MyAnnotation().name('Test'));
     }
 }
 ```

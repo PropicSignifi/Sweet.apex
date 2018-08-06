@@ -32,7 +32,7 @@ const annotationInstances = [];
 
 const getAnnotationRegisterCode = annotationInstance => {
     const annotation = annotations[annotationInstance.name];
-    return `registerAnnotation('${annotationInstance.targetName}', new ${annotation.name}()${_.map(annotationInstance.fields, field => '.' + field.name + '(' + field.value + ')').join('')});`;
+    return `registerAnnotation(${annotationInstance.targetName}.class.getName(), new ${annotation.name}()${_.map(annotationInstance.fields, field => '.' + field.name + '(' + field.value + ')').join('')});`;
 };
 
 const getAnnotationsClass = name => {
@@ -255,9 +255,14 @@ const Annotation = {
                 return;
             }
 
+            const topTypeDeclaration = AST.getTopLevelType(root);
+            const targetName = topTypeDeclaration === typeDeclaration ?
+                getValue(typeDeclaration.name) :
+                getValue(topTypeDeclaration.name) + '.' + getValue(typeDeclaration.name);
+
             const annotationInstance = {
                 name: annotationName,
-                targetName: getValue(typeDeclaration.name),
+                targetName,
                 fields: [],
             };
             if(current.values) {
