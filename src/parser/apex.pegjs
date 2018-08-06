@@ -1311,7 +1311,7 @@ ArrayCreatorRest
     { return { extraDims:[dim], init:null, dimms: [] }; }
 
 ArrayElementValuePair
-    = Indent name:VariableInitializer ARROW? value:ElementValue?
+    = Indent name:VariableInitializer (ARROW / COLON)? value:ElementValue?
     {
         if(value) {
             return {

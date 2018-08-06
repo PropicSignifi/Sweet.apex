@@ -5,7 +5,7 @@ public class ArrayCreation {
 
     public List<Object> mList3 = new Object []{ 1, 2, 3 };
 
-    private Map<String, Object> mMap1 = new Map<String, Object>{ 'name' => 'value' };
+    private Map<String, Object> mMap1 = new Map<String, Object>{ 'name' : 'value' };
 
     private Map<String, Object> mMap2 = { 'name' => 'value' };
 
