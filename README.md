@@ -266,5 +266,9 @@ Generate JavaScript equivalent functions from Apex methods.
 
 Add custom tags to prefix strings.
 
+- [annotation](https://click-to-cloud.github.io/sweet-apex/docs/Features/annotation.html)
+
+Add support for defining custom annotations on classes.
+
 ## Feature Request
 If you have any feature request, you can submit it in the issues. Or you can submit a PR to implement your own feature.

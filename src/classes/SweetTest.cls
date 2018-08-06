@@ -84,6 +84,15 @@ private class SweetTest extends Sweet.BaseEnum {
         System.assert(o instanceof Case);
     }
 
+    @isTest
+    private static void testGetTypeName() {
+        String typeName = Sweet.getTypeName('abc');
+        System.assertEquals('String', typeName);
+
+        typeName = Sweet.getTypeName(new List<String>{ 'abc' });
+        System.assertEquals('List<String>', typeName);
+    }
+
     // @isTest
     // private static void getBeanWithNameTest() {
     //     Object o = Sweet.getBean('demo');

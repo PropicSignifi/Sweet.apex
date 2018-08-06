@@ -57,6 +57,25 @@ public class Sweet {
     // Cache for the typed beans
     private static Map<Type, Object> typedBeanCache = new Map<Type, Object>();
 
+    // The prefix of the cast error message
+    private static final String CAST_ERROR_MSG_PREFIX = 'Invalid conversion from runtime type ';
+
+    // The suffix of the cast error message
+    private static final String CAST_ERROR_MSG_SUFFIX = ' to Boolean';
+
+    private static Sweet.Annotations annotations = null;
+
+    static {
+        try {
+            Type annotationsType = Type.forName(Sweet.class.getName() + 'Annotations');
+            if(annotationsType != null) {
+                annotations = (Sweet.Annotations)annotationsType.newInstance();
+            }
+        }
+        catch(Exception e) {
+        }
+    }
+
     /**
      * Bind the target type to the implementor type
      *
@@ -77,6 +96,7 @@ public class Sweet {
     public static void unbind(Type target) {
         if(target != null) {
             Sweet.boundTypes.remove(target);
+            Sweet.typedBeanCache.remove(target);
         }
     }
 
@@ -237,6 +257,45 @@ public class Sweet {
         }
 
         return (Integer)hash;
+    }
+
+    /**
+     * Get the type name of the target object
+     *
+     * @param target The target object
+     * @return String
+     * */
+    public static String getTypeName(Object target) {
+        try {
+            Boolean attempt = (Boolean)target;
+
+            return Boolean.class.getName();
+        }
+        catch(Exception e) {
+            String msg = e.getMessage();
+
+            return msg.substring(CAST_ERROR_MSG_PREFIX.length(), msg.length() - CAST_ERROR_MSG_SUFFIX.length());
+        }
+    }
+
+    public static List<Object> getAnnotations(Object target) {
+        String targetType = getTypeName(target);
+        if(annotations != null) {
+            return annotations.getAnnotations(targetType);
+        }
+        else {
+            return new List<Object>();
+        }
+    }
+
+    public static Object getAnnotation(Object target) {
+        String targetType = getTypeName(target);
+        if(annotations != null) {
+            return annotations.getAnnotation(targetType);
+        }
+        else {
+            return null;
+        }
     }
 
     private static void loadBeanInfos() {
@@ -409,6 +468,12 @@ public class Sweet {
         List<String> reflect_getMethodNames();
 
         Object reflect_invokeMethod(String name, List<Object> args);
+    }
+
+    public interface Annotations {
+        List<Object> getAnnotations(String targetName);
+
+        Object getAnnotation(String targetName);
     }
 
     public class SweetException extends Exception {

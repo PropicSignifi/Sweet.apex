@@ -230,6 +230,7 @@ TypeDeclaration
           ClassDeclaration
         / InterfaceDeclaration
         / EnumDeclaration
+        / AnnotationTypeDeclaration
       )
       { return mergeProps(type, { modifiers: modifiers, comments: leadComments }); }
       / SEMI
@@ -283,6 +284,7 @@ MemberDecl
     = InterfaceDeclaration                             // Interface
     / ClassDeclaration                                 // Class
     / EnumDeclaration                                  // Enum
+    / AnnotationTypeDeclaration                        // Annotation
     / EmptyLines type:Type EmptyLines id:Identifier
       rest:MethodDeclaratorRest                        // Method
     {
@@ -1421,6 +1423,56 @@ Modifier
 //-------------------------------------------------------------------------
 //  Annotations
 //-------------------------------------------------------------------------
+
+AnnotationTypeDeclaration
+    = AT INTERFACE id:Identifier body:AnnotationTypeBody
+    {
+      return {
+        node:            'AnnotationTypeDeclaration',
+        name:             id,
+        bodyDeclarations: body
+      };
+    }
+
+AnnotationTypeBody
+    = LWING decl:AnnotationTypeElementDeclaration* RWING
+    { return skipNulls(decl); }
+
+AnnotationTypeElementDeclaration
+    = modifiers:Modifier* rest:AnnotationTypeElementRest EmptyLines
+    { return mergeProps(rest, { modifiers: modifiers }); }
+    / SEMI
+    { return null; }
+
+AnnotationTypeElementRest
+    = type:Type rest:AnnotationMethodOrConstantRest SEMI
+    { return mergeProps(rest, { type: type }); }
+    / ClassDeclaration
+    / EnumDeclaration
+    / InterfaceDeclaration
+    / AnnotationTypeDeclaration
+
+AnnotationMethodOrConstantRest
+    = AnnotationMethodRest
+    / AnnotationConstantRest
+
+AnnotationMethodRest
+    = id:Identifier LPAR RPAR def:DefaultValue?
+    {
+      return {
+        node:   'AnnotationTypeMemberDeclaration',
+        name:    id,
+        default: def
+      };
+    }
+
+AnnotationConstantRest
+    = fragments:VariableDeclarators
+    { return { node: 'FieldDeclaration', fragments: fragments }; }
+
+DefaultValue
+    = DEFAULT val:ElementValue
+    { return val; }
 
 Annotation
     = NormalAnnotation

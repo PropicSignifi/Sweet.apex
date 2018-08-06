@@ -41,6 +41,7 @@
         "action",
         "identity",
         "reflect",
-        "enum"
+        "enum",
+        "annotation"
     ]
 }

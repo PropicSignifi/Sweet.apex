@@ -125,6 +125,13 @@ const buildMemberClassDeclarations = (node, typingsConfig) =>
         .filter(n => n.node === 'TypeDeclaration' && !n.interface)
         .map(n => buildClassDeclaration(n, node, typingsConfig))
         .value();
+//
+// Build the member annotation declarations of the AST node
+const buildMemberAnnotationDeclarations = (node, typingsConfig) =>
+    _.chain(node.bodyDeclarations)
+        .filter(n => n.node === 'AnnotationTypeDeclaration')
+        .map(n => buildAnnotationDeclaration(n, node, typingsConfig))
+        .value();
 
 // Build the member interface declarations of the AST node
 const buildMemberInterfaceDeclarations = (node, typingsConfig) =>
@@ -160,11 +167,28 @@ const buildFieldDeclaration = (node, parent, typingsConfig) => {
         .value();
 };
 
+// Build the annotation field declaration of the AST node
+const buildAnnotationFieldDeclaration = (node, parent, typingsConfig) => {
+    return {
+        name: getValue(node.name),
+        'default': node.default ? getValue(node.default) : null,
+        modifiers: getModifiers(node, typingsConfig),
+        type: getValue(node.type),
+    };
+};
+
 // Build the field declarations of the AST node
 const buildFieldDeclarations = (node, typingsConfig) =>
     _.chain(node.bodyDeclarations)
         .filter(n => n.node === 'FieldDeclaration')
         .map(n => buildFieldDeclaration(n, node, typingsConfig))
+        .value();
+
+// Build the annotation field declarations of the AST node
+const buildAnnotationFieldDeclarations = (node, typingsConfig) =>
+    _.chain(node.bodyDeclarations)
+        .filter(n => n.node === 'AnnotationTypeMemberDeclaration')
+        .map(n => buildAnnotationFieldDeclaration(n, node, typingsConfig))
         .value();
 
 // Build the method declaration of the AST node
@@ -214,6 +238,7 @@ const buildClassDeclaration = (node, parent, typingsConfig) => {
         classDeclarations: buildMemberClassDeclarations(node, typingsConfig),
         interfaceDeclarations: buildMemberInterfaceDeclarations(node, typingsConfig),
         enumDeclarations: buildMemberEnumDeclarations(node, typingsConfig),
+        annotationDeclarations: buildMemberAnnotationDeclarations(node, typingsConfig),
         fieldDeclarations: buildFieldDeclarations(node, typingsConfig),
         methodDeclarations: buildMethodDeclarations(node, typingsConfig),
     };
@@ -253,6 +278,18 @@ const buildEnumDeclaration = (node, parent, typingsConfig) => {
     };
 };
 
+// Build the annotation declaration of the AST node
+const buildAnnotationDeclaration = (node, parent, typingsConfig) => {
+    return {
+        type: 'Annotation',
+        name: getName(node, typingsConfig),
+        modifiers: getModifiers(node, typingsConfig),
+        annotations: getAnnotations(node, typingsConfig),
+        comments: buildComments(node, parent, typingsConfig),
+        fieldDeclarations: buildAnnotationFieldDeclarations(node, typingsConfig),
+    };
+};
+
 // Build the doc object
 const buildDoc = (node, typingsConfig) => {
     if(node.node === 'TypeDeclaration') {
@@ -265,6 +302,9 @@ const buildDoc = (node, typingsConfig) => {
     }
     else if(node.node === 'EnumDeclaration') {
         return buildEnumDeclaration(node, null, typingsConfig);
+    }
+    else if(node.node === 'AnnotationTypeDeclaration') {
+        return buildAnnotationDeclaration(node, null, typingsConfig);
     }
     else {
         return {};
