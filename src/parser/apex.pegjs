@@ -642,12 +642,15 @@ FormalParameterList
     { return [last]; }
 
 VariableDeclaratorId
-    = id:Identifier dims:Dim*
+    = id:Identifier required:BANG? optional:QUERY? defaultValue:(EQU ElementValue)? dims:Dim*
     {
       return {
         node:           'SingleVariableDeclaration',
         name:            id,
-        extraDimensions: dims.length
+        extraDimensions: dims.length,
+        required:        required,
+        optional:        optional,
+        defaultValue:    defaultValue && defaultValue[1],
       };
     }
 

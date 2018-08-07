@@ -27,21 +27,19 @@ const getValue = require('../../valueProvider');
 
 const NotNull = {
     accept: ({ current, parent, root, }) => {
-        const methodDeclaration = AST.getParent(root, parent);
-
-        const passed = parent.node === 'SingleVariableDeclaration' &&
-            current.node === 'Annotation' &&
-            getValue(current.typeName) === 'notNull' &&
-            methodDeclaration !== null &&
-            methodDeclaration.node === 'MethodDeclaration' &&
-            (!!methodDeclaration.body);
+        const passed = current.node === 'SingleVariableDeclaration' &&
+            parent.node === 'MethodDeclaration' &&
+            (!!parent.body) &&
+            (
+                AST.hasAnnotation(current.modifiers, 'notNull') ||
+                !!current.required
+            );
 
         return passed;
     },
 
     groupBy: ({ parent, root, }) => {
-        const methodDeclaration = AST.getParent(root, parent);
-        return AST.getMethodSignature(methodDeclaration);
+        return AST.getMethodSignature(parent);
     },
 
     runGroup: group => {
@@ -50,18 +48,20 @@ const NotNull = {
 
         _.each(group, ({ current, parent, root, }) => {
             if(!methodDeclaration) {
-                methodDeclaration = AST.getParent(root, parent);
+                methodDeclaration = parent;
             }
 
             const typeDeclaration = AST.getParent(root, methodDeclaration);
-            const paramName = getValue(parent.name);
+            const paramName = getValue(current.name);
 
             const content = `Sweet.assertNotNull(${paramName}, '"${paramName}" in ${AST.getMethodSignature(methodDeclaration, typeDeclaration)} should not be null');`;
             const newBlockStatement = AST.parseBlockStatement(content);
 
             newBlockStatements.push(newBlockStatement);
 
-            AST.removeChild(parent, 'modifiers', current);
+            const annotation = AST.findAnnotation(current.modifiers, 'notNull');
+            AST.removeChild(current, 'modifiers', annotation);
+            current.required = null;
         });
 
         newBlockStatements.push(AST.parseBlockStatement('\n'));

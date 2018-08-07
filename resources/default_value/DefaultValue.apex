@@ -5,7 +5,7 @@ public class DefaultValue {
 
     public static Integer add(
         @defaultValue(init()) Integer a,
-        @defaultValue(init()) Integer b
+        Integer b = init()
     ) {
         return a + b;
     }

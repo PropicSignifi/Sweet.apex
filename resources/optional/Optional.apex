@@ -3,7 +3,7 @@ public class Optional {
         System.debug(s1 + (s2 == null ? '' : s2));
     }
 
-    public static Integer add(Integer a, @optional Integer b, @optional Integer c) {
+    public static Integer add(Integer a, @optional Integer b, Integer c?) {
         b = b == null ? 0 : b;
         c = c == null ? 0 : c;
 

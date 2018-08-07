@@ -36,7 +36,7 @@ public class DefaultValueDemo {
 
     public static Integer add(
         @defaultValue(init()) Integer a,
-        @defaultValue(init()) Integer b
+        Integer b = init()
     ) {
         return a + b;
     }
@@ -70,5 +70,7 @@ public class DefaultValueDemo {
 ## Usage
 
 `@defaultValue` can only be applied to method parameters.
+
+Or you can append `= ...` expressions to the parameter name.
 
 </article>

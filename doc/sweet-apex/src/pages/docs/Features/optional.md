@@ -30,7 +30,7 @@ None
 
 ```javascript
 public class OptionalDemo {
-    public static Integer add(Integer a, @optional Integer b, @optional Integer c) {
+    public static Integer add(Integer a, @optional Integer b, Integer c?) {
         b = b == null ? 0 : b;
         c = c == null ? 0 : c;
 
@@ -71,5 +71,7 @@ public class OptionalDemo {
 ## Usage
 
 `@optional` can only be used as the rear parameters in a method.
+
+Or you can append `?` to the parameter name.
 
 </article>

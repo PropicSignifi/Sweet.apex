@@ -27,21 +27,19 @@ const getValue = require('../../valueProvider');
 
 const DefaultValue = {
     accept: ({ current, parent, root, }) => {
-        const methodDeclaration = AST.getParent(root, parent);
-
-        const passed = parent.node === 'SingleVariableDeclaration' &&
-            current.node === 'Annotation' &&
-            getValue(current.typeName) === 'defaultValue' &&
-            methodDeclaration !== null &&
-            methodDeclaration.node === 'MethodDeclaration' &&
-            (!!methodDeclaration.body);
+        const passed = current.node === 'SingleVariableDeclaration' &&
+            parent.node === 'MethodDeclaration' &&
+            (!!parent.body) &&
+            (
+                AST.hasAnnotation(current.modifiers, 'defaultValue') ||
+                !!current.defaultValue
+            );
 
         return passed;
     },
 
     groupBy: ({ parent, root, }) => {
-        const methodDeclaration = AST.getParent(root, parent);
-        return AST.getMethodSignature(methodDeclaration);
+        return AST.getMethodSignature(parent);
     },
 
     runGroup: group => {
@@ -50,21 +48,30 @@ const DefaultValue = {
 
         _.each(group, ({ current, parent, root, }) => {
             if(!methodDeclaration) {
-                methodDeclaration = AST.getParent(root, parent);
+                methodDeclaration = parent;
             }
 
-            if(!current.value) {
-                throw new Error('Default value is not set for @defaultValue');
+            let defaultValue = null;
+            const annotation = AST.findAnnotation(current.modifiers, 'defaultValue');
+            if(annotation) {
+                defaultValue = annotation.value;
+                AST.removeChild(current, 'modifiers', annotation);
+            }
+            else {
+                defaultValue = current.defaultValue;
+                current.defaultValue = null;
             }
 
-            const paramName = getValue(parent.name);
+            if(!defaultValue) {
+                throw new Error('Default value is not set');
+            }
 
-            const content = `${paramName} = (${paramName} == null) ? ${getValue(current.value)} : ${paramName};`;
+            const paramName = getValue(current.name);
+
+            const content = `${paramName} = (${paramName} == null) ? ${getValue(defaultValue)} : ${paramName};`;
             const newBlockStatement = AST.parseBlockStatement(content);
 
             newBlockStatements.push(newBlockStatement);
-
-            AST.removeChild(parent, 'modifiers', current);
         });
 
         newBlockStatements.push(AST.parseBlockStatement('\n'));

@@ -25,41 +25,40 @@ const _ = require('lodash');
 const AST = require('../../ast');
 const getValue = require('../../valueProvider');
 
+const isOptional = param => AST.hasAnnotation(param.modifiers, 'optional') || !!param.optional;
+
 const Optional = {
     accept: ({ current, parent, root, }) => {
-        const methodDeclaration = AST.getParent(root, parent);
-
-        const passed = parent.node === 'SingleVariableDeclaration' &&
-            current.node === 'Annotation' &&
-            getValue(current.typeName) === 'optional' &&
-            methodDeclaration !== null &&
-            methodDeclaration.node === 'MethodDeclaration' &&
-            (!!methodDeclaration.body);
+        const passed = current.node === 'SingleVariableDeclaration' &&
+            parent.node === 'MethodDeclaration' &&
+            (!!parent.body) &&
+            isOptional(current);
 
         return passed;
     },
 
     groupBy: ({ parent, root, }) => {
-        const methodDeclaration = AST.getParent(root, parent);
-        return AST.getMethodSignature(methodDeclaration);
+        return AST.getMethodSignature(parent);
     },
 
     runGroup: group => {
         const newStatements = [];
         const { parent, root, } = group[0];
-        const methodDeclaration = AST.getParent(root, parent);
+        const methodDeclaration = parent;
         const typeDeclaration = AST.getParent(root, methodDeclaration);
         const totalOptional = _.size(group);
         const hasReturn = 'void' !== getValue(methodDeclaration.returnType2);
 
-        const index = _.findIndex(methodDeclaration.parameters, param => AST.hasAnnotation(param.modifiers, 'optional'));
+        const index = _.findIndex(methodDeclaration.parameters, isOptional);
         const restParameters = _.slice(methodDeclaration.parameters, index);
-        if(!_.every(restParameters, param => AST.hasAnnotation(param.modifiers, 'optional'))) {
-            throw new Error('@optional should be used at rear parameters');
+        if(!_.every(restParameters, isOptional)) {
+            throw new Error('Rear parameters should all be optional');
         }
 
         _.each(group, ({ current, parent, root, }) => {
-            AST.removeChild(parent, 'modifiers', current);
+            const annotation = AST.findAnnotation(current.modifiers, 'optional');
+            AST.removeChild(current, 'modifiers', annotation);
+            current.required = null;
         });
 
         let delegator = methodDeclaration;

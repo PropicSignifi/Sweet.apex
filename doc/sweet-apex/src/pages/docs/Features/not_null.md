@@ -32,7 +32,7 @@ None
 public class NotNullDemo {
     public static Integer add(
         @notNull Integer a,
-        @notNull Integer b
+        Integer b!
     ) {
         return a + b;
     }
@@ -63,5 +63,7 @@ public class NotNullDemo {
 ## Usage
 
 `@notNull` can only be used on method parameters.
+
+Or you can append `!` after the parameter variable.
 
 </article>
