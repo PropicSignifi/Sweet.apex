@@ -127,14 +127,21 @@ const config = {
 };
 
 // Apply options from command line with highest priorities
-_.assign(config, JSON.parse(fs.readFileSync(__dirname + path.sep + 'config.json', 'utf8')), {
+const overrideOptions = {
     isDebugEnabled,
     isPerfEnabled,
     silent,
     clean,
     ignoreErrors,
     generateJavaScript,
+};
+const validOptions = {};
+_.forEach(overrideOptions, (value, key) => {
+    if(!_.isUndefined(value)) {
+        validOptions[key] = value;
+    }
 });
+_.assign(config, JSON.parse(fs.readFileSync(__dirname + path.sep + 'config.json', 'utf8')), validOptions);
 
 if(features) {
     config.features = _.split(features, ',');

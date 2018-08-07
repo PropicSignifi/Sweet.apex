@@ -52,7 +52,6 @@ class PlainScript extends Func {
         while(total > 0) {
             total -= 1;
         }
-
         upsert accounts Id;
 
         do {

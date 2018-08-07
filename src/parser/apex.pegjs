@@ -1651,12 +1651,6 @@ Keyword
       / "void"
       / "Void"
       / "while"
-      / "insert"
-      / "update"
-      / "upsert"
-      / "delete"
-      / "undelete"
-      / "merge"
       ) !LetterOrDigit
 
 BREAK        = Indent "break"        !LetterOrDigit Spacing
@@ -1739,7 +1733,7 @@ OctalNumeral
     = "0" ([_]*[0-7])+
 
 FloatLiteral
-    = DecimalFloat
+    = DecimalFloat ![lL]
     { return { node: 'NumberLiteral', token: text() }; }
 
 DecimalFloat

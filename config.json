@@ -14,9 +14,8 @@
     "scriptAppName": "$SweetApp",
     "silent": false,
     "clean": false,
-    "ignoreErrors": false,
-    "scanExcludePatterns": [".*Test.cls$"],
-    "scanDestDir": false,
+    "ignoreErrors": true,
+    "scanDestDir": true,
     "generatedClassComment": "// This is a generated file. Please do not modify it.",
     "features": [
         "apexdoc",
