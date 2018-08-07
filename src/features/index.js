@@ -25,7 +25,7 @@ const fs = require('fs');
 const path = require('path');
 const _ = require('lodash');
 const AST = require('../ast');
-const { time, timeEnd, } = require('../utils');
+const { time, timeEnd, log, } = require('../utils');
 
 // The Sweet.apex features
 let features = null;
@@ -116,6 +116,10 @@ const rebuild = (node, config) => {
 
     time('Add index', config);
     AST.addIndex(node);
+    if(config.isDebugEnabled) {
+        log('------------ Scopes --------------', config);
+        AST.printScopes(node, config);
+    }
     timeEnd('Add index', config);
 
     _.each(fList, featureName => {

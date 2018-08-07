@@ -25,6 +25,7 @@ const _ = require('lodash');
 const parse = require('../parser');
 const getValue = require('../valueProvider');
 const compile = require('../compiler');
+const { log, } = require('../utils');
 
 // Traverse the AST nodes
 const _traverse = (node, parent, callback, skip) => {
@@ -95,6 +96,134 @@ const traverse = (node, callback, skip) => {
 const addIndex = root => {
     traverse(root, (curr, parent) => {
         curr.parent = parent;
+        setUpScope(curr);
+    });
+};
+
+const setUpScope = (current) => {
+    if(!current) {
+        return;
+    }
+
+    if(current.node === 'TypeDeclaration' ||
+        current.node === 'EnumDeclaration' ||
+        current.node === 'AnnotationTypeDeclaration') {
+        current.scope = {};
+
+        const fieldDeclarations = _.filter(current.bodyDeclarations, n => n.node === 'FieldDeclaration');
+        _.forEach(fieldDeclarations, fieldDeclaration => {
+            const type = getValue(fieldDeclaration.type);
+            _.forEach(fieldDeclaration.fragments, fragment => {
+                const name = getValue(fragment.name);
+                current.scope[name] = type;
+            });
+        });
+
+        const name = getValue(current.name);
+        const top = getEnclosingType(current);
+        if(top && current !== top) {
+            current.scope['this'] = getValue(top.name) + '.' + name;
+        }
+        else {
+            current.scope['this'] = name;
+        }
+        if(current.superclassType) {
+            current.scope['super'] = getValue(current.superclassType);
+        }
+    }
+    else if(current.node === 'Initializer' ||
+        current.node === 'DoStatement' ||
+        current.node === 'WhileStatement') {
+        current.scope = {};
+    }
+    else if(current.node === 'IfStatement') {
+        if(current.thenStatement) {
+            current.thenStatement.scope = {};
+        }
+
+        if(current.elseStatement) {
+            current.elseStatement.scope = {};
+        }
+    }
+    else if(current.node === 'TryStatement') {
+        current.body.scope = {};
+
+        if(current['finally']) {
+            current['finally'].scope = {};
+        }
+    }
+    else if(current.node === 'CatchClause') {
+        current.scope = {};
+        const ex = current.exception;
+        const name = getValue(ex.name);
+        const type = getValue(ex.type);
+        current.scope[name] = type;
+    }
+    else if(current.node === 'EnhancedForStatement') {
+        current.scope = {};
+        const param = current.parameter;
+        const name = getValue(param.name);
+        const type = getValue(param.type);
+        current.scope[name] = type;
+    }
+    else if(current.node === 'MethodDeclaration') {
+        current.scope = {};
+        _.forEach(current.parameters, param => {
+            const name = getValue(param.name);
+            const type = getValue(param.type);
+            current.scope[name] = type;
+        });
+    }
+    else if(current.node === 'LambdaExpression') {
+        current.scope = {};
+        _.forEach(current.args, arg => {
+            const name = getValue(arg.name);
+            const type = getValue(arg.type);
+            current.scope[name] = type;
+        });
+    }
+    else if(current.node === 'VariableDeclarationStatement') {
+        const type = getValue(current.type);
+        const enclosingScope = getEnclosingScope(current);
+        if(enclosingScope) {
+            _.forEach(current.fragments, fragment => {
+                const name = getValue(fragment.name);
+                enclosingScope[name] = type;
+            });
+        }
+    }
+};
+
+const getEnclosingScope = current => {
+    if(!current) {
+        return null;
+    }
+
+    const parent = current.parent;
+    if(!parent) {
+        return null;
+    }
+    if(parent.scope) {
+        return parent.scope;
+    }
+    else {
+        return getEnclosingScope(parent);
+    }
+};
+
+const getScopeDepths = current => {
+    if(!current || !current.parent) {
+        return 0;
+    }
+
+    return (current.scope ? 1 : 0) + getScopeDepths(current.parent);
+};
+
+const printScopes = (root, config) => {
+    traverse(root, (curr, parent) => {
+        if(curr.scope) {
+            log(`${_.repeat('--> ', getScopeDepths(curr))}${curr.node}[${curr.name ? getValue(curr.name) : 'Unknown'}]: ${JSON.stringify(curr.scope)}`, config);
+        }
     });
 };
 
@@ -584,6 +713,8 @@ const AST = {
     getParameters,
     getCompiled,
     getAnnotation,
+    getEnclosingScope,
+    printScopes,
 };
 
 module.exports = AST;
