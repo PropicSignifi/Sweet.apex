@@ -1078,6 +1078,7 @@ Primary
         : mergeProps(suffix, { qualifier: null });
     }
     / Literal
+    / ArrayInitializer
     / NEW creator:Creator
     { return creator; }
     / QualifiedIdentifierSuffix

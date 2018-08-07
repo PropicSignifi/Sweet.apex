@@ -1,15 +1,21 @@
 public class ArrayCreation {
-    public List<Object> mList1 = new List<Object>{ 1, 2, 3 };
+    public static void run(Object o) {
+    }
 
-    public List<Object> mList2 = { 1, 2, 3 };
+    public static void main() {
+        Map<String, Object> m = new Map<String, Object>{ 'a': 2, };
+        List<Object> l = new List<Object>{ 'a', };
 
-    public List<Object> mList3 = new Object []{ 1, 2, 3 };
+        Map<String, Object> m1 = { 'a' => 2 };
+        List<Object> l1 = { 'a' };
 
-    private Map<String, Object> mMap1 = new Map<String, Object>{ 'name' : 'value' };
+        Object m2 = { 'a' => 2 };
+        Object l2 = { 'a' };
 
-    private Map<String, Object> mMap2 = { 'name' => 'value' };
+        Map<String, Object> m3 = { 'a' => { 'b' => 2 } };
+        List<Object> l3 = { { 'a' } };
 
-    public void init() {
-        List<Integer> ints = { 1, 2, 3 };
+        run({ 'a' => 2 });
+        run({ 'a' });
     }
 }

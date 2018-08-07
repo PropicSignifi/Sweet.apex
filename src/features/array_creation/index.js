@@ -23,30 +23,106 @@
  **/
 const _ = require('lodash');
 const AST = require('../../ast');
+const getValue = require('../../valueProvider');
+
+const createMapType = () => {
+    return {
+        node: "ParameterizedType",
+        type: {
+            node: "SimpleType",
+            name: {
+                identifier: "Map",
+                node: "SimpleName"
+            }
+        },
+        typeArguments: [
+            {
+                node: "SimpleType",
+                name: {
+                    identifier: "String",
+                    node: "SimpleName"
+                }
+            },
+            {
+                node: "SimpleType",
+                name: {
+                    identifier: "Object",
+                    node: "SimpleName"
+                }
+            }
+        ]
+    };
+};
+
+const createListType = () => {
+    return {
+        node: "ParameterizedType",
+        type: {
+            node: "SimpleType",
+            name: {
+                identifier: "List",
+                node: "SimpleName"
+            }
+        },
+        typeArguments: [
+            {
+                node: "SimpleType",
+                name: {
+                    identifier: "Object",
+                    node: "SimpleName"
+                }
+            }
+        ]
+    };
+};
 
 const ArrayCreation = {
     accept: ({ current, parent, }) => {
         const accepted =
-            current.node === 'ArrayInitializer' &&
-            parent.node === 'VariableDeclarationFragment';
+            current.node === 'ArrayInitializer';
         return accepted;
     },
 
     run: ({ current, parent, root, }) => {
-        const declarationNode = AST.getParent(root, parent);
-        if(!declarationNode || !declarationNode.type) {
-            throw new Error('Failed to find type info for array creation');
+        if(current.parent.node !== 'ArrayCreation') {
+            let typeNode = null;
+
+            if(current.parent.node === 'VariableDeclarationFragment') {
+                const declarationNode = AST.getParent(root, current.parent);
+                if(!declarationNode || !declarationNode.type) {
+                    throw new Error('Failed to find type info for array creation');
+                }
+
+                const typeName = getValue(declarationNode.type);
+                if(typeName.startsWith('List<') || typeName.startsWith('Map<')) {
+                    typeNode = _.cloneDeep(declarationNode.type);
+                }
+            }
+
+            if(!typeNode) {
+                const pair = _.first(current.expressions);
+                if(pair && pair.node === 'ArrayMemberValuePair') {
+                    typeNode = createMapType();
+                }
+                else {
+                    typeNode = createListType();
+                }
+            }
+
+            const initializerCopy = {
+                node: 'ArrayInitializer',
+                expressions: current.expressions,
+            };
+
+            const arrayCreationNode = {
+                node: 'ArrayCreation',
+                type: typeNode,
+                initializer: initializerCopy,
+                dimensions: [],
+            };
+
+            AST.transform(current, arrayCreationNode);
         }
-
-        const typeNode = _.cloneDeep(declarationNode.type);
-        const arrayCreationNode = {
-            node: 'ArrayCreation',
-            type: typeNode,
-            initializer: current,
-            dimensions: [],
-        };
-
-        AST.setChild(parent, 'initializer', arrayCreationNode);
     },
 };
 
