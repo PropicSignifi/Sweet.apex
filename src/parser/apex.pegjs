@@ -1193,10 +1193,10 @@ PostfixOp
     ) { return op[0]; /* remove ending spaces */ }
 
 Selector
-    = DOT EmptyLines id:Identifier args:Arguments
-    { return { node: 'MethodInvocation', arguments: args, name: id, typeArguments: [] }; }
-    / DOT EmptyLines id:Identifier
-    { return { node: 'FieldAccess', name: id }; }
+    = nullable:QUERY? DOT EmptyLines id:Identifier args:Arguments
+    { return { node: 'MethodInvocation', arguments: args, name: id, typeArguments: [], nullable: nullable }; }
+    / nullable:QUERY? DOT EmptyLines id:Identifier
+    { return { node: 'FieldAccess', name: id, nullable: nullable }; }
     / DOT EmptyLines ret:ExplicitGenericInvocation
     { return ret; }
     / DOT EmptyLines THIS

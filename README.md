@@ -270,5 +270,9 @@ Add custom tags to prefix strings.
 
 Add support for defining custom annotations on classes.
 
+- [nullable](https://click-to-cloud.github.io/sweet-apex/docs/Features/nullable.html)
+
+Specify a nullable variable to avoid null de-reference.
+
 ## Feature Request
 If you have any feature request, you can submit it in the issues. Or you can submit a PR to implement your own feature.
