@@ -100,6 +100,38 @@ const addIndex = root => {
     });
 };
 
+// Call this when you have changed the type of a variable
+const refreshIndex = root => {
+    let traverseRoot = getEnclosingWithScope(root);
+    if(!traverseRoot) {
+        traverseRoot = root;
+    }
+    traverse(traverseRoot, (curr, parent) => {
+        curr.parent = parent;
+        setUpScope(curr);
+    });
+};
+
+const getScope = current => {
+    const scopes = [];
+    let curr = current;
+    while(true) {
+        curr = getEnclosingWithScope(curr);
+        if(!curr) {
+            break;
+        }
+
+        scopes.push(curr.scope);
+    }
+
+    const scope = {};
+    _.reverse(scopes).forEach(s => {
+        _.assign(scope, s);
+    });
+
+    return scope;
+};
+
 const setUpScope = (current) => {
     if(!current) {
         return;
@@ -194,15 +226,26 @@ const setUpScope = (current) => {
     }
 };
 
-const getEnclosingScope = current => {
-    if(!current) {
+const getEnclosingWithScope = current => {
+    if(!current || !current.parent) {
         return null;
     }
 
     const parent = current.parent;
-    if(!parent) {
+    if(parent.scope) {
+        return parent;
+    }
+    else {
+        return getEnclosingWithScope(parent);
+    }
+};
+
+const getEnclosingScope = current => {
+    if(!current || !current.parent) {
         return null;
     }
+
+    const parent = current.parent;
     if(parent.scope) {
         return parent.scope;
     }
@@ -688,6 +731,7 @@ const AST = {
     parseType,
     getMethodSignature,
     addIndex,
+    refreshIndex,
     removeIndex,
     transform,
     hasModifier,
@@ -718,6 +762,8 @@ const AST = {
     getCompiled,
     getAnnotation,
     getEnclosingScope,
+    getEnclosingWithScope,
+    getScope,
     printScopes,
 };
 

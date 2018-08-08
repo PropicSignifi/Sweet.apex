@@ -1,4 +1,20 @@
 {
+    "Object": {
+        "methodDeclarations": [
+            {
+                "modifiers": [
+                    "public"
+                ],
+                "name": "toString",
+                "returnType": "String"
+            }
+        ],
+        "modifiers": [
+            "global"
+        ],
+        "name": "Object",
+        "type": "Class"
+    },
     "Address": {
         "methodDeclarations": [
             {

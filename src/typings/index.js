@@ -32,6 +32,45 @@ const parse = require('../parser');
 const AST = require('../ast');
 const getValue = require('../valueProvider');
 
+// Type checkers for AST expressions
+let typeCheckers = null;
+
+// Load typeCheckers
+const loadTypeCheckers = () => {
+    const typeCheckers = {};
+
+    _.each(fs.readdirSync(__dirname), fileName => {
+        if(fileName === 'index.js' || fileName === 'builder.js') {
+            return;
+        }
+
+        const name = fileName.endsWith('.js') ? fileName.substring(0, fileName.length - 3) : fileName;
+        const typeChecker = require('.' + path.sep + fileName);
+        typeCheckers[name] = typeChecker;
+    });
+
+    return typeCheckers;
+};
+
+// Check the node evaluated type
+const checkType = (node, config) => {
+    if(!node) {
+        throw new Error('Node does not exist');
+    }
+
+    if(!typeCheckers) {
+        typeCheckers = loadTypeCheckers();
+    }
+
+    const c = typeCheckers[node.node];
+    if(c) {
+        return c(node, config);
+    }
+    else {
+        throw new Error(`Failed to find type checker for ${node.node}`);
+    }
+};
+
 // Typings for all the files in the source directory and destination directory
 let allTypings = null;
 
@@ -114,6 +153,8 @@ const getSuperTypeNames = (typeName, config) => {
         ];
     }
 
+    names.push('OBJECT');
+
     return _.uniq(names);
 };
 
@@ -181,63 +222,81 @@ const lookup = (name, currentTypeName, config) => {
     }
 };
 
-const getVariableType = (typing, variableName) => {
+const getVariableType = (typing, variableName, config) => {
     if(typing && variableName) {
-        const found = _.filter(typing.fieldDeclarations, field => {
-            field = field[0];
-            return _.toUpper(field.name) === _.toUpper(variableName);
+        const parentTypings = _.map(getSuperTypeNames(typing.name, config), name => lookup(name, null, config));
+        let result = void 0;
+        [typing, ...parentTypings].forEach(typing => {
+            if(result) {
+                return;
+            }
+            const found = _.filter(typing.fieldDeclarations, field => {
+                field = field[0];
+                return _.toUpper(field.name) === _.toUpper(variableName);
+            });
+
+            if(!_.isEmpty(found)) {
+                result = found[0][0].type;
+            }
         });
 
-        if(!_.isEmpty(found)) {
-            return found[0][0].type;
-        }
+        return result;
     }
 };
 
-const getMethodType = (typing, methodName, argTypes) => {
+const getMethodType = (typing, methodName, argTypes, config) => {
     argTypes = argTypes || [];
     if(typing && methodName) {
-        const found = _.filter(typing.methodDeclarations, method => {
-            return _.toUpper(method.name) === _.toUpper(methodName) &&
-                _.size(method.parameters) === _.size(argTypes);
-        });
-
-        const size = _.size(found);
-        let returnType = void 0;
-        if(size > 1) {
-            const refined = _.filter(found, method => {
-                const paramTypeNames = _.map(method.parameters, param => _.toUpper(param.type));
-                const argTypeNames = _.map(argTypes, type => _.toUpper(type));
-                const canAssign = canArgTypesBeAssignedTo(argTypeNames, paramTypeNames);
-                return canAssign;
+        const parentTypings = _.map(getSuperTypeNames(typing.name, config), name => lookup(name, null, config));
+        let result = void 0;
+        [typing, ...parentTypings].forEach(typing => {
+            if(result) {
+                return;
+            }
+            const found = _.filter(typing.methodDeclarations, method => {
+                return _.toUpper(method.name) === _.toUpper(methodName) &&
+                    _.size(method.parameters) === _.size(argTypes);
             });
 
-            if(!_.isEmpty(refined)) {
-                returnType = refined[0].returnType;
-            }
-        }
-        else if(size === 1) {
-            returnType = found[0].returnType;
-        }
+            const size = _.size(found);
+            let returnType = void 0;
+            if(size > 1) {
+                const refined = _.filter(found, method => {
+                    const paramTypeNames = _.map(method.parameters, param => _.toUpper(param.type));
+                    const argTypeNames = _.map(argTypes, type => _.toUpper(type));
+                    const canAssign = canArgTypesBeAssignedTo(argTypeNames, paramTypeNames);
+                    return canAssign;
+                });
 
-        if(returnType && !_.isEmpty(typing.genericTypes)) {
-            let realType = null;
-            if(typing.name === 'Map' && methodName === 'keys') {
-                realType = _.first(typing.genericTypes);
+                if(!_.isEmpty(refined)) {
+                    returnType = refined[0].returnType;
+                }
             }
-            else {
-                realType = _.last(typing.genericTypes);
+            else if(size === 1) {
+                returnType = found[0].returnType;
             }
 
-            if(_.toUpper(returnType) === 'OBJECT') {
-                returnType = realType;
-            }
-            else {
-                returnType = returnType.replace(/<Object>/i, realType);
-            }
-        }
+            if(returnType && !_.isEmpty(typing.genericTypes)) {
+                let realType = null;
+                if(typing.name === 'Map' && methodName === 'keys') {
+                    realType = _.first(typing.genericTypes);
+                }
+                else {
+                    realType = _.last(typing.genericTypes);
+                }
 
-        return returnType;
+                if(_.toUpper(returnType) === 'OBJECT') {
+                    returnType = realType;
+                }
+                else {
+                    returnType = returnType.replace(/<Object>/i, `<${realType}>`);
+                }
+            }
+
+            result = returnType;
+        });
+
+        return result;
     }
 };
 
@@ -378,15 +437,8 @@ const scan = (fileName, config) => {
                     resolve(result);
                 }
                 catch(e) {
-                    if(config.ignoreErrors) {
-                        console.error(new Error(`Failed to scan ${fileName}:\n${e}`));
-                        resolve(null);
-                    }
-                    else {
-                        reject(new Error(`Failed to scan ${fileName}:\n${e}`));
-                        console.error(`Failed to scan ${fileName}`);
-                        throw e;
-                    }
+                    console.error(new Error(`Failed to scan ${fileName}:\n${e}`));
+                    resolve(null);
                 }
             });
         }
@@ -404,6 +456,7 @@ const Typings = {
     lookup,
     getVariableType,
     getMethodType,
+    checkType,
 };
 
 module.exports = Typings;

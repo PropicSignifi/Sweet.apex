@@ -51,4 +51,45 @@ describe("Sweet.apex", function() {
         const typing2 = Typings.lookup('List<String>', null, config);
         expect(Typings.getMethodType(typing2, 'get', ['Integer'])).toEqual('String');
     });
+
+    it('should check types', function() {
+        const expr1 = AST.parseExpression('1 + 2 * 3');
+        const type1 = Typings.checkType(expr1, config);
+        expect(type1).toEqual('Integer');
+
+        const expr2 = AST.parseExpression('1.0 + 2 * 3');
+        const type2 = Typings.checkType(expr2, config);
+        expect(type2).toEqual('Double');
+
+        const expr3 = AST.parseExpression('2 > 3');
+        const type3 = Typings.checkType(expr3, config);
+        expect(type3).toEqual('Boolean');
+
+        const expr4 = AST.parseExpression("'a' instanceof String");
+        const type4 = Typings.checkType(expr4, config);
+        expect(type4).toEqual('Boolean');
+
+        const expr5 = AST.parseExpression("1 < 2 ? 'a' : 'b'");
+        const type5 = Typings.checkType(expr5, config);
+        expect(type5).toEqual('String');
+
+        const expr6 = AST.parseExpression("(String s) -> { return s; }");
+        const type6 = Typings.checkType(expr6, config);
+        expect(type6).toEqual('Func');
+
+        const expr7 = AST.parseExpression("Math.PI");
+        const type7 = Typings.checkType(expr7, config);
+        expect(type7).toEqual('Double');
+
+        const expr8 = AST.parseExpression("Math.abs(-4)");
+        const type8 = Typings.checkType(expr8, config);
+        expect(type8).toEqual('Integer');
+
+        config.variableContext = {
+            a: 'String',
+        };
+        const expr9 = AST.parseExpression("a");
+        const type9 = Typings.checkType(expr9, config);
+        expect(type9).toEqual('String');
+    });
 });
