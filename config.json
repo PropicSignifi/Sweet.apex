@@ -5,6 +5,7 @@
     "generateDoc": "off",
     "srcDir": "resources/",
     "destDir": "build/",
+    "classpath": "",
     "docDir": "docs/",
     "fileSrcDir": "files/",
     "fileDestDir": "build/staticresources/",

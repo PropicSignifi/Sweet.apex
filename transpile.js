@@ -304,7 +304,17 @@ Promise.resolve(srcFiles)
             .map(name => config.destDir + name)
             .value();
 
-        return Promise.resolve(config.scanDestDir ? [ ...files, ...destFiles, ] : files)
+        const classpathFiles = !config.classpath ? [] : _.chain(config.classpath)
+            .split(':')
+            .flatMap(classpath => {
+                return _.chain(fs.readdirSync(classpath))
+                    .filter(name => name.endsWith('.cls'))
+                    .map(name => classpath + path.sep + name)
+                    .value();
+            })
+            .value();
+
+        return Promise.resolve(config.scanDestDir ? [ ...files, ...destFiles, ...classpathFiles, ] : files)
             .then(files => {
                 return Promise.all(
                     _.chain(files)
