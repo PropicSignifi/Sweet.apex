@@ -33,13 +33,13 @@ const MethodInvocation = (node, config) => {
 
     if(expression) {
         const expressionType = Typings.checkType(expression, config);
-        const typing = Typings.lookup(expressionType, null, config);
+        const typing = Typings.lookup(expressionType, AST.getRootTypeName(node), config);
         return Typings.getMethodType(typing, name, argTypes, config);
     }
     else {
         const type = AST.getEnclosingType(node);
         const expressionType = getValue(type.name);
-        const typing = Typings.lookup(expressionType, null, config);
+        const typing = Typings.lookup(expressionType, AST.getRootTypeName(node), config);
         return Typings.getMethodType(typing, name, argTypes, config);
     }
 };

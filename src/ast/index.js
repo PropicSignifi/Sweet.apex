@@ -101,13 +101,12 @@ const addIndex = root => {
 };
 
 // Call this when you have changed the type of a variable
-const refreshIndex = root => {
+const refreshScopes = root => {
     let traverseRoot = getEnclosingWithScope(root);
     if(!traverseRoot) {
         traverseRoot = root;
     }
     traverse(traverseRoot, (curr, parent) => {
-        curr.parent = parent;
         setUpScope(curr);
     });
 };
@@ -671,6 +670,17 @@ const getTopLevelType = root => {
     return root.types[0];
 };
 
+// Get the root type
+const getRootType = node => {
+    const compilationUnit = _getEnclosing('CompilationUnit', node);
+    return compilationUnit ? getTopLevelType(compilationUnit) : null;
+};
+
+const getRootTypeName = node => {
+    const rootType = getRootType(node);
+    return rootType ? getValue(rootType.name) : null;
+};
+
 // Get the enclosing type of this AST node
 const getEnclosingType = node => {
     return _getEnclosing('TypeDeclaration', node);
@@ -731,7 +741,7 @@ const AST = {
     parseType,
     getMethodSignature,
     addIndex,
-    refreshIndex,
+    refreshScopes,
     removeIndex,
     transform,
     hasModifier,
@@ -755,6 +765,8 @@ const AST = {
     getUniqueName,
     getAnnotationValue,
     getTopLevelType,
+    getRootType,
+    getRootTypeName,
     getEnclosingType,
     getEnclosingMethod,
     getEnclosingField,

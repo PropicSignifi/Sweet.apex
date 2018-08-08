@@ -23,6 +23,7 @@
  **/
 const Typings = require('./index.js');
 const getValue = require('../valueProvider');
+const AST = require('../ast');
 
 const QualifiedName = (node, config) => {
     const {
@@ -31,12 +32,13 @@ const QualifiedName = (node, config) => {
     } = node;
 
     const qualifiedName = getValue(qualifier) + '.' + getValue(name);
-    let typing = Typings.lookup(qualifiedName, null, config);
+    const rootTypeName = AST.getRootTypeName(node);
+    let typing = Typings.lookup(qualifiedName, rootTypeName, config);
     if(typing) {
         return qualifiedName;
     }
     else {
-        const typing = Typings.lookup(getValue(qualifier), null, config);
+        const typing = Typings.lookup(getValue(qualifier), rootTypeName, config);
         return Typings.getVariableType(typing, getValue(name), config);
     }
 };

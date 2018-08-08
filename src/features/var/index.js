@@ -48,7 +48,7 @@ const Var = {
         const type = AST.parseType(typeStr);
 
         AST.setChild(current, 'type', type);
-        AST.refreshIndex(current);
+        AST.refreshScopes(current);
     },
 };
 

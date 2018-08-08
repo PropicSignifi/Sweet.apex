@@ -55,7 +55,7 @@ const Val = {
         }
 
         AST.setChild(current, 'type', type);
-        AST.refreshIndex(current);
+        AST.refreshScopes(current);
     },
 };
 

@@ -31,7 +31,7 @@ const FieldAccess = (node, config) => {
     } = node;
 
     const expressionType = Typings.checkType(expression, config);
-    const typing = Typings.lookup(expressionType, null, config);
+    const typing = Typings.lookup(expressionType, AST.getRootTypeName(node), config);
     return Typings.getVariableType(typing, getValue(name), config);
 };
 
