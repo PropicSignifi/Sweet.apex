@@ -39,6 +39,7 @@ const allowedStartRules = [
     'ClassBodyDeclaration',
     'BlockStatement',
     'Expression',
+    'Type',
 ];
 
 // The generated peg parser

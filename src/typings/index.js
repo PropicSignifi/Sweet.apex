@@ -30,6 +30,7 @@ const FileUpdates = require('../utils/fileUpdates');
 const normalize = require('../template');
 const parse = require('../parser');
 const AST = require('../ast');
+const getValue = require('../valueProvider');
 
 // Typings for all the files in the source directory and destination directory
 let allTypings = null;
@@ -142,7 +143,20 @@ const canArgTypesBeAssignedTo = (fromTypes, toTypes) => {
 
 const lookup = (name, currentTypeName, config) => {
     loadTypings(config);
-    name = _.toUpper(name);
+
+    let genericTypes = [];
+    let capitalizedName = _.toUpper(name);
+    if(capitalizedName.startsWith('LIST<') ||
+        capitalizedName.startsWith('SET<') ||
+        capitalizedName.startsWith('MAP<')) {
+        const type = AST.parseType(name);
+        genericTypes = _.map(type.typeArguments, getValue);
+
+        const pos = capitalizedName.indexOf('<');
+        capitalizedName = capitalizedName.substring(0, pos);
+    }
+
+    name = capitalizedName;
 
     let result = typingsData[name];
     if(!result) {
@@ -154,7 +168,17 @@ const lookup = (name, currentTypeName, config) => {
         result = typingsData['SYSTEM.' + name];
     }
 
-    return result;
+    if(!_.isEmpty(genericTypes)) {
+        const copy = _.cloneDeep(result);
+        if(copy) {
+            copy.genericTypes = genericTypes;
+        }
+
+        return copy;
+    }
+    else {
+        return result;
+    }
 };
 
 const getVariableType = (typing, variableName) => {
@@ -179,6 +203,7 @@ const getMethodType = (typing, methodName, argTypes) => {
         });
 
         const size = _.size(found);
+        let returnType = void 0;
         if(size > 1) {
             const refined = _.filter(found, method => {
                 const paramTypeNames = _.map(method.parameters, param => _.toUpper(param.type));
@@ -188,12 +213,31 @@ const getMethodType = (typing, methodName, argTypes) => {
             });
 
             if(!_.isEmpty(refined)) {
-                return refined[0].returnType;
+                returnType = refined[0].returnType;
             }
         }
         else if(size === 1) {
-            return found[0].returnType;
+            returnType = found[0].returnType;
         }
+
+        if(returnType && !_.isEmpty(typing.genericTypes)) {
+            let realType = null;
+            if(typing.name === 'Map' && methodName === 'keys') {
+                realType = _.first(typing.genericTypes);
+            }
+            else {
+                realType = _.last(typing.genericTypes);
+            }
+
+            if(_.toUpper(returnType) === 'OBJECT') {
+                returnType = realType;
+            }
+            else {
+                returnType = returnType.replace(/<Object>/i, realType);
+            }
+        }
+
+        return returnType;
     }
 };
 

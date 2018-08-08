@@ -270,6 +270,9 @@ const parseBlockStatements = lines => _.map(lines, parseBlockStatement);
 // Parse the compilation unit
 const parseCompilationUnit = content => _.parse('CompilationUnit', content);
 
+// Parse the type
+const parseType = content => _parse('Type', content);
+
 // Get the method signature from the type and method
 const getMethodSignature = (methodDeclaration, typeDeclaration) => {
     if(typeDeclaration) {
@@ -682,6 +685,7 @@ const AST = {
     parseClassBodyDeclaration,
     parseExpression,
     parseCompilationUnit,
+    parseType,
     getMethodSignature,
     addIndex,
     removeIndex,

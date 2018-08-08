@@ -1,4 +1,5 @@
 const Typings = require('../src/typings');
+const AST = require('../src/ast');
 
 const config = {
     libraryDir: __dirname + '/../library',
@@ -26,9 +27,28 @@ describe("Sweet.apex", function() {
         expect(Typings.getVariableType(typing, 'PI')).toEqual('Double');
     });
 
+    it('should parse type', function() {
+        const content = 'Map<String, Object>';
+        const type = AST.parseType(content);
+        expect(type).not.toBeUndefined();
+    });
+
     it('should get method return type', function() {
         const typing = Typings.lookup('Math', null, config);
         expect(Typings.getMethodType(typing, 'abs', ['Integer'])).toEqual('Integer');
         expect(Typings.getMethodType(typing, 'abs', ['Double'])).toEqual('Double');
+    });
+
+    it('should look up generic types', function() {
+        const typing = Typings.lookup('Map<String, String>', null, config);
+        expect(typing.genericTypes.length).toEqual(2);
+    });
+
+    it('should get generic method return type', function() {
+        const typing1 = Typings.lookup('Map<String, String>', null, config);
+        expect(Typings.getMethodType(typing1, 'get', ['String'])).toEqual('String');
+
+        const typing2 = Typings.lookup('List<String>', null, config);
+        expect(Typings.getMethodType(typing2, 'get', ['Integer'])).toEqual('String');
     });
 });
