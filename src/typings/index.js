@@ -37,18 +37,194 @@ let allTypings = null;
 // Typings for the Salesforce apex library classes
 let libraryTypings = null;
 
+// Mapping from capitalized names to class typings
+const typingsData = {};
+
+const prepTypingsData = () => {
+    if(allTypings) {
+        _.forEach(allTypings, typing => {
+            const name = _.toUpper(typing.name);
+            typingsData[name] = typing;
+
+            _.forEach(typing.classDeclarations, decl => {
+                const qualifiedName = name + '.' + _.toUpper(decl.name);
+                decl.name = qualifiedName;
+                typingsData[qualifiedName] = decl;
+            });
+
+            _.forEach(typing.interfaceDeclarations, decl => {
+                const qualifiedName = name + '.' + _.toUpper(decl.name);
+                decl.name = qualifiedName;
+                typingsData[qualifiedName] = decl;
+            });
+        });
+    }
+
+    if(libraryTypings) {
+        _.forEach(libraryTypings, (library, libraryName) => {
+            libraryName = _.toUpper(libraryName);
+            _.forEach(library, typing => {
+                const name = _.toUpper(typing.name);
+                typingsData[libraryName + '.' + name] = typing;
+
+                _.forEach(typing.classDeclarations, decl => {
+                    const qualifiedName = libraryName + '.' + name + '.' + _.toUpper(decl.name);
+                    decl.name = qualifiedName;
+                    typingsData[qualifiedName] = decl;
+                });
+
+                _.forEach(typing.interfaceDeclarations, decl => {
+                    const qualifiedName = libraryName + '.' + name + '.' + _.toUpper(decl.name);
+                    decl.name = qualifiedName;
+                    typingsData[qualifiedName] = decl;
+                });
+            });
+        });
+    }
+};
+
+// utility to get a list of super type names
+// accept capitalized type name
+const getSuperTypeNames = (typeName, config) => {
+    if(!typeName) {
+        return ['OBJECT'];
+    }
+
+    const typing = lookup(typeName, null, config);
+    if(!typing) {
+        return ['OBJECT'];
+    }
+
+    let names = [];
+
+    if(typing.superclassType) {
+        names = [
+            ...names,
+            typing.superclassType,
+            ...getSuperTypeNames(typing.superclassType, config),
+        ];
+    }
+
+    if(typing.superInterfaceTypes) {
+        names = [
+            ...names,
+            ...typing.superInterfaceTypes,
+            ..._.flatMap(typing.superInterfaceTypes, type => getSuperTypeNames(type, config)),
+        ];
+    }
+
+    return _.uniq(names);
+};
+
+// capitalized names
+const canBeAssignedTo = (fromType, toType) => {
+    if(fromType === toType) {
+        return true;
+    }
+
+    const superTypes = getSuperTypeNames(fromType);
+    return _.includes(superTypes, toType);
+};
+
+// fromTypes case insensitive
+// toTypes capitalized
+const canArgTypesBeAssignedTo = (fromTypes, toTypes) => {
+    for(let i in fromTypes) {
+        const fromType = _.toUpper(fromTypes[i]);
+        const toType = toTypes[i];
+        if(!canBeAssignedTo(fromType, toType)) {
+            return false;
+        }
+    }
+
+    return true;
+};
+
+const lookup = (name, currentTypeName, config) => {
+    loadTypings(config);
+    name = _.toUpper(name);
+
+    let result = typingsData[name];
+    if(!result) {
+        if(currentTypeName && _.indexOf(name, '.') > 0) {
+            result = typingsData[_.toUpper(currentTypeName) + '.' + name];
+        }
+    }
+    if(!result) {
+        result = typingsData['SYSTEM.' + name];
+    }
+
+    return result;
+};
+
+const getVariableType = (typing, variableName) => {
+    if(typing && variableName) {
+        const found = _.filter(typing.fieldDeclarations, field => {
+            field = field[0];
+            return _.toUpper(field.name) === _.toUpper(variableName);
+        });
+
+        if(!_.isEmpty(found)) {
+            return found[0][0].type;
+        }
+    }
+};
+
+const getMethodType = (typing, methodName, argTypes) => {
+    argTypes = argTypes || [];
+    if(typing && methodName) {
+        const found = _.filter(typing.methodDeclarations, method => {
+            return _.toUpper(method.name) === _.toUpper(methodName) &&
+                _.size(method.parameters) === _.size(argTypes);
+        });
+
+        const size = _.size(found);
+        if(size > 1) {
+            const refined = _.filter(found, method => {
+                const paramTypeNames = _.map(method.parameters, param => _.toUpper(param.type));
+                const argTypeNames = _.map(argTypes, type => _.toUpper(type));
+                const canAssign = canArgTypesBeAssignedTo(argTypeNames, paramTypeNames);
+                return canAssign;
+            });
+
+            if(!_.isEmpty(refined)) {
+                return refined[0].returnType;
+            }
+        }
+        else if(size === 1) {
+            return found[0].returnType;
+        }
+    }
+};
+
+const loadTypings = config => {
+    if(!allTypings) {
+        loadAllTypings(config);
+    }
+
+    if(!libraryTypings) {
+        loadLibraryTypings(config);
+    }
+};
+
+const loadAllTypings = config => {
+    const allTypingsPath = config.cacheDir + path.sep + 'allTypings.json';
+    if(fs.existsSync(allTypingsPath)) {
+        try {
+            allTypings = JSON.parse(fs.readFileSync(allTypingsPath, 'utf8'));
+        }
+        catch(e) {
+            console.error('Failed to load all typings', e);
+        }
+    }
+
+    prepTypingsData();
+};
+
 // Get all the typings from the source and destination directories
 const getAllTypings = config => {
     if(!allTypings) {
-        const allTypingsPath = config.cacheDir + path.sep + 'allTypings.json';
-        if(fs.existsSync(allTypingsPath)) {
-            try {
-                allTypings = JSON.parse(fs.readFileSync(allTypingsPath, 'utf8'));
-            }
-            catch(e) {
-                console.error('Failed to load all typings', e);
-            }
-        }
+        loadAllTypings(config);
     }
 
     if(!allTypings) {
@@ -58,22 +234,28 @@ const getAllTypings = config => {
     return allTypings;
 };
 
+const loadLibraryTypings = config => {
+    libraryTypings = {};
+
+    _.each(fs.readdirSync(config.libraryDir), subdir => {
+        const libraryTypingsPath = config.libraryDir + path.sep + subdir + path.sep + 'typings.json';
+        if(fs.existsSync(libraryTypingsPath)) {
+            try {
+                libraryTypings[subdir] = JSON.parse(fs.readFileSync(libraryTypingsPath, 'utf8'));
+            }
+            catch(e) {
+                console.error(`Failed to load library typings for ${subdir}`, e);
+            }
+        }
+    });
+
+    prepTypingsData();
+};
+
 // Get all the typings from library apex classes
 const getLibraryTypings = config => {
     if(!libraryTypings) {
-        libraryTypings = {};
-
-        _.each(fs.readdirSync(config.libraryDir), subdir => {
-            const libraryTypingsPath = config.libraryDir + path.sep + subdir + path.sep + 'typings.json';
-            if(fs.existsSync(libraryTypingsPath)) {
-                try {
-                    libraryTypings[subdir] = JSON.parse(fs.readFileSync(libraryTypingsPath, 'utf8'));
-                }
-                catch(e) {
-                    console.error(`Failed to load library typings for ${subdir}`, e);
-                }
-            }
-        });
+        loadLibraryTypings(config);
     }
 
     return libraryTypings;
@@ -175,6 +357,9 @@ const Typings = {
     getAllTypings,
     getLibraryTypings,
     flush,
+    lookup,
+    getVariableType,
+    getMethodType,
 };
 
 module.exports = Typings;
