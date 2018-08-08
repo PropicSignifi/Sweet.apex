@@ -278,5 +278,9 @@ Specify a nullable variable to avoid null de-reference.
 
 Infer the variable type according to the context.
 
+- [val](https://click-to-cloud.github.io/sweet-apex/docs/Features/val.html)
+
+Infer the variable type according to the context and make it final.
+
 ## Feature Request
 If you have any feature request, you can submit it in the issues. Or you can submit a PR to implement your own feature.

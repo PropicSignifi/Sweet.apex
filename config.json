@@ -22,6 +22,7 @@
         "apexdoc",
         "array_creation",
         "var",
+        "val",
         "mod",
         "nullable",
         "operator",
