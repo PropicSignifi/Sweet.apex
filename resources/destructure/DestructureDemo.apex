@@ -8,5 +8,9 @@ public class DestructureDemo {
 
         Account ac = new Account(Name='test acc');
         { Name: String name } = ac;
+
+        List<Integer> numbers = new List<Integer>{ 1, 2, 3, 4, 5 };
+        Integer { first, _ } = numbers;
+        Integer { _, last } = numbers;
     }
 }

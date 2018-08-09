@@ -610,20 +610,8 @@ const insertChildrenAfter = (parent, name, target, children) => {
 };
 
 // Get the unique name of the AST node
-const getUniqueName = node => {
-    const items = [];
-    let curr = node;
-    while(curr) {
-        if(curr.name) {
-            items.push(getValue(curr.name));
-        }
-
-        curr = curr.parent;
-    }
-
-    _.reverse(items);
-
-    return _.join(items, '_');
+const getUniqueName = (node, prefix = 'var_') => {
+    return prefix + getOffsetInSiblings(node);
 };
 
 const getOffsetInSiblings = current => {

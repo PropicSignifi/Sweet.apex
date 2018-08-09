@@ -39,6 +39,10 @@ public class DestructureDemo {
 
         Account ac = new Account(Name='test acc');
         { Name: String name } = ac;
+
+        List<Integer> numbers = new List<Integer>{ 1, 2, 3, 4, 5 };
+        Integer { first, _ } = numbers;
+        Integer { _, last } = numbers;
     }
 }
 ```
@@ -65,6 +69,12 @@ public class DestructureDemo {
         Account ac = new Account(Name = 'test acc');
         SObject destructure_11 = (SObject)ac;
         String name = (String)destructure_11.get('Name');
+
+        List<Integer> numbers = new List<Integer>{ 1, 2, 3, 4, 5 };
+        List<Object> destructure_15 = (List<Object>)numbers;
+        Integer first = (Integer)destructure_15.get(0);
+        List<Object> destructure_17 = (List<Object>)numbers;
+        Integer last = (Integer)destructure_17.get(destructure_17.size() - 1);
     }
 }
 ```
@@ -77,5 +87,7 @@ public class DestructureDemo {
 
 Destructuring is built on the base of type inference. Should the type inference go wrong, the generated
 destructuring code might fail.
+
+You can insert one `_` as a placeholder when destructuring a list.
 
 </article>

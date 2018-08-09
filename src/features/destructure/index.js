@@ -58,7 +58,7 @@ const Destructure = {
     },
 
     run: ({ current, parent, root, config, }) => {
-        const destrutureName = 'destructure_' + AST.getOffsetInSiblings(current);
+        const destrutureName = AST.getUniqueName(current, 'destructure_');
         const globalType = current.type ? getValue(current.type) : null;
         const initializer = current.initializer;
 
@@ -77,9 +77,11 @@ const Destructure = {
         }
 
         const pairs = [];
-        _.forEach(current.variables.expressions, expr => {
+        let placeholderIndex = -1;
+        _.forEach(current.variables.expressions, (expr, index) => {
             const pair = {
                 name: getValue(expr.name),
+                index,
             };
             if(expr.rename) {
                 if(expr.rename.type) {
@@ -91,7 +93,8 @@ const Destructure = {
                 }
             }
 
-            if(pair.name === '_' && !isList) {
+            if(pair.name === '_') {
+                placeholderIndex = index;
                 return;
             }
 
@@ -100,7 +103,7 @@ const Destructure = {
 
         const reassign = getReassign(destrutureName, collectionType, initializer);
         const newNodes = [ reassign ];
-        _.forEach(pairs, (pair, index) => {
+        _.forEach(pairs, pair => {
             let name = pair.newName ? pair.newName : pair.name;
             let type = pair.type ? pair.type : globalType;
             if(!type) {
@@ -108,7 +111,12 @@ const Destructure = {
             }
             let line = null;
             if(isList) {
-                line = `${type} ${name} = (${type})${destrutureName}.get(${index});`;
+                if(placeholderIndex >= 0 && pair.index > placeholderIndex) {
+                    line = `${type} ${name} = (${type})${destrutureName}.get(${destrutureName}.size() - ${_.size(pairs) - pair.index + 1});`;
+                }
+                else {
+                    line = `${type} ${name} = (${type})${destrutureName}.get(${pair.index});`;
+                }
             }
             else {
                 line = `${type} ${name} = (${type})${destrutureName}.get('${pair.name}');`;
