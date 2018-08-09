@@ -286,5 +286,9 @@ Infer the variable type according to the context and make it final.
 
 Add array access support to maps.
 
+- [constructor](https://click-to-cloud.github.io/sweet-apex/docs/Features/constructor_annotation.html)
+
+Help generate constructors.
+
 ## Feature Request
 If you have any feature request, you can submit it in the issues. Or you can submit a PR to implement your own feature.

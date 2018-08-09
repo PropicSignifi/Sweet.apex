@@ -44,6 +44,7 @@
         "function",
         "action",
         "identity",
+        "constructor",
         "reflect",
         "enum",
         "annotation"
