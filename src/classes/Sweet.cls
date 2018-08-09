@@ -298,6 +298,17 @@ public class Sweet {
         }
     }
 
+    /**
+     * Get the default value if the value is null
+     *
+     * @param value The value
+     * @param defaultValue The default value
+     * @return Object
+     * */
+    public static Object defaultIfNull(Object value, Object defaultValue) {
+        return value == null ? defaultValue : value;
+    }
+
     private static void loadBeanInfos() {
         try {
             String beansJSON = readFile('beans');

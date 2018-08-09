@@ -91,6 +91,10 @@ const Destructure = {
                 if(expr.rename.name) {
                     pair.newName = getValue(expr.rename.name);
                 }
+
+                if(expr.rename.defaultValue) {
+                    pair.defaultValue = getValue(expr.rename.defaultValue);
+                }
             }
 
             if(pair.name === '_') {
@@ -109,17 +113,25 @@ const Destructure = {
             if(!type) {
                 throw new Error('No destructuring type could be found');
             }
-            let line = null;
+            let key = null;
             if(isList) {
                 if(placeholderIndex >= 0 && pair.index > placeholderIndex) {
-                    line = `${type} ${name} = (${type})${destrutureName}.get(${destrutureName}.size() - ${_.size(pairs) - pair.index + 1});`;
+                    key = `${destrutureName}.size() - ${_.size(pairs) - pair.index + 1}`;
                 }
                 else {
-                    line = `${type} ${name} = (${type})${destrutureName}.get(${pair.index});`;
+                    key = `${pair.index}`;
                 }
             }
             else {
-                line = `${type} ${name} = (${type})${destrutureName}.get('${pair.name}');`;
+                key = `'${pair.name}'`;
+            }
+
+            let line = null;
+            if(pair.defaultValue) {
+                line = `${type} ${name} = (${type})Sweet.defaultIfNull(${destrutureName}.get(${key}), ${pair.defaultValue});`;
+            }
+            else {
+                line = `${type} ${name} = (${type})${destrutureName}.get(${key});`;
             }
             newNodes.push(AST.parseBlockStatement(line));
         });

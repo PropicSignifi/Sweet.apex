@@ -12,5 +12,8 @@ public class DestructureDemo {
         List<Integer> numbers = new List<Integer>{ 1, 2, 3, 4, 5 };
         Integer { first, _ } = numbers;
         Integer { _, last } = numbers;
+
+        List<String> signs = new List<String>{};
+        String { sign : String = 'stop' } = signs;
     }
 }

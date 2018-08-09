@@ -19,5 +19,9 @@ public class DestructureDemo {
         Integer first = (Integer)destructure_15.get(0);
         List<Object> destructure_17 = (List<Object>)numbers;
         Integer last = (Integer)destructure_17.get(destructure_17.size() - 1);
+
+        List<String> signs = new List<String>{  };
+        List<Object> destructure_21 = (List<Object>)signs;
+        String sign = (String)Sweet.defaultIfNull(destructure_21.get(0), 'stop');
     }
 }

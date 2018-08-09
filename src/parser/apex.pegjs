@@ -570,12 +570,13 @@ DestructurePair
     }
 
 DestructureRename
-    = Indent COLON type:Type name:Identifier?
+    = Indent COLON type:Type name:Identifier? defaultValue:(EQU VariableInitializer)?
     {
         return {
             node: 'DestructureRename',
             name: name,
             type: type,
+            defaultValue: extractOptional(defaultValue, 1),
         };
     }
 
