@@ -40,7 +40,6 @@ const Val = {
             throw new Error('Incomplete variable declaration for val');
         }
         const initializer = fragment.initializer;
-        config.variableContext = AST.getScope(current);
         const typeStr = Typings.checkType(initializer, config);
         if(!typeStr) {
             throw new Error(`Cannot infer variable type for "${getValue(fragment.name)}" in : ${getValue(initializer)}`);

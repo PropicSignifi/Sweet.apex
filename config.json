@@ -24,6 +24,7 @@
         "var",
         "val",
         "mod",
+        "map_access",
         "nullable",
         "operator",
         "template_string",

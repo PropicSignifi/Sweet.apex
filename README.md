@@ -282,5 +282,9 @@ Infer the variable type according to the context.
 
 Infer the variable type according to the context and make it final.
 
+- [map_access](https://click-to-cloud.github.io/sweet-apex/docs/Features/map_access.html)
+
+Add array access support to maps.
+
 ## Feature Request
 If you have any feature request, you can submit it in the issues. Or you can submit a PR to implement your own feature.

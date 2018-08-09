@@ -22,9 +22,10 @@
  * SOFTWARE.
  **/
 const getValue = require('../valueProvider');
+const AST = require('../ast');
 
 const SimpleName = (node, config) => {
-    const variableContext = config.variableContext;
+    const variableContext = config.variableContext || AST.getScope(node);
 
     const name = getValue(node);
     if(variableContext && variableContext[name]) {
