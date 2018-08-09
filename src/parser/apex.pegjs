@@ -48,9 +48,6 @@
   }
 
     function buildQualified(first, rest, index) {
-        if(first.node === 'SimpleName') {
-            first.isIdentifier = true;
-        }
         return buildTree(first, rest,
             function(result, element) {
                 return {
@@ -64,9 +61,6 @@
 
   function popQualified(tree) {
       if(tree.node === 'QualifiedName') {
-          if(tree.qualifier.node === 'SimpleName') {
-              tree.qualifier.isIdentifier = true;
-          }
           return {
               name: tree.name,
               expression: tree.qualifier,
@@ -497,7 +491,6 @@ ConstantDeclaratorsRest
 ConstantDeclarator
     = id:Identifier rest:ConstantDeclaratorRest
     {
-        id.isIdentifier = true;
         return mergeProps(rest, { name: id });
     }
 
@@ -541,7 +534,6 @@ EnumConstants
 EnumConstant
     = EmptyLines annot:Annotation* name:Identifier args:Arguments? cls:ClassBody?
     {
-        name.isIdentifier = true;
         return {
             node:                     'EnumConstantDeclaration',
             anonymousClassDeclaration: cls === null ? null : {
@@ -620,7 +612,6 @@ VariableDeclarators
 VariableDeclarator
     = name:Identifier dims:Dim* EmptyLines init:(EQU VariableInitializer)? accessor:(AccessorDeclarator1 / AccessorDeclarator2)?
     {
-        name.isIdentifier = true;
         return {
             node:           'VariableDeclarationFragment',
             name:            name,
@@ -717,7 +708,6 @@ FormalParameterList
 VariableDeclaratorId
     = id:Identifier required:BANG? optional:QUERY? defaultValue:(EQU ElementValue)? dims:Dim*
     {
-        id.isIdentifier = true;
         return {
             node:           'SingleVariableDeclaration',
             name:            id,
@@ -1163,7 +1153,6 @@ Primary
     / QualifiedIdentifierSuffix
     / qId:QualifiedIdentifier
     {
-        qId.isIdentifier = true;
         return qId;
     }
     / type:BasicType dims:Dim* DOT CLASS
@@ -1205,9 +1194,6 @@ QualifiedIdentifierSuffix
             arguments:     args,
             typeArguments: []
         });
-        if(ret.name.node === 'SimpleName') {
-            ret.name.isIdentifier = false;
-        }
 
         return ret;
     }
@@ -1263,9 +1249,6 @@ ExplicitGenericInvocationSuffix
     { return suffix; }
     / id:Identifier args:Arguments
     {
-        if(id.node === 'SimpleName') {
-            id.isIdentifier = false;
-        }
         return { node: 'MethodInvocation', arguments: args, name: id, typeArguments: [] };
     }
 
@@ -1288,9 +1271,6 @@ PostfixOp
 Selector
     = nullable:QUERY? DOT EmptyLines id:Identifier args:Arguments
     {
-        if(id.node === 'SimpleName') {
-            id.isIdentifier = false;
-        }
         return { node: 'MethodInvocation', arguments: args, name: id, typeArguments: [], nullable: nullable };
     }
     / nullable:QUERY? DOT EmptyLines id:Identifier

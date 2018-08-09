@@ -30,7 +30,7 @@ const ImportStatic = {
     accept: ({ current, parent, }) => {
         const accepted =
             current.node === 'CompilationUnit' ||
-            (current.node === 'SimpleName' && current.isIdentifier) ||
+            AST.maybeVariable(current) ||
             (current.node === 'MethodInvocation' && !current.expression);
         return accepted;
     },

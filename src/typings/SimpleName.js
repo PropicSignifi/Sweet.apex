@@ -27,7 +27,7 @@ const Typings = require('../typings');
 
 const SimpleName = (node, config) => {
     const name = getValue(node);
-    if(node.isIdentifier) {
+    if(AST.maybeVariable(node)) {
         const variableContext = config.variableContext || AST.getScope(node);
         const rootTypeName = AST.getRootTypeName(node);
 
@@ -37,7 +37,7 @@ const SimpleName = (node, config) => {
         else {
             const typing = Typings.lookup(name, rootTypeName, config);
             if(typing) {
-                return typing.name;
+                return name;
             }
             else {
                 throw new Error('Failed to resolve identifier: ' + name);

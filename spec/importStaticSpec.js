@@ -1,12 +1,31 @@
 const fs = require('fs');
 const path = require('path');
 const transpile = require('../src/transpiler');
+const Typings = require('../src/typings');
 
 const targetFile = 'ImportStaticDemo';
 const config = {
     features: ['import_static'],
     libraryDir: __dirname + '/../library',
 };
+
+Typings.addTyping({
+    "methodDeclarations": [
+        {
+            "modifiers": [
+                "public",
+                "static"
+            ],
+            "name": "main",
+            "returnType": "void"
+        }
+    ],
+    "modifiers": [
+        "public"
+    ],
+    "name": "ImportStaticDemo",
+    "type": "Class"
+}, config);
 
 function joinPath(items) {
     return items.join(path.sep);

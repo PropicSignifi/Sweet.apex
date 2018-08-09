@@ -738,6 +738,34 @@ const getCompiled = node => {
     return lines;
 };
 
+// Check if the node could be a variable
+const maybeVariable = node => {
+    if(node.node !== 'SimpleName') {
+        return false;
+    }
+
+    if(node.parent) {
+        if(node.parent.node === 'QualifiedName') {
+            return false;
+        }
+
+        if(node.parent.node === 'SimpleType') {
+            return false;
+        }
+
+        if(node.parent.node === 'MethodDeclaration' ||
+            node.parent.node === 'MethodInvocation' ||
+            node.parent.node === 'SingleVariableDeclaration' ||
+            node.parent.node === 'VariableDeclarationFragment') {
+            if(node.parent.name === node) {
+                return false;
+            }
+        }
+    }
+
+    return true;
+};
+
 const AST = {
     traverse,
     getParent,
@@ -787,6 +815,7 @@ const AST = {
     getScope,
     printScopes,
     getOffsetInSiblings,
+    maybeVariable,
 };
 
 module.exports = AST;
