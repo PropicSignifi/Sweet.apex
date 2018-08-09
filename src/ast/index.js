@@ -626,6 +626,27 @@ const getUniqueName = node => {
     return _.join(items, '_');
 };
 
+const getOffsetInSiblings = current => {
+    if(!current || !current.parent) {
+        return null;
+    }
+
+    let offset = -1;
+
+    _.forOwn(current.parent, (value, key) => {
+        if(key === 'parent' || offset >= 0) {
+            return;
+        }
+
+        if(_.isArray(value) && _.includes(value, current)) {
+            const index = _.indexOf(value, current);
+            offset = index;
+        }
+    });
+
+    return offset;
+};
+
 // Get the value of the annotation
 const getAnnotationValue = annotation => {
     if(annotation.value) {
@@ -777,6 +798,7 @@ const AST = {
     getEnclosingWithScope,
     getScope,
     printScopes,
+    getOffsetInSiblings,
 };
 
 module.exports = AST;

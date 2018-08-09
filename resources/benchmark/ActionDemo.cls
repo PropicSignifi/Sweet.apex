@@ -26,6 +26,7 @@ public class ActionDemo {
     private class AddAction extends Action {
         public AddAction() {
             super('add');
+
             param('a', Integer.class, 'The first number');
             param('b', Integer.class, 'The second number');
             this.returnRaw();
@@ -41,11 +42,13 @@ public class ActionDemo {
     private class StartAction extends Action {
         public StartAction() {
             super('start');
+
             param('id', String.class, 'id');
 
         }
         public override Object execAction(Object arg0) {
             String id = (String)arg0;
+
             System.debug('Started');
             return null;
         }
@@ -54,6 +57,7 @@ public class ActionDemo {
     private class ConcatAction extends Action {
         public ConcatAction() {
             super('concat');
+
             param('s1', String.class, 's1');
             param('s2', String.class, 's2');
             param('s3', String.class, 's3');

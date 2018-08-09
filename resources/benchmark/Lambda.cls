@@ -14,6 +14,7 @@ public class Lambda {
         private Sweet.AnonymousContext anonymous_context;
         public AnonymousFunc0(Sweet.AnonymousContext context) {
             super(-1);
+
             this.anonymous_context = context;
         }
         public override Object execN(List<Object> args) {
@@ -26,6 +27,7 @@ public class Lambda {
         private Sweet.AnonymousContext anonymous_context;
         public AnonymousFunc1(Sweet.AnonymousContext context) {
             super(-1);
+
             this.anonymous_context = context;
         }
         public override Object execN(List<Object> args) {
@@ -38,6 +40,7 @@ public class Lambda {
         private Sweet.AnonymousContext anonymous_context;
         public AnonymousFunc2(Sweet.AnonymousContext context) {
             super(-1);
+
             this.anonymous_context = context;
         }
         public override Object execN(List<Object> args) {
@@ -51,6 +54,7 @@ public class Lambda {
         private Sweet.AnonymousContext anonymous_context;
         public AnonymousFunc3(Sweet.AnonymousContext context) {
             super(-1);
+
             this.anonymous_context = context;
         }
         public override Object execN(List<Object> args) {
@@ -63,6 +67,7 @@ public class Lambda {
         private Sweet.AnonymousContext anonymous_context;
         public AnonymousFunc4(Sweet.AnonymousContext context) {
             super(-1);
+
             this.anonymous_context = context;
         }
         public override Object execN(List<Object> args) {

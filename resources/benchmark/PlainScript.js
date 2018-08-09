@@ -27,6 +27,7 @@ class PlainScript extends Func {
     }
     Plain(name) {
         super(-1);
+
         this.name = name;
     }
     Plain() {
@@ -39,6 +40,7 @@ class PlainScript extends Func {
         for(i = 0; i < 10 ; i++) {
             total = total + i;
         }
+
         total += mList[0];
 
         if(total > 20) {
@@ -52,6 +54,7 @@ class PlainScript extends Func {
         while(total > 0) {
             total -= 1;
         }
+
         upsert accounts Id;
 
         do {

@@ -22,6 +22,7 @@ public class FeatureOrder {
 
             a = (a == null) ? init() : a;
             b = (b == null) ? init() : b;
+
             Sweet.assertNotNull(a, '"a" in FeatureOrder.add(Integer, Integer) should not be null');
             Sweet.assertNotNull(b, '"b" in FeatureOrder.add(Integer, Integer) should not be null');
 

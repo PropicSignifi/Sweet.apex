@@ -540,6 +540,44 @@ LocalVariableDeclarationStatement
         type:         type
       };
     }
+    / Indent type:Type? variables:Destructure EmptyLines init:(EQU VariableInitializer)? SEMI
+    {
+        return {
+            node: 'DestructureStatement',
+            type: type,
+            variables: variables,
+            initializer: extractOptional(init, 1),
+        };
+    }
+
+Destructure
+    = EmptyLines LWING
+      init:(
+        first:DestructurePair rest:(COMMA DestructurePair)*
+        { return buildList(first, rest, 1); }
+      )?
+      EmptyLines  RWING
+    { return { node: 'Destructure', expressions: optionalList(init) }; }
+
+DestructurePair
+    = Indent name:Identifier rename:DestructureRename?
+    {
+        return {
+            node: 'DestructurePair',
+            name: name,
+            rename: rename,
+        };
+    }
+
+DestructureRename
+    = Indent COLON type:Type name:Identifier?
+    {
+        return {
+            node: 'DestructureRename',
+            name: name,
+            type: type,
+        };
+    }
 
 VariableDeclarators
     = first:VariableDeclarator rest:(COMMA VariableDeclarator)*
@@ -671,7 +709,9 @@ BlockStatements
     = BlockStatement*
 
 BlockStatement
-    = Indent comment:EndOfLineComment
+    = Indent !LetterOrDigit [\r\n\u000C]
+    { return { node: "LineEmpty" }; }
+    / Indent comment:EndOfLineComment
     { return { node: "EndOfLineComment", comment: comment.value }; }
     / Indent comment:TraditionalComment
     { return { node: "TraditionalComment", comment: comment.value }; }

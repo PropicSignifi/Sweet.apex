@@ -1,0 +1,17 @@
+public class DestructureDemo {
+    public static void main() {
+        List<String> names = new List<String>{ 'Wilson', 'Adam' };
+        List<Object> destructure_1 = (List<Object>)names;
+        String p1 = (String)destructure_1.get(0);
+        String p2 = (String)destructure_1.get(1);
+
+        Map<String, Object> infos = new Map<String, Object>{ 'a' => 1, 'b' => '2' };
+        Map<String, Object> destructure_6 = (Map<String, Object>)infos;
+        Integer count = (Integer)destructure_6.get('a');
+        String id = (String)destructure_6.get('b');
+
+        Account ac = new Account(Name = 'test acc');
+        SObject destructure_11 = (SObject)ac;
+        String name = (String)destructure_11.get('Name');
+    }
+}

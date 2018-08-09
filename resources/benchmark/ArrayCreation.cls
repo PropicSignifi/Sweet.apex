@@ -13,6 +13,7 @@ public class ArrayCreation {
 
         Map<String, Object> m3 = new Map<String, Object>{ 'a' => new Map<String, Object>{ 'b' => 2 } };
         List<Object> l3 = new List<Object>{ new List<Object>{ 'a' } };
+
         run(new Map<String, Object>{ 'a' => 2 });
         run(new List<Object>{ 'a' });
     }

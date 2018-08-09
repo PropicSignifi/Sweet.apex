@@ -294,5 +294,9 @@ Help generate constructors.
 
 Generate transactional methods that roll back when an exception is thrown.
 
+- [destructure](https://click-to-cloud.github.io/sweet-apex/docs/Features/destructure.html)
+
+Destructure the list/map/sobject.
+
 ## Feature Request
 If you have any feature request, you can submit it in the issues. Or you can submit a PR to implement your own feature.

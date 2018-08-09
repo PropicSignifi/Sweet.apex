@@ -25,6 +25,7 @@
         "val",
         "mod",
         "map_access",
+        "destructure",
         "nullable",
         "operator",
         "template_string",
