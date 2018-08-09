@@ -298,5 +298,9 @@ Generate transactional methods that roll back when an exception is thrown.
 
 Destructure the list/map/sobject.
 
+- [import_static](https://click-to-cloud.github.io/sweet-apex/docs/Features/import_static.html)
+
+Import static fields and methods from classes.
+
 ## Feature Request
 If you have any feature request, you can submit it in the issues. Or you can submit a PR to implement your own feature.

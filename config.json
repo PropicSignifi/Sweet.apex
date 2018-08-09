@@ -21,6 +21,7 @@
     "features": [
         "apexdoc",
         "array_creation",
+        "import_static",
         "var",
         "val",
         "mod",

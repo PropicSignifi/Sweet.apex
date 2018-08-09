@@ -47,22 +47,37 @@
     });
   }
 
-  function buildQualified(first, rest, index) {
-    return buildTree(first, rest,
-      function(result, element) {
-        return {
-          node:     'QualifiedName',
-          qualifier: result,
-          name:      element[index]
-        };
-      }
-    );
-  }
+    function buildQualified(first, rest, index) {
+        if(first.node === 'SimpleName') {
+            first.isIdentifier = true;
+        }
+        return buildTree(first, rest,
+            function(result, element) {
+                return {
+                    node:     'QualifiedName',
+                    qualifier: result,
+                    name:      element[index]
+                };
+            }
+        );
+    }
 
   function popQualified(tree) {
-    return tree.node === 'QualifiedName'
-      ? { name: tree.name, expression: tree.qualifier }
-      : { name: tree, expression: null };
+      if(tree.node === 'QualifiedName') {
+          if(tree.qualifier.node === 'SimpleName') {
+              tree.qualifier.isIdentifier = true;
+          }
+          return {
+              name: tree.name,
+              expression: tree.qualifier,
+          };
+      }
+      else {
+          return {
+              name: tree,
+              expression: null,
+          };
+      }
   }
 
   function extractExpressions(list) {
@@ -212,13 +227,27 @@
 //-------------------------------------------------------------------------
 
 CompilationUnit
-    = Spacing types:TypeDeclaration* EmptyLines EOT
+    = Spacing imports:ImportDeclaration* types:TypeDeclaration* EmptyLines EOT
     {
       return {
         node:    'CompilationUnit',
         types:    skipNulls(types),
+        imports:  skipNulls(imports)
       };
     }
+
+ImportDeclaration
+    = EmptyLines IMPORT stat:STATIC? name:QualifiedIdentifier asterisk:(DOT STAR)? SEMI
+    {
+      return {
+        node:    'ImportDeclaration',
+        name:     name,
+        static:   !!stat,
+        onDemand: !!extractOptional(asterisk, 1)
+      };
+    }
+    / SEMI
+    { return null; }
 
 TypeDeclaration
     = EmptyLines
@@ -467,7 +496,10 @@ ConstantDeclaratorsRest
 
 ConstantDeclarator
     = id:Identifier rest:ConstantDeclaratorRest
-    { return mergeProps(rest, { name: id }); }
+    {
+        id.isIdentifier = true;
+        return mergeProps(rest, { name: id });
+    }
 
 ConstantDeclaratorRest
     = dims:Dim* EQU init:VariableInitializer
@@ -509,16 +541,17 @@ EnumConstants
 EnumConstant
     = EmptyLines annot:Annotation* name:Identifier args:Arguments? cls:ClassBody?
     {
-      return {
-        node:                     'EnumConstantDeclaration',
-        anonymousClassDeclaration: cls === null ? null : {
-          node:             'AnonymousClassDeclaration',
-          bodyDeclarations:  cls
-        },
-        arguments:                 optionalList(args),
-        modifiers:                 annot,
-        name:                      name
-      };
+        name.isIdentifier = true;
+        return {
+            node:                     'EnumConstantDeclaration',
+            anonymousClassDeclaration: cls === null ? null : {
+                node:             'AnonymousClassDeclaration',
+                bodyDeclarations:  cls
+            },
+            arguments:                 optionalList(args),
+            modifiers:                 annot,
+            name:                      name
+        };
     }
 
 EnumBodyDeclarations
@@ -587,13 +620,14 @@ VariableDeclarators
 VariableDeclarator
     = name:Identifier dims:Dim* EmptyLines init:(EQU VariableInitializer)? accessor:(AccessorDeclarator1 / AccessorDeclarator2)?
     {
-      return {
-        node:           'VariableDeclarationFragment',
-        name:            name,
-        extraDimensions: dims.length,
-        initializer:     extractOptional(init, 1),
-        accessor:        accessor
-      };
+        name.isIdentifier = true;
+        return {
+            node:           'VariableDeclarationFragment',
+            name:            name,
+            extraDimensions: dims.length,
+            initializer:     extractOptional(init, 1),
+            accessor:        accessor
+        };
     }
 
 SetterDeclarator
@@ -683,14 +717,15 @@ FormalParameterList
 VariableDeclaratorId
     = id:Identifier required:BANG? optional:QUERY? defaultValue:(EQU ElementValue)? dims:Dim*
     {
-      return {
-        node:           'SingleVariableDeclaration',
-        name:            id,
-        extraDimensions: dims.length,
-        required:        required,
-        optional:        optional,
-        defaultValue:    defaultValue && defaultValue[1],
-      };
+        id.isIdentifier = true;
+        return {
+            node:           'SingleVariableDeclaration',
+            name:            id,
+            extraDimensions: dims.length,
+            required:        required,
+            optional:        optional,
+            defaultValue:    defaultValue && defaultValue[1],
+        };
     }
 
 //-------------------------------------------------------------------------
@@ -1126,7 +1161,11 @@ Primary
     / NEW creator:Creator
     { return creator; }
     / QualifiedIdentifierSuffix
-    / QualifiedIdentifier
+    / qId:QualifiedIdentifier
+    {
+        qId.isIdentifier = true;
+        return qId;
+    }
     / type:BasicType dims:Dim* DOT CLASS
     {
       return {
@@ -1161,11 +1200,16 @@ QualifiedIdentifierSuffix
     { return { node: 'ArrayAccess', array: qual, index: expr }; }
     / qual:QualifiedIdentifier args:Arguments
     {
-      return mergeProps(popQualified(qual), {
-        node:         'MethodInvocation',
-        arguments:     args,
-        typeArguments: []
-      });
+        var ret = mergeProps(popQualified(qual), {
+            node:         'MethodInvocation',
+            arguments:     args,
+            typeArguments: []
+        });
+        if(ret.name.node === 'SimpleName') {
+            ret.name.isIdentifier = false;
+        }
+
+        return ret;
     }
     / qual:QualifiedIdentifier typeArgs:TypeArguments? DOT CLASS
     { return { node: 'TypeLiteral', type: buildTypeName(qual, null, []), typeArguments: typeArgs }; }
@@ -1218,7 +1262,12 @@ ExplicitGenericInvocationSuffix
     = SUPER suffix:SuperSuffix
     { return suffix; }
     / id:Identifier args:Arguments
-    { return { node: 'MethodInvocation', arguments: args, name: id, typeArguments: [] }; }
+    {
+        if(id.node === 'SimpleName') {
+            id.isIdentifier = false;
+        }
+        return { node: 'MethodInvocation', arguments: args, name: id, typeArguments: [] };
+    }
 
 PrefixOp
     = op:(
@@ -1238,7 +1287,12 @@ PostfixOp
 
 Selector
     = nullable:QUERY? DOT EmptyLines id:Identifier args:Arguments
-    { return { node: 'MethodInvocation', arguments: args, name: id, typeArguments: [], nullable: nullable }; }
+    {
+        if(id.node === 'SimpleName') {
+            id.isIdentifier = false;
+        }
+        return { node: 'MethodInvocation', arguments: args, name: id, typeArguments: [], nullable: nullable };
+    }
     / nullable:QUERY? DOT EmptyLines id:Identifier
     { return { node: 'FieldAccess', name: id, nullable: nullable }; }
     / DOT EmptyLines ret:ExplicitGenericInvocation

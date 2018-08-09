@@ -31,16 +31,22 @@ const MethodInvocation = (node, config) => {
     const expression = node.expression;
     const argTypes = _.map(node.arguments, arg => Typings.checkType(arg, config));
 
+    let expressionType = null;
     if(expression) {
-        const expressionType = Typings.checkType(expression, config);
-        const typing = Typings.lookup(expressionType, AST.getRootTypeName(node), config);
-        return Typings.getMethodType(typing, name, argTypes, config);
+        expressionType = Typings.checkType(expression, config);
     }
     else {
         const type = AST.getEnclosingType(node);
-        const expressionType = getValue(type.name);
-        const typing = Typings.lookup(expressionType, AST.getRootTypeName(node), config);
-        return Typings.getMethodType(typing, name, argTypes, config);
+        expressionType = getValue(type.name);
+    }
+
+    const typing = Typings.lookup(expressionType, AST.getRootTypeName(node), config);
+    const result = Typings.getMethodType(typing, name, argTypes, config);
+    if(!result) {
+        throw new Error(`Failed to resolve: ${name}(${argTypes.join(', ')})`);
+    }
+    else {
+        return result;
     }
 };
 

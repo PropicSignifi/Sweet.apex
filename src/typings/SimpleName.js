@@ -23,13 +23,26 @@
  **/
 const getValue = require('../valueProvider');
 const AST = require('../ast');
+const Typings = require('../typings');
 
 const SimpleName = (node, config) => {
-    const variableContext = config.variableContext || AST.getScope(node);
-
     const name = getValue(node);
-    if(variableContext && variableContext[name]) {
-        return variableContext[name];
+    if(node.isIdentifier) {
+        const variableContext = config.variableContext || AST.getScope(node);
+        const rootTypeName = AST.getRootTypeName(node);
+
+        if(variableContext && variableContext[name]) {
+            return variableContext[name];
+        }
+        else {
+            const typing = Typings.lookup(name, rootTypeName, config);
+            if(typing) {
+                return typing.name;
+            }
+            else {
+                throw new Error('Failed to resolve identifier: ' + name);
+            }
+        }
     }
     else {
         return name;

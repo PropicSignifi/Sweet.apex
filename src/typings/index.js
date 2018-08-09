@@ -77,6 +77,8 @@ let allTypings = null;
 // Typings for the Salesforce apex library classes
 let libraryTypings = null;
 
+let staticTypings = {};
+
 // Mapping from capitalized names to class typings
 const typingsData = {};
 
@@ -445,6 +447,19 @@ const scan = (fileName, config) => {
     });
 };
 
+const addStaticTypingName = (sourceType, importedType) => {
+    let typings = staticTypings[sourceType];
+    if(!typings) {
+        typings = [];
+    }
+    typings.push(importedType);
+    staticTypings[sourceType] = typings;
+};
+
+const getStaticTypingNames = sourceType => {
+    return staticTypings[sourceType] || [];
+};
+
 // The global typings object
 const Typings = {
     add,
@@ -457,6 +472,8 @@ const Typings = {
     getVariableType,
     getMethodType,
     checkType,
+    addStaticTypingName,
+    getStaticTypingNames,
 };
 
 module.exports = Typings;
