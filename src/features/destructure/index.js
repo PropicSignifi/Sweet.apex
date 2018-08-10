@@ -59,7 +59,6 @@ const Destructure = {
 
     run: ({ current, parent, root, config, }) => {
         const destrutureName = AST.getUniqueName(current, 'destructure_');
-        const globalType = current.type ? getValue(current.type) : null;
         const initializer = current.initializer;
 
         let collectionType = null;
@@ -76,40 +75,13 @@ const Destructure = {
             collectionType = AST.parseType('SObject');
         }
 
-        const pairs = [];
-        let placeholderIndex = -1;
-        _.forEach(current.variables.expressions, (expr, index) => {
-            const pair = {
-                name: getValue(expr.name),
-                index,
-            };
-            if(expr.rename) {
-                if(expr.rename.type) {
-                    pair.type = getValue(expr.rename.type);
-                }
-
-                if(expr.rename.name) {
-                    pair.newName = getValue(expr.rename.name);
-                }
-
-                if(expr.rename.defaultValue) {
-                    pair.defaultValue = getValue(expr.rename.defaultValue);
-                }
-            }
-
-            if(pair.name === '_') {
-                placeholderIndex = index;
-                return;
-            }
-
-            pairs.push(pair);
-        });
+        const { pairs, placeholderIndex, } = AST.getDestructured(current);
 
         const reassign = getReassign(destrutureName, collectionType, initializer);
         const newNodes = [ reassign ];
         _.forEach(pairs, pair => {
             let name = pair.newName ? pair.newName : pair.name;
-            let type = pair.type ? pair.type : globalType;
+            let type = pair.type;
             if(!type) {
                 throw new Error('No destructuring type could be found');
             }

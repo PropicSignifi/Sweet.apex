@@ -24,6 +24,7 @@
 const getValue = require('../valueProvider');
 const AST = require('../ast');
 const Typings = require('../typings');
+const _ = require('lodash');
 
 const SimpleName = (node, config) => {
     const name = getValue(node);
@@ -37,6 +38,9 @@ const SimpleName = (node, config) => {
         else {
             const typing = Typings.lookup(name, rootTypeName, config);
             if(typing) {
+                return name;
+            }
+            else if(_.includes(config.reservedIdentifiers, name)) {
                 return name;
             }
             else {

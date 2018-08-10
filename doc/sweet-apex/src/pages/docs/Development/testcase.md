@@ -39,3 +39,17 @@ node transpile.js resource/ build/ mod -c -e
 ```
 
 </article>
+
+<article id="4">
+
+## Run Integration Test
+
+Integration test cases are listed under `integration` directory.
+
+Run the below code to start the integration test.
+
+```bash
+./run_integration_test.sh
+```
+
+</article>

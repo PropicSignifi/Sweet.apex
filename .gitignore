@@ -7,3 +7,4 @@ script/
 !src/features/script
 resources/Test.apex
 .vscode/
+integration/target/

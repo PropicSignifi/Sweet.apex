@@ -273,6 +273,7 @@ const buildEnumDeclaration = (node, parent, typingsConfig) => {
         classDeclarations: buildMemberClassDeclarations(node, typingsConfig),
         interfaceDeclarations: buildMemberInterfaceDeclarations(node, typingsConfig),
         enumDeclarations: buildMemberEnumDeclarations(node, typingsConfig),
+        annotationDeclarations: buildMemberAnnotationDeclarations(node, typingsConfig),
         fieldDeclarations: buildFieldDeclarations(node, typingsConfig),
         methodDeclarations: buildMethodDeclarations(node, typingsConfig),
     };

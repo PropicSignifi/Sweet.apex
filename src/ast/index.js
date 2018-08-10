@@ -223,6 +223,17 @@ const setUpScope = (current) => {
             });
         }
     }
+    else if(current.node === 'DestructureStatement') {
+        const { pairs, } = getDestructured(current);
+        const enclosingScope = getEnclosingScope(current);
+        if(enclosingScope) {
+            _.forEach(pairs, pair => {
+                const name = pair.newName ? pair.newName : pair.name;
+                const type = pair.type;
+                enclosingScope[name] = type;
+            });
+        }
+    }
 };
 
 const getEnclosingWithScope = current => {
@@ -692,7 +703,11 @@ const getRootTypeName = node => {
 
 // Get the enclosing type of this AST node
 const getEnclosingType = node => {
-    return _getEnclosing('TypeDeclaration', node);
+    let type = _getEnclosing('TypeDeclaration', node);
+    if(!type) {
+        type = _getEnclosing('EnumDeclaration', node);
+    }
+    return type;
 };
 
 // Get the enclosing method of this AST node
@@ -745,25 +760,79 @@ const maybeVariable = node => {
     }
 
     if(node.parent) {
-        if(node.parent.node === 'QualifiedName') {
-            return false;
-        }
-
-        if(node.parent.node === 'SimpleType') {
+        if(node.parent.node === 'QualifiedName' ||
+            node.parent.node === 'SimpleType' ||
+            node.parent.node === 'Annotation') {
             return false;
         }
 
         if(node.parent.node === 'MethodDeclaration' ||
             node.parent.node === 'MethodInvocation' ||
             node.parent.node === 'SingleVariableDeclaration' ||
-            node.parent.node === 'VariableDeclarationFragment') {
+            node.parent.node === 'VariableDeclarationFragment' ||
+            node.parent.node === 'EnumConstantDeclaration' ||
+            node.parent.node === 'TypeDeclaration' ||
+            node.parent.node === 'AnnotationTypeDeclaration' ||
+            node.parent.node === 'MemberValuePair' ||
+            node.parent.node === 'AnnotationTypeMemberDeclaration' ||
+            node.parent.node === 'DestructurePair') {
             if(node.parent.name === node) {
                 return false;
             }
         }
+
+        // custom operator
+        if(node.parent.node === 'InfixExpression' && node.parent.operator === node) {
+            return false;
+        }
     }
 
     return true;
+};
+
+const getDestructured = current => {
+    if(current.node !== 'DestructureStatement') {
+        return {};
+    }
+
+    const globalType = current.type ? getValue(current.type) : null;
+    const pairs = [];
+    let placeholderIndex = -1;
+    _.forEach(current.variables.expressions, (expr, index) => {
+        const pair = {
+            name: getValue(expr.name),
+            index,
+        };
+        if(expr.rename) {
+            if(expr.rename.type) {
+                pair.type = getValue(expr.rename.type);
+            }
+
+            if(expr.rename.name) {
+                pair.newName = getValue(expr.rename.name);
+            }
+
+            if(expr.rename.defaultValue) {
+                pair.defaultValue = getValue(expr.rename.defaultValue);
+            }
+        }
+
+        if(!pair.type) {
+            pair.type = globalType;
+        }
+
+        if(pair.name === '_') {
+            placeholderIndex = index;
+            return;
+        }
+
+        pairs.push(pair);
+    });
+
+    return {
+        pairs,
+        placeholderIndex,
+    };
 };
 
 const AST = {
@@ -816,6 +885,7 @@ const AST = {
     printScopes,
     getOffsetInSiblings,
     maybeVariable,
+    getDestructured,
 };
 
 module.exports = AST;

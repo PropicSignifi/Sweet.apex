@@ -17,6 +17,7 @@
     "clean": false,
     "ignoreErrors": false,
     "scanDestDir": true,
+    "reservedIdentifiers": [ "logger" ],
     "generatedClassComment": "// This is a generated file. Please do not modify it.",
     "features": [
         "apexdoc",
