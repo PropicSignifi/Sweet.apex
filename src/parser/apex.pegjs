@@ -1006,7 +1006,11 @@ ConditionalOrExpression
     { return buildInfixExpr(first, rest); }
 
 ConditionalAndExpression
-    = EmptyLines (EmptyLines NonJavaDocComment)* EmptyLines first:InclusiveOrExpression EmptyLines (EmptyLines NonJavaDocComment)* EmptyLines rest:(ANDAND InclusiveOrExpression)*
+    = EmptyLines (EmptyLines NonJavaDocComment)* EmptyLines first:PipelineExpression EmptyLines (EmptyLines NonJavaDocComment)* EmptyLines rest:(ANDAND PipelineExpression)*
+    { return buildInfixExpr(first, rest); }
+
+PipelineExpression
+    = EmptyLines (EmptyLines NonJavaDocComment)* EmptyLines first:InclusiveOrExpression EmptyLines (EmptyLines NonJavaDocComment)* EmptyLines rest:(PIPE InclusiveOrExpression)*
     { return buildInfixExpr(first, rest); }
 
 InclusiveOrExpression
@@ -1905,10 +1909,11 @@ MINUSEQU        =            "-="      Spacing
 MOD             =            "%"!"="   Spacing
 MODEQU          =            "%="      Spacing
 NOTEQUAL        =            "!="![=]  Spacing
-                /            "!=="      Spacing
-OR              =            "|"![=|]  Spacing
+                /            "!=="     Spacing
+OR              =            "|"![=|>] Spacing
 OREQU           =            "|="      Spacing
 OROR            =            "||"      Spacing
+PIPE            =            "|>"      Spacing
 PLUS            =            "+"![=+]  Spacing
 PLUSEQU         =            "+="      Spacing
 POINTER         =            "->"      Spacing

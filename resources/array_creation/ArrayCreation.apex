@@ -17,5 +17,8 @@ public class ArrayCreation {
 
         run({ 'a' => 2 });
         run({ 'a' });
+
+        Map<String, Integer> m4 = { 'a' => 2 };
+        m4 = { 'a' => 3 };
     }
 }

@@ -193,6 +193,7 @@ public class Demo extends Sweet.BaseEnum {
             Integer a = 1;
             Integer b = 2;
             Integer result = (Integer)Demo.mod((Integer)a, (Integer)b);
+            result = (Integer)((Func)R.inc).run(result);
 
             String msg = 'Hello';
             Integer size = (msg != null ? msg.length() : null);
@@ -200,15 +201,15 @@ public class Demo extends Sweet.BaseEnum {
             Map<String, Integer> counts = new Map<String, Integer>{ 'key' => 1 };
             counts.put('key', counts.get('key') + 2);
 
-            Map<String, Object> destructure_15 = (Map<String, Object>)counts;
-            Integer key = (Integer)destructure_15.get('key');
-            List<Object> destructure_17 = (List<Object>)intList;
-            Integer first = (Integer)destructure_17.get(0);
-            Integer last = (Integer)destructure_17.get(destructure_17.size() - 1);
+            Map<String, Object> destructure_16 = (Map<String, Object>)counts;
+            Integer key = (Integer)destructure_16.get('key');
+            List<Object> destructure_18 = (List<Object>)intList;
+            Integer first = (Integer)destructure_18.get(0);
+            Integer last = (Integer)destructure_18.get(destructure_18.size() - 1);
             Double perimeter = 2 * Math.PI * key;
 
-            Object var_22_s = result;
-            if(var_22_s == 1) {
+            Object var_23_s = result;
+            if(var_23_s == 1) {
                 System.debug('correct');
             } else {
                 System.debug('incorrect');

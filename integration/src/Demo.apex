@@ -43,6 +43,7 @@ public enum Demo {
         var a = 1;
         var b = 2;
         var result = a mod b;
+        result = result |> R.inc;
 
         var msg = 'Hello';
         var size = msg?.length();

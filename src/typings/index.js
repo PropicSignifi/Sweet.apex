@@ -57,6 +57,9 @@ const checkType = (node, config) => {
     if(!node) {
         throw new Error('Node does not exist');
     }
+    if(!config) {
+        throw new Error('Config is not provided');
+    }
 
     if(!typeCheckers) {
         typeCheckers = loadTypeCheckers();

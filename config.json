@@ -26,6 +26,7 @@
         "var",
         "val",
         "mod",
+        "pipeline",
         "map_access",
         "destructure",
         "nullable",

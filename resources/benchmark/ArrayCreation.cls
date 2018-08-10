@@ -16,5 +16,8 @@ public class ArrayCreation {
 
         run(new Map<String, Object>{ 'a' => 2 });
         run(new List<Object>{ 'a' });
+
+        Map<String, Integer> m4 = new Map<String, Integer>{ 'a' => 2 };
+        m4 = new Map<String, Integer>{ 'a' => 3 };
     }
 }

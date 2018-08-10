@@ -302,5 +302,9 @@ Destructure the list/map/sobject.
 
 Import static fields and methods from classes.
 
+- [pipeline](https://click-to-cloud.github.io/sweet-apex/docs/Features/pipeline.html)
+
+Combine Func calls into pipelines.
+
 ## Feature Request
 If you have any feature request, you can submit it in the issues. Or you can submit a PR to implement your own feature.

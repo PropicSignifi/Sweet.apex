@@ -24,6 +24,7 @@
 const _ = require('lodash');
 const AST = require('../../ast');
 const getValue = require('../../valueProvider');
+const Typings = require('../../typings');
 
 const createMapType = () => {
     return {
@@ -83,7 +84,7 @@ const ArrayCreation = {
         return accepted;
     },
 
-    run: ({ current, parent, root, }) => {
+    run: ({ current, parent, root, config, }) => {
         if(current.parent.node !== 'ArrayCreation') {
             let typeNode = null;
 
@@ -97,6 +98,10 @@ const ArrayCreation = {
                 if(typeName.startsWith('List<') || typeName.startsWith('Map<')) {
                     typeNode = _.cloneDeep(declarationNode.type);
                 }
+            }
+            else if(current.parent.node === 'Assignment') {
+                const typeName = Typings.checkType(current.parent.leftHandSide, config);
+                typeNode = AST.parseType(typeName);
             }
 
             if(!typeNode) {
