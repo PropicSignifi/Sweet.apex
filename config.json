@@ -25,6 +25,7 @@
         "import_static",
         "var",
         "val",
+        "varargs",
         "mod",
         "pipeline",
         "map_access",

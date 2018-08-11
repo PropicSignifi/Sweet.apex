@@ -45,6 +45,8 @@ public enum Demo {
         var result = a mod b;
         result = result |> R.inc;
 
+        result = product(1, 2, 3, 4);
+
         var msg = 'Hello';
         var size = msg?.length();
 
@@ -99,6 +101,15 @@ public enum Demo {
 
         if(c != null) {
             result += c;
+        }
+
+        return result;
+    }
+
+    public static Integer product(Integer ...nums) {
+        Integer result = 1;
+        for(Integer n : nums) {
+            result *= n;
         }
 
         return result;

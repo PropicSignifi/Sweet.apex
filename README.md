@@ -306,5 +306,9 @@ Import static fields and methods from classes.
 
 Combine Func calls into pipelines.
 
+- [varargs](https://click-to-cloud.github.io/sweet-apex/docs/Features/varargs.html)
+
+Support var-args parameter in methods.
+
 ## Feature Request
 If you have any feature request, you can submit it in the issues. Or you can submit a PR to implement your own feature.

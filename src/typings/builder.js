@@ -202,6 +202,7 @@ const buildMethodDeclaration = (node, parent, typingsConfig) => {
         return {
             name: getValue(param.name),
             type: getValue(param.type),
+            varargs: param.varargs,
         };
     });
     const comments = buildComments(node, parent, typingsConfig);

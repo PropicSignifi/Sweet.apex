@@ -85,16 +85,31 @@ let staticTypings = {};
 // Mapping from capitalized names to class typings
 const typingsData = {};
 
-const prepTypingsData = () => {
+const varargsMethods = {};
+
+const prepTypings = () => {
     if(allTypings) {
         _.forEach(allTypings, typing => {
+            const typeName = typing.name;
             const name = _.toUpper(typing.name);
             typingsData[name] = typing;
+
+            _.each(typing.methodDeclarations, method => {
+                if(hasVarargsInMethod(method)) {
+                    addVarargsMethod(typeName, method);
+                }
+            });
 
             _.forEach(typing.classDeclarations, decl => {
                 const qualifiedName = name + '.' + _.toUpper(decl.name);
                 decl.name = qualifiedName;
                 typingsData[qualifiedName] = decl;
+
+                _.each(decl.methodDeclarations, method => {
+                    if(hasVarargsInMethod(method)) {
+                        addVarargsMethod(typeName + '.' + decl.name, method);
+                    }
+                });
             });
 
             _.forEach(typing.interfaceDeclarations, decl => {
@@ -326,7 +341,7 @@ const loadAllTypings = config => {
         }
     }
 
-    prepTypingsData();
+    prepTypings();
 };
 
 // Get all the typings from the source and destination directories
@@ -357,7 +372,7 @@ const loadLibraryTypings = config => {
         }
     });
 
-    prepTypingsData();
+    prepTypings();
 };
 
 // Get all the typings from library apex classes
@@ -381,7 +396,12 @@ const slim = target => {
     if(_.isPlainObject(target)) {
         return _.chain(target)
             .toPairs()
-            .reject(pair => _.isEmpty(pair[1]))
+            .reject(pair => {
+                if(pair[0] === 'varargs') {
+                    return !pair[1];
+                }
+                return _.isEmpty(pair[1]);
+            })
             .map(([key, value]) => [key, slim(value)])
             .fromPairs()
             .value();
@@ -463,6 +483,71 @@ const getStaticTypingNames = sourceType => {
     return staticTypings[sourceType] || [];
 };
 
+const hasVarargsInMethod = method => {
+    return _.some(method.parameters, param => param.varargs);
+};
+
+const addVarargsMethod = (typeName, method) => {
+    let methods = varargsMethods[method.name];
+    if(!methods) {
+        methods = [];
+    }
+    methods.push({
+        typeName,
+        method,
+    });
+
+    varargsMethods[method.name] = methods;
+};
+
+const getMethodParamType = (method, index) => {
+    const size = _.size(method.parameters);
+    if(index < size) {
+        return method.parameters[index].type;
+    }
+    else {
+        const param = method.parameters[size - 1];
+        return param.varargs ? param.type : null;
+    }
+};
+
+const maybeVarargsMethod = current => {
+    return !!varargsMethods[getValue(current.name)]
+};
+
+const findVarargsMethod = (current, config) => {
+    const methodName = getValue(current.name);
+    const typeName = current.expression ? checkType(current.expression, config) : getValue(AST.getEnclosingType(current).name);
+    const argTypeNames = _.map(current.arguments, arg => checkType(arg, config));
+    const infos = varargsMethods[methodName];
+    let matchedVarargsMethod = null;
+    _.each(infos, info => {
+        if(matchedVarargsMethod) {
+            return;
+        }
+        if(!canBeAssignedTo(typeName, info.typeName)) {
+            return;
+        }
+
+        let matched = true;
+        _.each(argTypeNames, (argTypeName, index) => {
+            if(!matched) {
+                return;
+            }
+            const paramType = getMethodParamType(info.method, index);
+            if(!canBeAssignedTo(argTypeName, paramType)) {
+                matched = false;
+                return;
+            }
+        });
+        if(matched) {
+            matchedVarargsMethod = info.method;
+        }
+    });
+
+    return matchedVarargsMethod;
+};
+
 // The global typings object
 const Typings = {
     add,
@@ -477,6 +562,11 @@ const Typings = {
     checkType,
     addStaticTypingName,
     getStaticTypingNames,
+    getMethodParamType,
+    maybeVarargsMethod,
+    findVarargsMethod,
+    hasVarargsInMethod,
+    prepTypings,
 };
 
 module.exports = Typings;

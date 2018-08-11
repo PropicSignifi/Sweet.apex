@@ -43,7 +43,13 @@ const MethodInvocation = (node, config) => {
     const typing = Typings.lookup(expressionType, AST.getRootTypeName(node), config);
     const result = Typings.getMethodType(typing, name, argTypes, config);
     if(!result) {
-        throw new Error(`Failed to resolve: ${name}(${argTypes.join(', ')})`);
+        let varargsMethod = Typings.findVarargsMethod(node, config);
+        if(varargsMethod) {
+            return varargsMethod.returnType;
+        }
+        else {
+            throw new Error(`Failed to resolve: ${name}(${argTypes.join(', ')})`);
+        }
     }
     else {
         return result;

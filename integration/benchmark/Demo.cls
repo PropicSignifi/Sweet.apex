@@ -69,6 +69,14 @@ public class Demo extends Sweet.BaseEnum {
         }
         return result;
     }
+    public static Integer product(List<Integer> nums) {
+        Integer result = 1;
+        for(Integer n : nums) {
+            result *= n;
+        }
+
+        return result;
+    }
 
     public class Animal implements Sweet.Reflectable {
         private String name;
@@ -195,21 +203,23 @@ public class Demo extends Sweet.BaseEnum {
             Integer result = (Integer)Demo.mod((Integer)a, (Integer)b);
             result = (Integer)((Func)R.inc).run(result);
 
+            result = product(new List<Integer>{ 1, 2, 3, 4 });
+
             String msg = 'Hello';
             Integer size = (msg != null ? msg.length() : null);
 
             Map<String, Integer> counts = new Map<String, Integer>{ 'key' => 1 };
             counts.put('key', counts.get('key') + 2);
 
-            Map<String, Object> destructure_16 = (Map<String, Object>)counts;
-            Integer key = (Integer)destructure_16.get('key');
-            List<Object> destructure_18 = (List<Object>)intList;
-            Integer first = (Integer)destructure_18.get(0);
-            Integer last = (Integer)destructure_18.get(destructure_18.size() - 1);
+            Map<String, Object> destructure_18 = (Map<String, Object>)counts;
+            Integer key = (Integer)destructure_18.get('key');
+            List<Object> destructure_20 = (List<Object>)intList;
+            Integer first = (Integer)destructure_20.get(0);
+            Integer last = (Integer)destructure_20.get(destructure_20.size() - 1);
             Double perimeter = 2 * Math.PI * key;
 
-            Object var_23_s = result;
-            if(var_23_s == 1) {
+            Object var_25_s = result;
+            if(var_25_s == 1) {
                 System.debug('correct');
             } else {
                 System.debug('incorrect');
