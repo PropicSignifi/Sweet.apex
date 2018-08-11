@@ -47,6 +47,10 @@ public enum Demo {
 
         result = product(1, 2, 3, 4);
 
+        result = (Integer)Demo.F.multiply.run(result, 2);
+
+        var cat = new Demo.Animal();
+
         var msg = 'Hello';
         var size = msg?.length();
 

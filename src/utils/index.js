@@ -152,6 +152,17 @@ const log = (message, config) => {
     }
 };
 
+// Warn the message
+const warn = (message, config) => {
+    if(!config) {
+        throw new Error('Config is not passed in');
+    }
+
+    if(!config.silent) {
+        console.warn(`Warn: ${message}`);
+    }
+};
+
 // Write to the file into the destination directory
 const writeToFile = (fileName, content, config) => {
     time(`Write File ${fileName}`, config);
@@ -210,6 +221,7 @@ module.exports = {
     timeEnd,
     normalize,
     log,
+    warn,
     writeToFile,
     writeToScriptFile,
     getName,

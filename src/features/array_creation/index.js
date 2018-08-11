@@ -101,7 +101,9 @@ const ArrayCreation = {
             }
             else if(current.parent.node === 'Assignment') {
                 const typeName = Typings.checkType(current.parent.leftHandSide, config);
-                typeNode = AST.parseType(typeName);
+                if(typeName) {
+                    typeNode = AST.parseType(typeName);
+                }
             }
 
             if(!typeNode) {

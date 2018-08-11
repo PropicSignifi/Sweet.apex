@@ -53,6 +53,7 @@ const loadTypeCheckers = () => {
 };
 
 // Check the node evaluated type
+// Return null if no matched type found
 const checkType = (node, config) => {
     if(!node) {
         throw new Error('Node does not exist');

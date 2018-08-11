@@ -48,10 +48,8 @@ const ImportStatic = {
         else if(current.node === 'SimpleName') {
             const topLevelType = AST.getTopLevelType(root);
 
-            try {
-                Typings.checkType(current, config);
-            }
-            catch(e) {
+            const type = Typings.checkType(current, config);
+            if(!type) {
                 const typingNames = Typings.getStaticTypingNames(getValue(topLevelType.name));
                 const variableName = getValue(current);
                 let matchedTypingName = null;
@@ -68,18 +66,13 @@ const ImportStatic = {
 
                     AST.transform(current, newNode);
                 }
-                else {
-                    throw e;
-                }
             }
         }
         else {
             const topLevelType = AST.getTopLevelType(root);
 
-            try {
-                Typings.checkType(current, config);
-            }
-            catch(e) {
+            const type = Typings.checkType(current, config);
+            if(!type) {
                 const typingNames = Typings.getStaticTypingNames(getValue(topLevelType.name));
                 const methodName = getValue(current.name);
                 const argTypes = _.chain(current.arguments)
@@ -101,9 +94,6 @@ const ImportStatic = {
                     };
 
                     AST.setChild(current, 'expression', expressionNode);
-                }
-                else {
-                    throw e;
                 }
             }
         }

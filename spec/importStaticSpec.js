@@ -7,6 +7,7 @@ const targetFile = 'ImportStaticDemo';
 const config = {
     features: ['import_static'],
     libraryDir: __dirname + '/../library',
+    silent: true,
 };
 
 Typings.addTyping({

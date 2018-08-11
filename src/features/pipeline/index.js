@@ -81,15 +81,17 @@ const Pipeline = {
         }
         else if(current.node === 'Assignment') {
             const typeName = Typings.checkType(current.leftHandSide, config);
-            const type = AST.parseType(typeName);
+            if(typeName) {
+                const type = AST.parseType(typeName);
 
-            const newNode = {
-                node: "CastExpression",
-                type,
-                expression: current.rightHandSide,
-            };
+                const newNode = {
+                    node: "CastExpression",
+                    type,
+                    expression: current.rightHandSide,
+                };
 
-            AST.setChild(current, 'rightHandSide', newNode);
+                AST.setChild(current, 'rightHandSide', newNode);
+            }
         }
     },
 };

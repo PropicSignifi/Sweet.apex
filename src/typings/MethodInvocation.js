@@ -25,6 +25,7 @@ const _ = require('lodash');
 const Typings = require('./index.js');
 const AST = require('../ast');
 const getValue = require('../valueProvider');
+const { warn, } = require('../utils');
 
 const MethodInvocation = (node, config) => {
     const name = getValue(node.name);
@@ -40,19 +41,25 @@ const MethodInvocation = (node, config) => {
         expressionType = getValue(type.name);
     }
 
-    const typing = Typings.lookup(expressionType, AST.getRootTypeName(node), config);
-    const result = Typings.getMethodType(typing, name, argTypes, config);
-    if(!result) {
-        let varargsMethod = Typings.findVarargsMethod(node, config);
-        if(varargsMethod) {
-            return varargsMethod.returnType;
+    if(expressionType) {
+        const typing = Typings.lookup(expressionType, AST.getRootTypeName(node), config);
+        const result = Typings.getMethodType(typing, name, argTypes, config);
+        if(!result) {
+            let varargsMethod = Typings.findVarargsMethod(node, config);
+            if(varargsMethod) {
+                return varargsMethod.returnType;
+            }
+            else {
+                warn(`Failed to resolve MethodInvocation: ${name}(${argTypes.join(', ')})`, config);
+                return null;
+            }
         }
         else {
-            throw new Error(`Failed to resolve: ${name}(${argTypes.join(', ')})`);
+            return result;
         }
     }
     else {
-        return result;
+        return null;
     }
 };
 

@@ -30,8 +30,13 @@ const ArrayAccess = (node, config) => {
     } = node;
 
     const type = Typings.checkType(array);
-    const typing = Typings.lookup(type, AST.getRootTypeName(node), config);
-    return _.last(typing.genericTypes);
+    if(type) {
+        const typing = Typings.lookup(type, AST.getRootTypeName(node), config);
+        return _.last(typing.genericTypes);
+    }
+    else {
+        return null;
+    }
 };
 
 module.exports = ArrayAccess;

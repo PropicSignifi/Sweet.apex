@@ -25,6 +25,7 @@ const getValue = require('../valueProvider');
 const AST = require('../ast');
 const Typings = require('../typings');
 const _ = require('lodash');
+const { warn, } = require('../utils');
 
 const SimpleName = (node, config) => {
     const name = getValue(node);
@@ -44,7 +45,20 @@ const SimpleName = (node, config) => {
                 return name;
             }
             else {
-                throw new Error('Failed to resolve identifier: ' + name);
+                warn('Failed to resolve SimpleName: ' + name, config);
+
+                // guess the unkown type
+                if(_.toUpper(name) === name) {
+                    // Constant name
+                    return null;
+                }
+                else if(_.toUpper(name[0]) === name[0]) {
+                    // Type name
+                    return name;
+                }
+                else {
+                    return null;
+                }
             }
         }
     }
