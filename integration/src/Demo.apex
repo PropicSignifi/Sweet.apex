@@ -51,7 +51,7 @@ public enum Demo {
 
         var cat = new Demo.Animal();
 
-        var msg = 'Hello';
+        var msg = 'Hello'.prefix('_');
         var size = msg?.length();
 
         Map<String, Integer> counts = { 'key': 1 };
@@ -70,6 +70,11 @@ public enum Demo {
         }
 
         return null;
+    }
+
+    @patch(String)
+    public static String prefix(String s, String prefix) {
+        return prefix + s;
     }
 
     @transaction

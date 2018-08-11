@@ -310,5 +310,9 @@ Combine Func calls into pipelines.
 
 Support var-args parameter in methods.
 
+- [patch](https://click-to-cloud.github.io/sweet-apex/docs/Features/patch.html)
+
+Support patching methods to a type.
+
 ## Feature Request
 If you have any feature request, you can submit it in the issues. Or you can submit a PR to implement your own feature.

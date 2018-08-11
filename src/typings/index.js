@@ -88,6 +88,24 @@ const typingsData = {};
 
 const varargsMethods = {};
 
+const patchMethods = {};
+
+const isValidPatchMethodInTyping = method => {
+    return !!_.find(method.annotations, a => a.typeName === 'patch');
+};
+
+const addPatchMethod = (typeName, method) => {
+    let methods = patchMethods[method.name];
+    if(!methods) {
+        methods = [];
+    }
+    methods.push({
+        typeName,
+        method,
+    });
+    patchMethods[method.name] = methods;
+};
+
 const prepTypings = () => {
     if(allTypings) {
         _.forEach(allTypings, typing => {
@@ -98,6 +116,10 @@ const prepTypings = () => {
             _.each(typing.methodDeclarations, method => {
                 if(hasVarargsInMethod(method)) {
                     addVarargsMethod(typeName, method);
+                }
+
+                if(isValidPatchMethodInTyping(method)) {
+                    addPatchMethod(typeName, method);
                 }
             });
 
@@ -180,22 +202,22 @@ const getSuperTypeNames = (typeName, config) => {
 };
 
 // capitalized names
-const canBeAssignedTo = (fromType, toType) => {
+const canBeAssignedTo = (fromType, toType, config) => {
     if(fromType === toType) {
         return true;
     }
 
-    const superTypes = getSuperTypeNames(fromType);
+    const superTypes = getSuperTypeNames(fromType, config);
     return _.includes(superTypes, toType);
 };
 
 // fromTypes case insensitive
 // toTypes capitalized
-const canArgTypesBeAssignedTo = (fromTypes, toTypes) => {
+const canArgTypesBeAssignedTo = (fromTypes, toTypes, config) => {
     for(let i in fromTypes) {
         const fromType = _.toUpper(fromTypes[i]);
         const toType = toTypes[i];
-        if(!canBeAssignedTo(fromType, toType)) {
+        if(!canBeAssignedTo(fromType, toType, config)) {
             return false;
         }
     }
@@ -285,7 +307,7 @@ const getMethodType = (typing, methodName, argTypes, config) => {
                 const refined = _.filter(found, method => {
                     const paramTypeNames = _.map(method.parameters, param => _.toUpper(param.type));
                     const argTypeNames = _.map(argTypes, type => _.toUpper(type));
-                    const canAssign = canArgTypesBeAssignedTo(argTypeNames, paramTypeNames);
+                    const canAssign = canArgTypesBeAssignedTo(argTypeNames, paramTypeNames, config);
                     return canAssign;
                 });
 
@@ -513,7 +535,11 @@ const getMethodParamType = (method, index) => {
 };
 
 const maybeVarargsMethod = current => {
-    return !!varargsMethods[getValue(current.name)]
+    return !!varargsMethods[getValue(current.name)];
+};
+
+const maybePatchMethod = current => {
+    return !!patchMethods[getValue(current.name)];
 };
 
 const findVarargsMethod = (current, config) => {
@@ -526,7 +552,7 @@ const findVarargsMethod = (current, config) => {
         if(matchedVarargsMethod) {
             return;
         }
-        if(!canBeAssignedTo(typeName, info.typeName)) {
+        if(!canBeAssignedTo(typeName, info.typeName, config)) {
             return;
         }
 
@@ -536,7 +562,7 @@ const findVarargsMethod = (current, config) => {
                 return;
             }
             const paramType = getMethodParamType(info.method, index);
-            if(!canBeAssignedTo(argTypeName, paramType)) {
+            if(!canBeAssignedTo(argTypeName, paramType, config)) {
                 matched = false;
                 return;
             }
@@ -547,6 +573,44 @@ const findVarargsMethod = (current, config) => {
     });
 
     return matchedVarargsMethod;
+};
+
+const findPatchInfo = (current, config) => {
+    const methodName = getValue(current.name);
+    if(!current.expression) {
+        return null;
+    }
+    const typeName = checkType(current.expression, config);
+    const argTypeNames = _.map(current.arguments, arg => checkType(arg, config));
+    const infos = patchMethods[methodName];
+    let matchedPatchMethod = null;
+    _.each(infos, info => {
+        if(matchedPatchMethod) {
+            return;
+        }
+
+        const patchType = _.find(info.method.annotations, a => a.typeName === 'patch').value;
+        if(!canBeAssignedTo(typeName, patchType, config)) {
+            return;
+        }
+
+        let matched = true;
+        _.each(argTypeNames, (argTypeName, index) => {
+            if(!matched) {
+                return;
+            }
+            const paramType = getMethodParamType(info.method, index + 1);
+            if(!canBeAssignedTo(argTypeName, paramType, config)) {
+                matched = false;
+                return;
+            }
+        });
+        if(matched) {
+            matchedPatchMethod = info;
+        }
+    });
+
+    return matchedPatchMethod;
 };
 
 // The global typings object
@@ -565,7 +629,9 @@ const Typings = {
     getStaticTypingNames,
     getMethodParamType,
     maybeVarargsMethod,
+    maybePatchMethod,
     findVarargsMethod,
+    findPatchInfo,
     hasVarargsInMethod,
     prepTypings,
 };

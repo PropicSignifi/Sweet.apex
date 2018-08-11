@@ -50,8 +50,14 @@ const MethodInvocation = (node, config) => {
                 return varargsMethod.returnType;
             }
             else {
-                warn(`Failed to resolve MethodInvocation: ${name}(${argTypes.join(', ')})`, config);
-                return null;
+                let patchInfo = Typings.findPatchInfo(node, config);
+                if(patchInfo) {
+                    return patchInfo.method.returnType;
+                }
+                else {
+                    warn(`Failed to resolve MethodInvocation: ${name}(${argTypes.join(', ')})`, config);
+                    return null;
+                }
             }
         }
         else {

@@ -36,6 +36,9 @@ public class Demo extends Sweet.BaseEnum {
         Object ret = aspect_execute(id, callback);
         return ret;
     }
+    public static String prefix(String s, String prefix) {
+        return prefix + s;
+    }
     public static void main() {
         Savepoint sp = Database.setSavepoint();
         try {
@@ -209,7 +212,7 @@ public class Demo extends Sweet.BaseEnum {
 
             Demo.Animal cat = new Demo.Animal();
 
-            String msg = 'Hello';
+            String msg = Demo.prefix('Hello', '_');
             Integer size = (msg != null ? msg.length() : null);
 
             Map<String, Integer> counts = new Map<String, Integer>{ 'key' => 1 };

@@ -26,6 +26,7 @@
         "var",
         "val",
         "varargs",
+        "patch",
         "mod",
         "pipeline",
         "map_access",
