@@ -25,6 +25,8 @@ const _ = require('lodash');
 const AST = require('../ast');
 const getValue = require('../valueProvider');
 
+let aliases = {};
+
 // Build the comments
 const buildComments = (node, parent, typingsConfig) => {
     if(!typingsConfig.includeComments) {
@@ -151,7 +153,7 @@ const buildMemberEnumDeclarations = (node, typingsConfig) =>
 const buildFieldDeclaration = (node, parent, typingsConfig) => {
     const modifiers = getModifiers(node, typingsConfig);
     const annotations = getAnnotations(node, typingsConfig);
-    const type = getValue(node.type);
+    const type = getRealType(getValue(node.type));
     const comments = buildComments(node, parent, typingsConfig);
 
     return _.chain(node.fragments)
@@ -201,7 +203,7 @@ const buildMethodDeclaration = (node, parent, typingsConfig) => {
     const parameters = _.map(node.parameters, param => {
         return {
             name: getValue(param.name),
-            type: getValue(param.type),
+            type: getRealType(getValue(param.type)),
             varargs: param.varargs,
         };
     });
@@ -213,7 +215,7 @@ const buildMethodDeclaration = (node, parent, typingsConfig) => {
         annotations,
         constructor,
         parameters,
-        returnType,
+        returnType: getRealType(returnType),
         comments,
     };
 };
@@ -292,21 +294,33 @@ const buildAnnotationDeclaration = (node, parent, typingsConfig) => {
     };
 };
 
+const getRealType = typeName => {
+    return typeName && aliases[typeName] ? aliases[typeName] : typeName;
+};
+
 // Build the doc object
 const buildDoc = (node, typingsConfig) => {
-    if(node.node === 'TypeDeclaration') {
-        if(node.interface) {
-            return buildInterfaceDeclaration(node, null, typingsConfig);
+    _.chain(node.imports)
+        .filter(i => !i.static && !!i.alias)
+        .each(i => {
+            aliases[getValue(i.alias)] = getValue(i.name);
+        })
+        .value();
+
+    const topLevelType = AST.getTopLevelType(node);
+    if(topLevelType.node === 'TypeDeclaration') {
+        if(topLevelType.interface) {
+            return buildInterfaceDeclaration(topLevelType, null, typingsConfig);
         }
         else {
-            return buildClassDeclaration(node, null, typingsConfig);
+            return buildClassDeclaration(topLevelType, null, typingsConfig);
         }
     }
-    else if(node.node === 'EnumDeclaration') {
-        return buildEnumDeclaration(node, null, typingsConfig);
+    else if(topLevelType.node === 'EnumDeclaration') {
+        return buildEnumDeclaration(topLevelType, null, typingsConfig);
     }
-    else if(node.node === 'AnnotationTypeDeclaration') {
-        return buildAnnotationDeclaration(node, null, typingsConfig);
+    else if(topLevelType.node === 'AnnotationTypeDeclaration') {
+        return buildAnnotationDeclaration(topLevelType, null, typingsConfig);
     }
     else {
         return {};

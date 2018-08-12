@@ -23,6 +23,7 @@
         "apexdoc",
         "array_creation",
         "import_static",
+        "import_as",
         "var",
         "val",
         "varargs",

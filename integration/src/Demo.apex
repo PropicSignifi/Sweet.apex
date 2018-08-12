@@ -1,4 +1,5 @@
 import static Math;
+import HttpRequest as Req;
 
 @log
 public enum Demo {
@@ -60,6 +61,8 @@ public enum Demo {
         Integer { key } = counts;
         Integer { first, _, last } = intList;
         Double perimeter = 2 * PI * key;
+
+        Req r = null;
 
         switch(result) {
             case 1:

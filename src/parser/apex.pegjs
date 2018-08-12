@@ -231,13 +231,13 @@ CompilationUnit
     }
 
 ImportDeclaration
-    = EmptyLines IMPORT stat:STATIC? name:QualifiedIdentifier asterisk:(DOT STAR)? SEMI
+    = EmptyLines IMPORT stat:STATIC? name:QualifiedIdentifier alias:(AS Identifier)? SEMI
     {
       return {
         node:    'ImportDeclaration',
         name:     name,
         static:   !!stat,
-        onDemand: !!extractOptional(asterisk, 1)
+        alias:    extractOptional(alias, 1)
       };
     }
     / SEMI
@@ -1732,6 +1732,7 @@ Keyword
       / "while"
       ) !LetterOrDigit
 
+AS           = Indent "as"           !LetterOrDigit Spacing
 BREAK        = Indent "break"        !LetterOrDigit Spacing
 CASE         = Indent "case"         !LetterOrDigit Spacing
 CATCH        = Indent "catch"        !LetterOrDigit Spacing

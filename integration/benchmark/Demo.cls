@@ -225,8 +225,10 @@ public class Demo extends Sweet.BaseEnum {
             Integer last = (Integer)destructure_24.get(destructure_24.size() - 1);
             Double perimeter = 2 * Math.PI * key;
 
-            Object var_29_s = result;
-            if(var_29_s == 1) {
+            HttpRequest r = null;
+
+            Object var_31_s = result;
+            if(var_31_s == 1) {
                 System.debug('correct');
             } else {
                 System.debug('incorrect');

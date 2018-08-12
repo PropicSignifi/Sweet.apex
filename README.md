@@ -314,5 +314,9 @@ Support var-args parameter in methods.
 
 Support patching methods to a type.
 
+- [import_as](https://click-to-cloud.github.io/sweet-apex/docs/Features/import_as.html)
+
+Import a type as an alias.
+
 ## Feature Request
 If you have any feature request, you can submit it in the issues. Or you can submit a PR to implement your own feature.

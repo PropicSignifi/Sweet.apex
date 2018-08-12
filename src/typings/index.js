@@ -439,9 +439,7 @@ const slim = target => {
 
 // Add typings from the AST node
 const add = (node, config) => {
-    const typeDeclaration = AST.getTopLevelType(node);
-
-    const typing = build(typeDeclaration, {
+    const typing = build(node, {
         includeComments: false,
     });
 

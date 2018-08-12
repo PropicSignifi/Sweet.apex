@@ -56,14 +56,13 @@ const writeToDoc = (fileName, content, config) => {
 const ApexDoc = {
     accept: ({ current, parent, root, }) => {
         const accepted =
-            (current.node === 'TypeDeclaration' ||
-            current.node === 'EnumDeclaration') &&
-            current === AST.getTopLevelType(root);
+            current.node === 'CompilationUnit';
         return accepted;
     },
 
     run: ({ current, parent, root, config, }) => {
-        const fileName = getValue(current.name);
+        const topLevelType = AST.getTopLevelType(current);
+        const fileName = getValue(topLevelType.name);
 
         const docs = buildDoc(current, {
             includeComments: true,
